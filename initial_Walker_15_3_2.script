@@ -1,0 +1,300 @@
+%General Mission Analysis Tool(GMAT) Script
+%Created: 2018-04-24 10:37:38
+
+
+%----------------------------------------
+%---------- Spacecraft
+%----------------------------------------
+
+
+% Plane 1
+Create Spacecraft Sat11;
+GMAT Sat11.DateFormat = TAIModJulian;
+GMAT Sat11.Epoch = '21545';
+GMAT Sat11.CoordinateSystem = EarthMJ2000Eq;
+GMAT Sat11.DisplayStateType = Keplerian;
+GMAT Sat11.SMA = 7377.999999999998;
+GMAT Sat11.ECC = 2.630395633637559e-016;
+GMAT Sat11.INC = 65;
+GMAT Sat11.RAAN = 360;
+GMAT Sat11.AOP = 0;
+GMAT Sat11.TA = 0;
+
+Create Spacecraft Sat12;
+GMAT Sat12.DateFormat = TAIModJulian;
+GMAT Sat12.Epoch = '21545';
+GMAT Sat12.CoordinateSystem = EarthMJ2000Eq;
+GMAT Sat12.DisplayStateType = Keplerian;
+GMAT Sat12.SMA = 7377.999999999998;
+GMAT Sat12.ECC = 1.357296367346912e-016;
+GMAT Sat12.INC = 65;
+GMAT Sat12.RAAN = 360;
+GMAT Sat12.AOP = 0;
+GMAT Sat12.TA = 72;
+
+Create Spacecraft Sat13;
+GMAT Sat13.DateFormat = TAIModJulian;
+GMAT Sat13.Epoch = '21545';
+GMAT Sat13.CoordinateSystem = EarthMJ2000Eq;
+GMAT Sat13.DisplayStateType = Keplerian;
+GMAT Sat13.SMA = 7377.999999999998;
+GMAT Sat13.ECC = 1.357296367346912e-016;
+GMAT Sat13.INC = 65;
+GMAT Sat13.RAAN = 360;
+GMAT Sat13.AOP = 0;
+GMAT Sat13.TA = 144;
+
+Create Spacecraft Sat14;
+GMAT Sat14.DateFormat = TAIModJulian;
+GMAT Sat14.Epoch = '21545';
+GMAT Sat14.CoordinateSystem = EarthMJ2000Eq;
+GMAT Sat14.DisplayStateType = Keplerian;
+GMAT Sat14.SMA = 7377.999999999998;
+GMAT Sat14.ECC = 1.357296367346912e-016;
+GMAT Sat14.INC = 65;
+GMAT Sat14.RAAN = 360;
+GMAT Sat14.AOP = 0;
+GMAT Sat14.TA = 216;
+
+Create Spacecraft Sat15;
+GMAT Sat15.DateFormat = TAIModJulian;
+GMAT Sat15.Epoch = '21545';
+GMAT Sat15.CoordinateSystem = EarthMJ2000Eq;
+GMAT Sat15.DisplayStateType = Keplerian;
+GMAT Sat15.SMA = 7377.999999999998;
+GMAT Sat15.ECC = 1.357296367346912e-016;
+GMAT Sat15.INC = 65;
+GMAT Sat15.RAAN = 360;
+GMAT Sat15.AOP = 0;
+GMAT Sat15.TA = 288;
+
+% Plane 2
+Create Spacecraft Sat21;
+GMAT Sat21.DateFormat = TAIModJulian;
+GMAT Sat21.Epoch = '21545';
+GMAT Sat21.CoordinateSystem = EarthMJ2000Eq;
+GMAT Sat21.DisplayStateType = Keplerian;
+GMAT Sat21.SMA = 7377.999999999998;
+GMAT Sat21.ECC = 2.630395633637559e-016;
+GMAT Sat21.INC = 65;
+GMAT Sat21.RAAN = 120;
+GMAT Sat21.AOP = 0;
+GMAT Sat21.TA = 48;
+
+Create Spacecraft Sat22;
+GMAT Sat22.DateFormat = TAIModJulian;
+GMAT Sat22.Epoch = '21545';
+GMAT Sat22.CoordinateSystem = EarthMJ2000Eq;
+GMAT Sat22.DisplayStateType = Keplerian;
+GMAT Sat22.SMA = 7377.999999999998;
+GMAT Sat22.ECC = 1.357296367346912e-016;
+GMAT Sat22.INC = 65;
+GMAT Sat22.RAAN = 120;
+GMAT Sat22.AOP = 0;
+GMAT Sat22.TA = 120;
+
+Create Spacecraft Sat23;
+GMAT Sat23.DateFormat = TAIModJulian;
+GMAT Sat23.Epoch = '21545';
+GMAT Sat23.CoordinateSystem = EarthMJ2000Eq;
+GMAT Sat23.DisplayStateType = Keplerian;
+GMAT Sat23.SMA = 7377.999999999998;
+GMAT Sat23.ECC = 1.357296367346912e-016;
+GMAT Sat23.INC = 65;
+GMAT Sat23.RAAN = 120;
+GMAT Sat23.AOP = 0;
+GMAT Sat23.TA = 192;
+
+Create Spacecraft Sat24;
+GMAT Sat24.DateFormat = TAIModJulian;
+GMAT Sat24.Epoch = '21545';
+GMAT Sat24.CoordinateSystem = EarthMJ2000Eq;
+GMAT Sat24.DisplayStateType = Keplerian;
+GMAT Sat24.SMA = 7377.999999999998;
+GMAT Sat24.ECC = 1.357296367346912e-016;
+GMAT Sat24.INC = 65;
+GMAT Sat24.RAAN = 120;
+GMAT Sat24.AOP = 0;
+GMAT Sat24.TA = 264;
+
+Create Spacecraft Sat25;
+GMAT Sat25.DateFormat = TAIModJulian;
+GMAT Sat25.Epoch = '21545';
+GMAT Sat25.CoordinateSystem = EarthMJ2000Eq;
+GMAT Sat25.DisplayStateType = Keplerian;
+GMAT Sat25.SMA = 7377.999999999998;
+GMAT Sat25.ECC = 1.357296367346912e-016;
+GMAT Sat25.INC = 65;
+GMAT Sat25.RAAN = 120;
+GMAT Sat25.AOP = 0;
+GMAT Sat25.TA = 336;
+
+% Plane 3
+Create Spacecraft Sat31;
+GMAT Sat31.DateFormat = TAIModJulian;
+GMAT Sat31.Epoch = '21545';
+GMAT Sat31.CoordinateSystem = EarthMJ2000Eq;
+GMAT Sat31.DisplayStateType = Keplerian;
+GMAT Sat31.SMA = 7377.999999999998;
+GMAT Sat31.ECC = 2.630395633637559e-016;
+GMAT Sat31.INC = 65;
+GMAT Sat31.RAAN = 240;
+GMAT Sat31.AOP = 0;
+GMAT Sat31.TA = 96;
+
+Create Spacecraft Sat32;
+GMAT Sat32.DateFormat = TAIModJulian;
+GMAT Sat32.Epoch = '21545';
+GMAT Sat32.CoordinateSystem = EarthMJ2000Eq;
+GMAT Sat32.DisplayStateType = Keplerian;
+GMAT Sat32.SMA = 7377.999999999998;
+GMAT Sat32.ECC = 1.357296367346912e-016;
+GMAT Sat32.INC = 65;
+GMAT Sat32.RAAN = 240;
+GMAT Sat32.AOP = 0;
+GMAT Sat32.TA = 168;
+
+Create Spacecraft Sat33;
+GMAT Sat33.DateFormat = TAIModJulian;
+GMAT Sat33.Epoch = '21545';
+GMAT Sat33.CoordinateSystem = EarthMJ2000Eq;
+GMAT Sat33.DisplayStateType = Keplerian;
+GMAT Sat33.SMA = 7377.999999999998;
+GMAT Sat33.ECC = 1.357296367346912e-016;
+GMAT Sat33.INC = 65;
+GMAT Sat33.RAAN = 240;
+GMAT Sat33.AOP = 0;
+GMAT Sat33.TA = 240;
+
+Create Spacecraft Sat34;
+GMAT Sat34.DateFormat = TAIModJulian;
+GMAT Sat34.Epoch = '21545';
+GMAT Sat34.CoordinateSystem = EarthMJ2000Eq;
+GMAT Sat34.DisplayStateType = Keplerian;
+GMAT Sat34.SMA = 7377.999999999998;
+GMAT Sat34.ECC = 1.357296367346912e-016;
+GMAT Sat34.INC = 65;
+GMAT Sat34.RAAN = 240;
+GMAT Sat34.AOP = 0;
+GMAT Sat34.TA = 312;
+
+Create Spacecraft Sat35;
+GMAT Sat35.DateFormat = TAIModJulian;
+GMAT Sat35.Epoch = '21545';
+GMAT Sat35.CoordinateSystem = EarthMJ2000Eq;
+GMAT Sat35.DisplayStateType = Keplerian;
+GMAT Sat35.SMA = 7377.999999999998;
+GMAT Sat35.ECC = 1.357296367346912e-016;
+GMAT Sat35.INC = 65;
+GMAT Sat35.RAAN = 240;
+GMAT Sat35.AOP = 0;
+GMAT Sat35.TA = 24;
+%----------------------------------------
+%---------- Formation
+%----------------------------------------
+
+Create Formation Formation1;
+GMAT Formation1.Add = {Sat11, Sat12, Sat13, Sat14, Sat15, Sat21, Sat22, Sat23, Sat24, Sat25, Sat31, Sat32, Sat33, Sat34, Sat35};
+
+
+
+
+%----------------------------------------
+%---------- ForceModels
+%----------------------------------------
+
+Create ForceModel DefaultProp_ForceModel;
+GMAT DefaultProp_ForceModel.CentralBody = Earth;
+GMAT DefaultProp_ForceModel.PrimaryBodies = {Earth};
+GMAT DefaultProp_ForceModel.Drag = None;
+GMAT DefaultProp_ForceModel.SRP = Off;
+GMAT DefaultProp_ForceModel.RelativisticCorrection = Off;
+GMAT DefaultProp_ForceModel.ErrorControl = RSSStep;
+GMAT DefaultProp_ForceModel.GravityField.Earth.Degree = 4;
+GMAT DefaultProp_ForceModel.GravityField.Earth.Order = 4;
+GMAT DefaultProp_ForceModel.GravityField.Earth.PotentialFile = 'JGM2.cof';
+GMAT DefaultProp_ForceModel.GravityField.Earth.EarthTideModel = 'None';
+
+%----------------------------------------
+%---------- Propagators
+%----------------------------------------
+
+Create Propagator DefaultProp;
+GMAT DefaultProp.FM = DefaultProp_ForceModel;
+GMAT DefaultProp.Type = RungeKutta89;
+GMAT DefaultProp.InitialStepSize = 60;
+GMAT DefaultProp.Accuracy = 9.999999999999999e-012;
+GMAT DefaultProp.MinStep = 0.001;
+GMAT DefaultProp.MaxStep = 2700;
+GMAT DefaultProp.MaxStepAttempts = 50;
+GMAT DefaultProp.StopIfAccuracyIsViolated = true;
+
+%----------------------------------------
+%---------- Subscribers
+%----------------------------------------
+
+Create OrbitView DefaultOrbitView;
+GMAT DefaultOrbitView.SolverIterations = Current;
+GMAT DefaultOrbitView.UpperLeft = [ 0.006470588235294118 0 ];
+GMAT DefaultOrbitView.Size = [ 0.5 0.4494949494949495 ];
+GMAT DefaultOrbitView.RelativeZOrder = 140;
+GMAT DefaultOrbitView.Maximized = false;
+GMAT DefaultOrbitView.Add = {Sat11, Sat12, Sat13, Sat14, Sat15, Sat21, Sat22, Sat23, Sat24, Sat25, Sat31, Sat32, Sat33, Sat34, Sat35, Earth};
+GMAT DefaultOrbitView.CoordinateSystem = EarthMJ2000Eq;
+GMAT DefaultOrbitView.DrawObject = [ true true true ];
+GMAT DefaultOrbitView.DataCollectFrequency = 1;
+GMAT DefaultOrbitView.UpdatePlotFrequency = 50;
+GMAT DefaultOrbitView.NumPointsToRedraw = 0;
+GMAT DefaultOrbitView.ShowPlot = true;
+GMAT DefaultOrbitView.ShowLabels = true;
+GMAT DefaultOrbitView.ViewPointReference = Earth;
+GMAT DefaultOrbitView.ViewPointVector = [ 30000 0 0 ];
+GMAT DefaultOrbitView.ViewDirection = Earth;
+GMAT DefaultOrbitView.ViewScaleFactor = 1;
+GMAT DefaultOrbitView.ViewUpCoordinateSystem = EarthMJ2000Eq;
+GMAT DefaultOrbitView.ViewUpAxis = Z;
+GMAT DefaultOrbitView.EclipticPlane = Off;
+GMAT DefaultOrbitView.XYPlane = On;
+GMAT DefaultOrbitView.WireFrame = Off;
+GMAT DefaultOrbitView.Axes = On;
+GMAT DefaultOrbitView.Grid = Off;
+GMAT DefaultOrbitView.SunLine = Off;
+GMAT DefaultOrbitView.UseInitialView = On;
+GMAT DefaultOrbitView.StarCount = 7000;
+GMAT DefaultOrbitView.EnableStars = On;
+GMAT DefaultOrbitView.EnableConstellations = On;
+
+Create GroundTrackPlot DefaultGroundTrackPlot;
+GMAT DefaultGroundTrackPlot.SolverIterations = Current;
+GMAT DefaultGroundTrackPlot.UpperLeft = [ 0.006470588235294118 0.4532828282828283 ];
+GMAT DefaultGroundTrackPlot.Size = [ 0.5 0.4494949494949495 ];
+GMAT DefaultGroundTrackPlot.RelativeZOrder = 113;
+GMAT DefaultGroundTrackPlot.Maximized = false;
+GMAT DefaultGroundTrackPlot.Add = {Sat11, Sat12, Sat13, Sat14, Sat15, Sat21, Sat22, Sat23, Sat24, Sat25, Sat31, Sat32, Sat33, Sat34, Sat35};
+GMAT DefaultGroundTrackPlot.DataCollectFrequency = 1;
+GMAT DefaultGroundTrackPlot.UpdatePlotFrequency = 50;
+GMAT DefaultGroundTrackPlot.NumPointsToRedraw = 0;
+GMAT DefaultGroundTrackPlot.ShowPlot = true;
+GMAT DefaultGroundTrackPlot.CentralBody = Earth;
+GMAT DefaultGroundTrackPlot.TextureMap = 'ModifiedBlueMarble.jpg';
+
+%----------------------------------------
+%---------- Arrays, Variables, Strings
+%----------------------------------------
+Create Variable T P F SMA INC;
+GMAT T = 15;
+GMAT P = 3;
+GMAT F = 2;
+GMAT SMA = 7378;
+GMAT INC = 65;
+
+
+
+
+
+%----------------------------------------
+%---------- Mission Sequence
+%----------------------------------------
+
+BeginMissionSequence;
+Propagate DefaultProp(Formation1) {Sat11.ElapsedSecs = 12000.0};

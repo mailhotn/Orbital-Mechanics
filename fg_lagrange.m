@@ -11,6 +11,7 @@ function [ R, V ] = fg_lagrange( R0, V0, dt, tol, mu )
 % r  - the final position vector (km)
 % v  - the final velocity vector (km/s)
 % dt - elapsed time (s)
+
 if nargin < 4
     tol = 1e-14;
 end
@@ -23,7 +24,7 @@ vr0 = dot(V0,R0)/r0;
 a = 2/r0 - v0^2/mu; % inverse of semimajor axis
 X = sqrt(mu)*abs(a)*dt;
 ratio = inf;
-while ratio > tol
+while ratio > tol % Newton - Raphson
     f = (r0*vr0/sqrt(mu))*X^2*StumC(a*X^2) +...
         (1-a*r0)*X^3*StumS(a*X^2) + r0*X - sqrt(mu)*dt;
     df = (r0*vr0/sqrt(mu))*X*(1 - a*X^2*StumS(a*X^2)) +...
@@ -34,8 +35,8 @@ end
 f = 1 - X^2/r0*StumC(a*X^2);
 g = dt - 1/sqrt(mu)*X^3*StumS(a*X^2);
 R = f*R0 + g*V0;
-rm = norm(R);
-df = sqrt(mu)/(rm*r0)*(a*X^3*StumS(a*X^2)-X);
-dg = 1 - X^2/rm*StumC(a*X^2);
+r = norm(R);
+df = sqrt(mu)/(r*r0)*(a*X^3*StumS(a*X^2)-X);
+dg = 1 - X^2/r*StumC(a*X^2);
 V = df*R0 + dg*V0;
 end

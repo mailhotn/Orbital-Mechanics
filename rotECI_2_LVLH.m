@@ -1,4 +1,4 @@
-function [ Rot ] = rotECI2Radial( O,i,w,th )
+function [ Rot ] = rotECI_2_LVLH( O,i,w,th )
 %UNTITLED8 Summary of this function goes here
 %   Detailed explanation goes here
 R1 = [ cos(O)*cos(w) - sin(O)*cos(i)*sin(w), - cos(O)*sin(w) - sin(O)*cos(i)*cos(w),  sin(O)*sin(i);
