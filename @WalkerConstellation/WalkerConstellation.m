@@ -1,58 +1,64 @@
-classdef WalkerConstellation  < handle
-    % WalkerConstellation is a class that defines an i-T/P/F Walker
+classdef WalkerConstellation < Constellation
+    % WalkerConstellation is a class that defines an i:T/P/F Walker
     % constellation
-    properties
+    properties (SetAccess = private)
         % constellation properties
-        T   = []; % total number of satellites
-        P   = []; % number of planes
-        F   = []; % between-plane phasing
-        inc = []; % inclination [deg]
-        alt = []; % altitude [km]
-        S   = []; % satellites per plane
-        PU  = []; % pattern unit
-        
-        % environment properties
-        mu  = []; % gravitational const [km^3/s^2]
-        Re  = []; % primary body equatorial radius [km]
-        J2  = []; % zonal harmonic
-        
+        F    % between-plane phasing
+        inc  % inclination [deg]
+        sma  % semi-major axis [km]        
+        S    % satellites per plane
+        PU   % pattern unit
     end
     
     methods
-        function WC = WalkerConstellation(varargin)
+        function WC = WalkerConstellation(T,P,F,inc,sma)
+            %%%% Pre Initialization %%%%
             switch nargin
                 case 0
-                    WC.T   = 15;
-                    WC.P   = 3;
-                    WC.inc = 55;
-                    WC.alt = 1000;
-                case 4 % Earth orbit
                     % constellation definition
-                    WC.T   = varargin{1};
-                    WC.P   = varargin{2};
-                    WC.F   = varargin{3};
-                    WC.inc = varargin{4};
-                    WC.alt = varargin{5};
-                    % primary definition
-                    WC.mu  = 398600.440;
-                    WC.Re  = 6378.14;
-                    WC.J2  = 0.0010826265;
+                    T        = 24;
+                    P        = 6;
+                    F        = 2;
+                    inc      = 55;
+                    sma      = 20180 + 6378.137;
+                case 5
+                    % Check input
+                    if mod(T,P) ~= 0
+                        error('Invalid T/P configuration')
+                    end
+                    if F > P-1
+                        error('F must be less than P')
+                    end
+                otherwise
+                    error('Wrong number of input arguments')
             end
+            
+            %%%% Object Initialization %%%%
+            % Call superclass constructor before accessing object
+            WC = WC@Constellation(T,P);
+            
+            %%%% Post Initialization %%%%
+            % property assignment
+            WC.F   = F;
+            WC.inc = inc;
+            WC.sma = sma;
             % derived properties
-            WC.S  = WC.T/WC.P;
-            WC.PU = 360/WC.T;
+            WC.S   = WC.N_sats/WC.N_planes;
+            WC.PU  = 360/WC.N_sats;
         end
         
         function OE = getInitElements(WC)
             % returns the orbital elements as a matrix of column vectors
-            % each column represents [a,e,i,RAAN,th*]
-            OE = zeros(5,WC.T);
-            OE(1,:) = WC.alt + WC.Re;
-            OE(3,:) = WC.inc;
-            for ii = 1:WC.P
-                OE(4,ii:ii+WC.S-1) = wrapTo360((ii-1)*WC.S*WC.PU);
-                OE(5,ii:ii+WC.S-1) = wrapTo360((ii-1)*WC.PU*WC.F:WC.PU*WC.P
-                    
+            % each column represents [a,e,i,RAAN,AOP,th*/th/Me].'
+            X = zeros(6,WC.N_sats);
+            X(1,:) = WC.sma;
+            X(3,:) = WC.inc;
+            for ii = 1:WC.N_planes
+                X(4,((ii-1)*WC.S+1):ii*WC.S) = wrapTo360((ii-1)*WC.S*WC.PU);
+                X(6,((ii-1)*WC.S+1):ii*WC.S) = wrapTo360((ii-1)*WC.PU*WC.F...
+                    :WC.PU*WC.N_planes:(ii-1)*WC.PU*WC.F+(WC.S-1)*WC.PU*WC.N_planes);
+            end
+            OE = X;
         end
-    end 
+    end
 end
