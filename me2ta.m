@@ -1,4 +1,4 @@
-function [ th ] = mean2true_anomaly( Me , e, tol)
+function [ th ] = me2ta( Me , e, tol)
 %mean2true_anomaly Calculates the True anomaly (in radians) corresponding 
 % to the given Mean anomaly (in radians)
 if nargin < 3

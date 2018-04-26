@@ -1,8 +1,9 @@
-function [ a, e, i, O, w, th ] = state2elements( R, V ,mu )
+function OE = eci2oe( R, V ,mu )
 %state2elements calculate orbital elements from state in geocentric
 %equatorial reference frame. Accepts R and V matrices of N different points
-%and outputs the elements as 1xN vectors
+%and outputs the elements as a 6xN matrix
 %
+% outputs:    OE = [a; e; i; O; w; th];
 %  ~~~~~~~~~~   Variables    ~~~~~~~~~~~
 % mu - gravitational parameter (km^3/s^2)
 % e  - eccentricity
@@ -42,4 +43,5 @@ th = (vr>=0).*acosd(dot(E,R,1)./(e.*r)) + ...
     (vr<0).*(360 - acosd(dot(E,R,1)./(e.*r)));
 
 a = h.^2./(mu*(1-e.^2));
+OE = [a; e; i; O; w; th];
 end
