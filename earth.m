@@ -1,6 +1,7 @@
 function earthstruct = earth()
 %earth Returns a struct containing Earth physical characteristics
 % all values are taken from JPL HORIZONS database
+% ~~~~~~~~~~~ Might be better as a Class ~~~~~~~~~~~
 %
 %  ~~~~~~~~~~   Attributes    ~~~~~~~~~~~
 % mu - gravitational parameter (km^3/s^2)
