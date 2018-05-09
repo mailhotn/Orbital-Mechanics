@@ -1,5 +1,5 @@
 function [ th ] = me2ta( Me , e, tol)
-%mean2true_anomaly Calculates the True anomaly (in degrees) corresponding 
+%me2ta Calculates the True anomaly (in degrees) corresponding 
 % to the given Mean anomaly (in degrees)
 if nargin < 3
     tol = 1e-14;

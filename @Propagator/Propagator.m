@@ -65,6 +65,10 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             IC = reshape(P.Con.getInitECI,[6*P.Con.N_sats,1]);
             [Time, X] = ode45(@P.dyn_ECI_J2,T,IC,opts);
         end
+        
+        function [Time, X] = prop_OE_Mean(P,T)
+            
+        end
     end
     
     methods(Access = protected) % Equations of Motion

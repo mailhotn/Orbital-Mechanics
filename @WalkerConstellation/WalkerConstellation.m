@@ -68,6 +68,10 @@ classdef WalkerConstellation < Constellation
             [R, V] = oe2eci(OE,WC.mu);
             X = [R; V];
         end
+        
+        function OE_m = getInitMeanElements(WC)
+            
+        end
     end
     
     methods(Access = protected, Sealed)
