@@ -31,6 +31,7 @@ O  = OE(4,:);
 w  = OE(5,:);
 th = OE(6,:);
 
+% state in perifocal frame:
 r = a.*(1-e.^2)./(1+e.*cosd(th)).*[cosd(th); sind(th); zeros(1,length(th))];
 v_p = sqrt(mu./a./(1-e.^2)).*(1+e.*cosd(th));
 v_r = sqrt(mu./a./(1-e.^2)).*(e.*sind(th));

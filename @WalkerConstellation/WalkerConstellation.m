@@ -50,17 +50,8 @@ classdef WalkerConstellation < Constellation
         end
         
         function OE = getInitElements(WC)
-            % returns the orbital elements as a matrix of column vectors
-            % each column represents [a,e,i,RAAN,AOP,th*/th/Me].'
-            X = zeros(6,WC.N_sats);
-            X(1,:) = WC.alt + WC.R;
-            X(3,:) = WC.inc;
-            for ii = 1:WC.N_planes
-                X(4,((ii-1)*WC.S+1):ii*WC.S) = wrapTo360((ii-1)*WC.S*WC.PU);
-                X(6,((ii-1)*WC.S+1):ii*WC.S) = wrapTo360((ii-1)*WC.PU*WC.F...
-                    :WC.PU*WC.N_planes:(ii-1)*WC.PU*WC.F+(WC.S-1)*WC.PU*WC.N_planes);
-            end
-            OE = X;
+            OE_m = WC.getInitMeanElements();
+            OE = me2osc(OE_m,WC.J2,WC.Re);
         end
         
         function X = getInitECI(WC)
@@ -70,7 +61,17 @@ classdef WalkerConstellation < Constellation
         end
         
         function OE_m = getInitMeanElements(WC)
-            
+                        % returns the orbital elements as a matrix of column vectors
+            % each column represents [a,e,i,RAAN,AOP,th*/th/Me].'
+            X = zeros(6,WC.N_sats);
+            X(1,:) = WC.alt + WC.Re;
+            X(3,:) = WC.inc;
+            for ii = 1:WC.N_planes
+                X(4,((ii-1)*WC.S+1):ii*WC.S) = wrapTo360((ii-1)*WC.S*WC.PU);
+                X(6,((ii-1)*WC.S+1):ii*WC.S) = wrapTo360((ii-1)*WC.PU*WC.F...
+                    :WC.PU*WC.N_planes:(ii-1)*WC.PU*WC.F+(WC.S-1)*WC.PU*WC.N_planes);
+            end
+            OE_m = X;
         end
     end
     
@@ -80,7 +81,7 @@ classdef WalkerConstellation < Constellation
             propgroups(1).Title = 'Constellation Definitions';
             propgroups(1).PropertyList = {'N_sats','N_planes','F','inc','alt','PU','S'};
             propgroups(2).Title = 'Primary Body Characteristics';
-            propgroups(2).PropertyList = {'mu','R','J2'};
+            propgroups(2).PropertyList = {'mu','Re','J2'};
         end
     end
 end

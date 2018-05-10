@@ -7,7 +7,7 @@ classdef Constellation < handle  &  matlab.mixin.CustomDisplay
         N_planes % Number of planes
         % environment
         mu % gravitational constant [km^3/s^2]
-        R  % primary radius [km]
+        Re  % primary radius [km]
         J2 % primary J2 harmonic
     end
     
@@ -31,7 +31,7 @@ classdef Constellation < handle  &  matlab.mixin.CustomDisplay
             C.N_sats   = N_sats;
             C.N_planes = N_planes;
             C.mu       = primary.mu;
-            C.R        = primary.R;
+            C.Re       = primary.Re;
             C.J2       = primary.J2;
         end
     end

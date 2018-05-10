@@ -67,7 +67,43 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         end
         
         function [Time, X] = prop_OE_Mean(P,T)
-            
+            opts = odeset('reltol',P.reltol,'abstol',P.abstol);
+            IC = reshape(P.Con.getInitMeanElements,[6*P.Con.N_sats,1]);
+            [Time, X] = ode45(@P.dyn_OE_Mean,T,IC,opts);
+        end
+        
+        function [Time, X] = prop_OE_Mean_lin(P,T)
+            IC = reshape(P.Con.getInitMeanElements,[6*P.Con.N_sats,1]);
+            dT = T(2) - T(1);
+            % move stuff around
+            order = 6*P.Con.N_sats;
+            X2 = reshape(IC,[6,P.Con.N_sats]);
+            aV = X2(1,:);
+            eV = X2(2,:);
+            iV = X2(3,:);
+            a = reshape(repmat(aV,6,1),order,1);
+            e = reshape(repmat(eV,6,1),order,1);
+            i = reshape(repmat(iV,6,1),order,1);
+            % Derived values
+            p = a.*(1-e.^2);
+            n = sqrt(P.Con.mu./a.^3);
+            eta = sqrt(1-e.^2);
+            % Eq of motion
+            dO = 180/pi*repmat([0,0,0,1,0,0].',P.Con.N_sats,1).*...
+                (-3/2*P.Con.J2.*(P.Con.R./p).^2.*n.*cosd(i));
+            dw = 180/pi*repmat([0,0,0,0,1,0].',P.Con.N_sats,1).*...
+                (3/4*P.Con.J2.*(P.Con.R./p).^2.*n.*(5*cosd(i).^2-1));
+            dM = 180/pi*repmat([0,0,0,0,0,1].',P.Con.N_sats,1).*...
+                (3/4*P.Con.J2.*(P.Con.R./p).^2.*n.*eta.*(3*cosd(i).^2-1));
+            dX = dO + dw + dM;
+            % Propagate
+            X = zeros(order,length(T));
+            X(:,1) = IC;
+            for ii = 2:length(T)
+                X(:,ii) = X(:,ii-1)+ dX*dT;
+            end
+            X = X.';
+            Time = T;
         end
     end
     
@@ -75,7 +111,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         % equations of motion functions should only be called by prop
         % functions, thus they are protected
         
-        function dX = dyn_ECI_TB(P,t,X) %#ok
+        function dX = dyn_ECI_TB(P,t,X)  %#ok<INUSL>
             % move stuff around
             order = 6*P.Con.N_sats;
             X2 = reshape(X,[6,P.Con.N_sats]);
@@ -91,12 +127,12 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             dX = circshift(V2,-3) - circshift(P.Con.mu*R2./r_vec.^3,3);
         end
         
-        function dX = dyn_ECI_TB_for(P,t,X) %#ok
+        function dX = dyn_ECI_TB_for(P,t,X) %#ok<INUSL>
             r = norm(X(1:3));
             dX = [X(4:6);-P.Con.mu*X(1:3)/r^3];
         end
         
-        function dX = dyn_ECI_TB_for2(P,t,X) %#ok
+        function dX = dyn_ECI_TB_for2(P,t,X) %#ok<INUSL>
             order = 6*P.Con.N_sats;
             dX = zeros(order,1);
             for ii = 1:P.Con.N_sats
@@ -108,7 +144,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             end
         end
         
-        function dX = dyn_ECI_J2(P,t,X) %#ok
+        function dX = dyn_ECI_J2(P,t,X) %#ok<INUSL>
             % move stuff around
             order = 6*P.Con.N_sats;
             X2 = reshape(X,[6,P.Con.N_sats]);
@@ -124,14 +160,39 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             Z2 = [zeros(3,2),ones(3,1),zeros(3);zeros(3,6)]*X2;
             Z2 = reshape(Z2,[order,1]);
             % equation of motion
-            f_J2 = -P.Con.mu*P.Con.J2*P.Con.R^2./r.^4.*...
+            f_J2 = -P.Con.mu*P.Con.J2*P.Con.Re^2./r.^4.*...
                    (3*Z./r + (-7.5*(Z2./r).^2 + 1.5).*R2./r);
             dX = circshift(V2,-3) + circshift(-P.Con.mu*R2./r.^3 + f_J2,3);
         end
+        
+        function dX = dyn_OE_Mean(P,t,X) %#ok<INUSL>
+            % move stuff around
+            order = 6*P.Con.N_sats;
+            X2 = reshape(X,[6,P.Con.N_sats]);
+            aV = X2(1,:);
+            eV = X2(2,:);
+            iV = X2(3,:);
+            a = reshape(repmat(aV,6,1),order,1);
+            e = reshape(repmat(eV,6,1),order,1);
+            i = reshape(repmat(iV,6,1),order,1);
+            % Derived values
+            p = a.*(1-e.^2);
+            n = sqrt(P.Con.mu./a.^3);
+            eta = sqrt(1-e.^2);
+            % Eq of motion
+            dO = 180/pi*repmat([0,0,0,1,0,0].',P.Con.N_sats,1).*...
+                (-3/2*P.Con.J2.*(P.Con.Re./p).^2.*n.*cosd(i));
+            dw = 180/pi*repmat([0,0,0,0,1,0].',P.Con.N_sats,1).*...
+                (3/4*P.Con.J2.*(P.Con.Re./p).^2.*n.*(5*cosd(i).^2-1));
+            dM = 180/pi*repmat([0,0,0,0,0,1].',P.Con.N_sats,1).*...
+                (3/4*P.Con.J2.*(P.Con.Re./p).^2.*n.*eta.*(3*cosd(i).^2-1));
+            dX = dO + dw + dM;
+        end
+        
     end
     
     methods(Access = protected, Sealed)
-        function propgroups = getPropertyGroups(P) %#ok
+        function propgroups = getPropertyGroups(P)  %#ok<MANU>
             propgroups = matlab.mixin.util.PropertyGroup;
             propgroups(1).Title = 'Propagation Definitions';
             propgroups(1).PropertyList = {'reltol','abstol','Con'};

@@ -9,7 +9,7 @@ function earthstruct = earth()
 % J2 - zonal harmonic
 
 earthstruct.mu = 398600.440;
-earthstruct.R  = 6378.137;
+earthstruct.Re = 6378.137;
 earthstruct.J2 = 0.0010826265;
 
 end
