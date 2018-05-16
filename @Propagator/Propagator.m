@@ -90,11 +90,11 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             eta = sqrt(1-e.^2);
             % Eq of motion
             dO = 180/pi*repmat([0,0,0,1,0,0].',P.Con.N_sats,1).*...
-                (-3/2*P.Con.J2.*(P.Con.R./p).^2.*n.*cosd(i));
+                (-3/2*P.Con.J2.*(P.Con.Re./p).^2.*n.*cosd(i));
             dw = 180/pi*repmat([0,0,0,0,1,0].',P.Con.N_sats,1).*...
-                (3/4*P.Con.J2.*(P.Con.R./p).^2.*n.*(5*cosd(i).^2-1));
+                (3/4*P.Con.J2.*(P.Con.Re./p).^2.*n.*(5*cosd(i).^2-1));
             dM = 180/pi*repmat([0,0,0,0,0,1].',P.Con.N_sats,1).*...
-                (3/4*P.Con.J2.*(P.Con.R./p).^2.*n.*eta.*(3*cosd(i).^2-1));
+                (3/4*P.Con.J2.*(P.Con.Re./p).^2.*n.*eta.*(3*cosd(i).^2-1));
             dX = dO + dw + dM;
             % Propagate
             X = zeros(order,length(T));

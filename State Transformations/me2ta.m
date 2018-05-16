@@ -7,7 +7,7 @@ end
 Me = Me*pi/180;
 
 E = (Me < pi).*(Me+e) + (Me >= pi).*(Me-e);
-dE = inf*ones(length(Me));
+dE = inf*ones(1,length(Me));
 
 while norm(dE,inf) > tol
     dE = -(E-e.*sin(E)-Me)./(1-e.*cos(E));

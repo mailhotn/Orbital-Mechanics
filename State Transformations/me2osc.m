@@ -1,10 +1,11 @@
-function [OE_osc] = me2osc(OE_m,J2,R)
+function [OE_osc] = me2osc(OE_m,J2,Re)
 %me2osc Calculates the osculating orbital elements of a satellite
 %   Based on algorithm in appendix F of "Analytical Mechanics of Space
 %   Systems" Schaub & Junkins- Second Edition
 %   Accepts a 6xN Matrix of oscillating elements in the following order:
-% e  - eccentricity
+%
 % a  - semimajor axis (km)
+% e  - eccentricity
 % i  - inclination relative to equatorial plane (deg)
 % O  - right ascension of ascending node (deg)
 % w  - argument of periapsis (deg)
@@ -14,7 +15,7 @@ function [OE_osc] = me2osc(OE_m,J2,R)
 if nargin == 1
     primary = earth();
     J2 = primary.J2;
-    R = primary.R;
+    Re = primary.Re;
 end
 
 a0 = OE_m(1,:);
@@ -27,7 +28,7 @@ TA = me2ta(M0,e0);
 M0 = pi/180*M0;
 TA = pi/180*TA;
 
-g2 = J2/2*(R./a0).^2;
+g2 = J2/2*(Re./a0).^2;
 
 % Check inclination singularity
 epsilon = 0.05;
