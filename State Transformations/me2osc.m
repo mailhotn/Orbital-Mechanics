@@ -83,7 +83,9 @@ M1 = atan2(d1,d2);
 e1 = sqrt(d1.^2 + d2.^2);
 
 O1 = atan2(d3,d4);
-
+if any(sqrt(d3.^2 + d4.^2)>1)
+    bla = 4;
+end
 i1 = 2*asin(sqrt(d3.^2 + d4.^2));
 
 w1 = argsum - M1 - O1;

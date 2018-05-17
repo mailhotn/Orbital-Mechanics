@@ -1,4 +1,4 @@
-function [X_IS] = sats_in_sight_sphere( X_ECEF, X_GS, e_min, Re )
+function [X_IS] = sats_in_sight( X_ECEF, X_GS, e_min, Re )
 %sats_in_sight_sphere Gets satellites in line of sight to Ground Station
 %   Algorithm adapted from "Orbit and Constellation Design and Management"
 %   by James R Wertz 2001, page 423.
@@ -7,6 +7,7 @@ function [X_IS] = sats_in_sight_sphere( X_ECEF, X_GS, e_min, Re )
 % * X_ECEF - 6xN Matrix of satellites states in ECEF frame
 % * X_GS   - 3x1 position vector of ground station in ECEF frame
 % * e_min  - minimum acceptable elevation angle (deg)
+% * Re     - LOCAL Earth radius at ground station <<<<<<<<<<<<<<<<<<<<<<<<<
 
 %%
 N = size(X_ECEF,2);
@@ -26,6 +27,5 @@ elev   = acosd(dot(P_hat,O_hat,1))-90;
 sight = ((diff<1e-6).*(elev>=e_min));
 
 X_IS = X_ECEF(:,sight==1);
-
 end
 

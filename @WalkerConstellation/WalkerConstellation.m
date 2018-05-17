@@ -49,13 +49,14 @@ classdef WalkerConstellation < Constellation
             WC.PU  = 360/WC.N_sats;
         end
         
-        function OE = getInitElements(WC)
+        function OE = getInitElements(WC) %[a e i O w M]
             OE_m = WC.getInitMeanElements();
             OE = me2osc(OE_m,WC.J2,WC.Re);
         end
         
         function X = getInitECI(WC)
             OE = WC.getInitElements;
+            OE(6,:) = me2ta(OE(6,:),OE(2,:));
             [R, V] = oe2eci(OE,WC.mu);
             X = [R; V];
         end

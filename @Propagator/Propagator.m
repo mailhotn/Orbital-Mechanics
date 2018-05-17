@@ -29,6 +29,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         
         function [Time, X] = prop_ECI_TB(P,T)
             % Propagate for time T in ECI frame with no perturbations
+            % This should be replaced with Analytical Solution
             % Complexity ~O(T)
             opts = odeset('reltol',P.reltol,'abstol',P.abstol);
             IC = reshape(P.Con.getInitECI,[6*P.Con.N_sats,1]);
@@ -46,7 +47,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                  [Time, tX] = ode45(@P.dyn_ECI_TB_for,T,IC(:,ii),opts);
                  X = [X,tX];%#ok
             end
-        end
+        end 
         
         function [Time, X] = prop_ECI_TB_for2(P,T)
             % Propagate for time T in ECI frame with no perturbations
@@ -104,6 +105,12 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             end
             X = X.';
             Time = T;
+        end
+        
+        function [Time, X] = prop_OE_Osc(P,T)
+            opts = odeset('reltol',P.reltol,'abstol',P.abstol);
+            IC = reshape(P.Con.getInitElements,[6*P.Con.N_sats,1]);
+            [Time, X] = ode45(@P.dyn_OE_Osc,T,IC,opts);
         end
     end
     
@@ -187,6 +194,10 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             dM = 180/pi*repmat([0,0,0,0,0,1].',P.Con.N_sats,1).*...
                 (3/4*P.Con.J2.*(P.Con.Re./p).^2.*n.*eta.*(3*cosd(i).^2-1));
             dX = dO + dw + dM;
+        end
+        
+        function dX = dyn_OE_Osc(P,t,X)
+            
         end
         
     end
