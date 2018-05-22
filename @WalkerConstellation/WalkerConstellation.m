@@ -29,7 +29,8 @@ classdef WalkerConstellation < Constellation
             end
             % Check input
             if mod(T,P) ~= 0
-                error('T/P must be a whole number')
+                error(['T/P must be a whole number, T = '...
+                    num2str(T) ' P = ' num2str(P)])
             end
             if F > P-1
                 error('F must be less than P')
