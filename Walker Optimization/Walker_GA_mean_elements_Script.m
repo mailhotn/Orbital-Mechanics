@@ -31,9 +31,9 @@ datafolder = 'C:\Users\User\Dropbox\Walker Optimization Data';
 delete([datafolder '\error.txt']) % clear IFTT error file
 N = 300;
 p = primes(N);
-for T = 166:N
+for T = 249:N
     if ~any(T == p)
-        GAsol = []; fit = []; sol = [];
+        GAsol = []; fit = []; sol = []; %#ok<NASGU>
         % Set T-dependant bounds
         P_UB = floor(T/2);
         F_UB = floor(T/2)-1;
@@ -61,8 +61,12 @@ for T = 166:N
             sol.GMST0 = GAsol(5);
             sol.fit = fit;
             save([datafolder '\Walker_Mean_Sol_T_' num2str(T) '_fit_' num2str(fit) '.mat'],'sol');
-        catch
-            fopen([datafolder '\error.txt'],'w'); % create error file for IFTT phone notification
+        catch ME
+            c = clock;
+            fileID = fopen([datafolder '\error'...
+                num2str(c(3)) '_' num2str(c(2)) '_' num2str(c(4)) '_' num2str(c(5)) '.txt'],'w'); % create error file for IFTT phone notification
+            fprintf(fileID,ME.message);
+            rethrow(ME)
         end
     end
 end

@@ -64,7 +64,7 @@ classdef WalkerConstellation < Constellation
         
         function OE_m = getInitMeanElements(WC)
             % returns the orbital elements as a matrix of column vectors
-            % each column represents [a,e,i,RAAN,AOP,th*/th/Me].'
+            % each column represents [a,e,i,RAAN,AOP,Me].'
             X = zeros(6,WC.N_sats);
             X(1,:) = WC.alt + WC.Re;
             X(3,:) = WC.inc;

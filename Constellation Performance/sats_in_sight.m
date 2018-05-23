@@ -7,7 +7,7 @@ function [X_IS] = sats_in_sight( X_ECEF, X_GS, e_min, Re )
 % * X_ECEF - 6xN Matrix of satellites states in ECEF frame
 % * X_GS   - 3x1 position vector of ground station in ECEF frame
 % * e_min  - minimum acceptable elevation angle (deg)
-% * Re     - LOCAL Earth radius at ground station <<<<<<<<<<<<<<<<<<<<<<<<<
+% * Re     - >>>>> LOCAL <<<<< Earth radius at ground station 
 
 %%
 N = size(X_ECEF,2);
