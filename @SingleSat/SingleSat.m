@@ -8,7 +8,7 @@ classdef SingleSat < Constellation
         inc  % inclination [deg]
         raan % right ascension of ascending node [deg]
         aop  % argument of perigee [deg]
-        th   % true anomaly [deg]
+        me   % Mean anomaly [deg]
     end
     
     methods
@@ -16,8 +16,8 @@ classdef SingleSat < Constellation
             %%%% Pre Initialization %%%%
             switch nargin
                 case 0 % default - Hubble
-                    OE = [6917.5, 0.0002455, 28.4690,...
-                          103.9640, 294.6441, 0].';
+                    OE = [6917.5, 0.000287, 28.47,...
+                          176.23, 82.61, 319.41].';
                     primary = earth();
                 case 1 % earth orbit
                     primary = earth();
@@ -37,15 +37,21 @@ classdef SingleSat < Constellation
             Sat.inc  = OE(3);
             Sat.raan = OE(4);
             Sat.aop  = OE(5);
-            Sat.th   = OE(6);
+            Sat.me   = OE(6);
+        end
+        
+        function OE_m = getInitMeanElements(Sat)
+            OE_m = [Sat.sma,Sat.e,Sat.inc,Sat.raan,Sat.aop,Sat.me].';
         end
         
         function OE = getInitElements(Sat)
-            OE = [Sat.sma,Sat.e,Sat.inc,Sat.raan,Sat.aop,Sat.th].';
+            OE_m = Sat.getInitMeanElements;
+            OE = me2osc(OE_m,Sat.J2,Sat.Re);
         end
         
         function X = getInitECI(Sat)
-            OE = [Sat.sma,Sat.e,Sat.inc,Sat.raan,Sat.aop,Sat.th].';
+            OE = Sat.getInitElements;
+            OE(6) = me2ta(OE(6),OE(2));
             [R, V] = oe2eci(OE,Sat.mu);
             X = [R; V];
         end
@@ -55,7 +61,7 @@ classdef SingleSat < Constellation
         function propgroups = getPropertyGroups(Sat) %#ok
             propgroups = matlab.mixin.util.PropertyGroup;
             propgroups(1).Title = 'Satellite Orbital Elements';
-            propgroups(1).PropertyList = {'sma','e','inc','raan','aop','th'};
+            propgroups(1).PropertyList = {'sma','e','inc','raan','aop','me'};
             propgroups(2).Title = 'Primary Body Characteristics';
             propgroups(2).PropertyList = {'mu','R','J2'};
         end

@@ -28,4 +28,7 @@ if cond(G) <= 1e10
 else
     PDOP = 20;
 end
+if PDOP > 20
+    PDOP = 20;
+end
 end

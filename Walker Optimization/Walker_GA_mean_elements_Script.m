@@ -9,9 +9,10 @@ nParams = 5;
 % Integer Values
 intCon = [1,2]; % P,F
 % GA Options
-options = gaoptimset('UseParallel',true);%...
+options = gaoptimset('UseParallel',true...
+                    ,'PopulationSize',50);
 %     ,'PlotFcns',{@gaplotbestf,@gaplotscorediversity,@gaplotrange,@gaplotexpectation}...
-%     ,'PopulationSize',1000);
+
 
 % Bounds
 P_LB = 1;
@@ -31,7 +32,7 @@ datafolder = 'C:\Users\User\Dropbox\Walker Optimization Data';
 delete([datafolder '\error.txt']) % clear IFTT error file
 N = 300;
 p = primes(N);
-for T = 249:N
+for T = 50:N
     if ~any(T == p)
         GAsol = []; fit = []; sol = []; %#ok<NASGU>
         % Set T-dependant bounds
@@ -46,10 +47,11 @@ for T = 249:N
                 ,nParams,[],[],[],[],LB,UB,@(x)Walker_GA_nonlcon(x,T),intCon,options);
             opt_time = toc;
             c = clock;
-            disp([newline num2str(c(3)) '-' num2str(c(2)) ' ' num2str(c(4)) ':' num2str(c(5)) ':' num2str(c(6))...
+            disp([newline num2str(c(3)) '/' num2str(c(2)) ' ' num2str(c(4)) ':' num2str(c(5)) ':' num2str(c(6),2)...
                 newline 'Optimization Complete for T = ' num2str(T)...
                 newline 'Maximum PDOP(fitness): ' num2str(fit)...
-                newline 'Elapsed Time: ' num2str(opt_time) ' seconds'...
+                newline 'Elapsed Time: ' num2str((opt_time-mod(opt_time,60))/60) ' min '...
+                num2str(mod(opt_time,60),3) ' sec'...
                 newline 'Optimal Solution (i/alt:T/P/F): '...
                 num2str(GAsol(3)) '°/' num2str(GAsol(4)) ':' num2str(T) '/' num2str(GAsol(1))...
                 '/' num2str(GAsol(2)) newline])
@@ -60,7 +62,7 @@ for T = 249:N
             sol.alt = GAsol(4);
             sol.GMST0 = GAsol(5);
             sol.fit = fit;
-            save([datafolder '\Walker_Mean_Sol_T_' num2str(T) '_fit_' num2str(fit) '.mat'],'sol');
+            save([datafolder '\Walker_Mean_Sol_T_' num2str(T) '.mat'],'sol');
         catch ME
             c = clock;
             fileID = fopen([datafolder '\error'...

@@ -21,9 +21,9 @@ end
 a0 = OE_osc(1,:);
 e0 = OE_osc(2,:);
 i0 = pi/180*OE_osc(3,:);
-O0 = pi/180*OE_osc(4,:);
-w0 = pi/180*OE_osc(5,:);
-M0 = OE_osc(6,:);
+O0 = wrapTo2Pi(pi/180*OE_osc(4,:));
+w0 = wrapTo2Pi(pi/180*OE_osc(5,:));
+M0 = wrapTo360(OE_osc(6,:));
 TA = me2ta(M0,e0);
 M0 = pi/180*M0;
 TA = pi/180*TA;
@@ -83,7 +83,9 @@ M1 = atan2(d1,d2);
 e1 = sqrt(d1.^2 + d2.^2);
 
 O1 = atan2(d3,d4);
-
+% if any(sqrt(d3.^2 + d4.^2)>1)
+%     bla = 4;
+% end
 i1 = 2*asin(sqrt(d3.^2 + d4.^2));
 
 w1 = argsum - M1 - O1;

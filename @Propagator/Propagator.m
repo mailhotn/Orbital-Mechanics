@@ -95,14 +95,12 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             dw = 180/pi*repmat([0,0,0,0,1,0].',P.Con.N_sats,1).*...
                 (3/4*P.Con.J2.*(P.Con.Re./p).^2.*n.*(5*cosd(i).^2-1));
             dM = 180/pi*repmat([0,0,0,0,0,1].',P.Con.N_sats,1).*...
-                (3/4*P.Con.J2.*(P.Con.Re./p).^2.*n.*eta.*(3*cosd(i).^2-1));
+                (3/4*P.Con.J2.*(P.Con.Re./p).^2.*n.*eta.*(3*cosd(i).^2-1) + n);
             dX = dO + dw + dM;
             % Propagate
             X = zeros(order,length(T));
             X(:,1) = IC;
-            for ii = 2:length(T)
-                X(:,ii) = X(:,ii-1)+ dX*dT;
-            end
+            X(:,2:end) = X(:,1) + dX*T(2:end);
             X = X.';
             Time = T;
         end
@@ -196,34 +194,31 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             dw = 180/pi*repmat([0,0,0,0,1,0].',P.Con.N_sats,1).*...
                 (3/4*P.Con.J2.*(P.Con.Re./p).^2.*n.*(5*cosd(i).^2-1));
             dM = 180/pi*repmat([0,0,0,0,0,1].',P.Con.N_sats,1).*...
-                (3/4*P.Con.J2.*(P.Con.Re./p).^2.*n.*eta.*(3*cosd(i).^2-1));
+                (3/4*P.Con.J2.*(P.Con.Re./p).^2.*n.*eta.*(3*cosd(i).^2-1) + n);
             dX = dO + dw + dM;
         end
         
-        function dX = dyn_OE_Osc(P,t,X) %#ok<INUSL>
+        function dX = dyn_OE_Osc(P,t,X)  %#ok<INUSL>
             OE  = reshape(X,6,P.Con.N_sats);
-            % Element vectors
+            % Element vectors (angles already in radians)
             a   = OE(1,:);
             e   = OE(2,:);
             inc = OE(3,:);
             w   = OE(5,:);
             Me  = OE(6,:);
             th  = pi/180*me2ta(Me*180/pi,e);
-            
             % Secondary definitions
             p = a.*(1-e.^2);
             h = sqrt(P.Con.mu*p);
             r = p./(1+e.*cos(th));
-            MJ2 = -3*P.Con.mu./r.^2.*P.Con.J2.*(P.Con.Re./r).^2;
+            MJ2 = -3*P.Con.mu./r.^4.*P.Con.J2.*P.Con.Re.^2;
             n = sqrt(P.Con.mu./a.^3);
             aop = th + w;
-            
             % Forces
             f_r = MJ2/2.*(1-3*sin(inc).^2.*sin(aop).^2);
             f_th = MJ2.*sin(inc).^2.*sin(aop).*cos(aop);
             f_h = MJ2.*sin(inc).*cos(inc).*sin(aop);
             F = reshape([f_r;f_th;f_h],3*P.Con.N_sats,1);
-            
             % GVE Sparsified Matrix
             B11 = vec2sparse(2*a.^2./h.*e.*sin(th),[6,3],[1,1]);
             B12 = vec2sparse(2*a.^2./h.*(1 + e.*cos(th)),[6,3],[1,2]);
@@ -245,6 +240,11 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             % Equations of Motion
             dX = B*F + K;
         end
+        
+%         function dX = dyn_OE_Osc2(P,t,X) 
+%             
+%         end
+        
         
     end
     
