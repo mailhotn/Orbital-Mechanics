@@ -32,7 +32,7 @@ datafolder = 'C:\Users\User\Dropbox\Walker Optimization Data';
 delete([datafolder '\error.txt']) % clear IFTT error file
 N = 300;
 p = primes(N);
-for T = 50:N
+for T = 279:N
     if ~any(T == p)
         GAsol = []; fit = []; sol = []; %#ok<NASGU>
         % Set T-dependant bounds
