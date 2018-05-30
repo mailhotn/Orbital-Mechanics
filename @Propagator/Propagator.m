@@ -27,38 +27,15 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             P.Con    = con;
         end
         
-        function [Time, X] = prop_ECI_TB(P,T)
+        function [Time, X] = PropEciTb(P,T)
             % Propagate for time T in ECI frame with no perturbations
             % This should be replaced with Analytical Solution
             % Complexity ~O(T)
             opts = odeset('reltol',P.reltol,'abstol',P.abstol);
             IC = reshape(P.Con.getInitECI,[6*P.Con.N_sats,1]);
-            [Time, X] = ode45(@P.dyn_ECI_TB,T,IC,opts);
+            [Time, X] = ode45(@P.DynEciTb,T,IC,opts);
         end
-        
-        function [Time, X] = prop_ECI_TB_for(P,T)
-            % Propagate for time T in ECI frame with no perturbations
-            % Much slower for large constellations. Slightly faster for
-            % single satellites. Complexity ~O(N_sats*T)
-            opts = odeset('reltol',P.reltol,'abstol',P.abstol);
-            IC = P.Con.getInitECI;
-            X = [];
-            for ii = 1:P.Con.N_sats
-                 [Time, tX] = ode45(@P.dyn_ECI_TB_for,T,IC(:,ii),opts);
-                 X = [X,tX];%#ok
-            end
-        end 
-        
-        function [Time, X] = prop_ECI_TB_for2(P,T)
-            % Propagate for time T in ECI frame with no perturbations
-            % Slower than vectorized, faster than regular for style
-            % Much easier to write than vectorized
-            % Complexity ~O(T)
-            opts = odeset('reltol',P.reltol,'abstol',P.abstol);
-            IC = reshape(P.Con.getInitECI,[6*P.Con.N_sats,1]);
-            [Time, X] = ode45(@P.dyn_ECI_TB_for2,T,IC,opts);
-        end
-        
+               
         function [Time, X] = prop_ECI_J2(P,T)
             % Propagate for time T in ECI frame with J2 perturbation
             % Complexity ~O(T)
@@ -67,13 +44,13 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             [Time, X] = ode45(@P.dyn_ECI_J2,T,IC,opts);
         end
         
-        function [Time, X] = prop_OE_Mean(P,T)
+        function [Time, X] = PropOeMean(P,T)
             opts = odeset('reltol',P.reltol,'abstol',P.abstol);
             IC = reshape(P.Con.getInitMeanElements,[6*P.Con.N_sats,1]);
-            [Time, X] = ode45(@P.dyn_OE_Mean,T,IC,opts);
+            [Time, X] = ode45(@P.DynOeMean,T,IC,opts);
         end
         
-        function [Time, X] = prop_OE_Mean_lin(P,T)
+        function [Time, X] = PropOeMeanFast(P,T)
             IC = reshape(P.Con.getInitMeanElements,[6*P.Con.N_sats,1]);
             dT = T(2) - T(1);
             % move stuff around
@@ -105,12 +82,12 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             Time = T;
         end
         
-        function [Time, X] = prop_OE_Osc(P,T)
+        function [Time, X] = PropOeOsc(P,T)
             opts = odeset('reltol',P.reltol,'abstol',P.abstol);
             OE = P.Con.getInitElements;
             OE(3:end,:) = OE(3:end,:)*pi/180;
             IC = reshape(OE,[6*P.Con.N_sats,1]);
-            [Time, X] = ode45(@P.dyn_OE_Osc,T,IC,opts);
+            [Time, X] = ode45(@P.DynOeOsc,T,IC,opts);
             inddeg = reshape((3:6).'+(0:P.Con.N_sats-1)*6,4*P.Con.N_sats,1);
             X(:,inddeg) = wrapTo360(180/pi*X(:,inddeg));
         end
@@ -120,7 +97,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         % equations of motion functions should only be called by prop
         % functions, thus they are protected
         
-        function dX = dyn_ECI_TB(P,t,X)  %#ok<INUSL>
+        function dX = DynEciTb(P,t,X)  %#ok<INUSL>
             % move stuff around
             order = 6*P.Con.N_sats;
             X2 = reshape(X,[6,P.Con.N_sats]);
@@ -135,24 +112,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             % equation of motion
             dX = circshift(V2,-3) - circshift(P.Con.mu*R2./r_vec.^3,3);
         end
-        
-        function dX = dyn_ECI_TB_for(P,t,X) %#ok<INUSL>
-            r = norm(X(1:3));
-            dX = [X(4:6);-P.Con.mu*X(1:3)/r^3];
-        end
-        
-        function dX = dyn_ECI_TB_for2(P,t,X) %#ok<INUSL>
-            order = 6*P.Con.N_sats;
-            dX = zeros(order,1);
-            for ii = 1:P.Con.N_sats
-                ind = (ii-1)*6+1:(ii-1)*6+6;
-                R = X(ind(1:3));
-                V = X(ind(4:6));
-                r = norm(R);
-                dX(ind) = [V;-P.Con.mu*R/r^3];
-            end
-        end
-        
+                
         function dX = dyn_ECI_J2(P,t,X) %#ok<INUSL>
             % move stuff around
             order = 6*P.Con.N_sats;
@@ -174,7 +134,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             dX = circshift(V2,-3) + circshift(-P.Con.mu*R2./r.^3 + f_J2,3);
         end
         
-        function dX = dyn_OE_Mean(P,t,X) %#ok<INUSL>
+        function dX = DynOeMean(P,t,X) %#ok<INUSL>
             % move stuff around
             order = 6*P.Con.N_sats;
             X2 = reshape(X,[6,P.Con.N_sats]);
@@ -198,7 +158,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             dX = dO + dw + dM;
         end
         
-        function dX = dyn_OE_Osc(P,t,X)  %#ok<INUSL>
+        function dX = DynOeOsc(P,t,X)  %#ok<INUSL>
             OE  = reshape(X,6,P.Con.N_sats);
             % Element vectors (angles already in radians)
             a   = OE(1,:);
