@@ -1,19 +1,20 @@
-function [ fit ] = WalkerFitnessOscPat(x, T, P, F, time, latGS, lonGS, eMin, relTol, absTol)
-%WalkerFitness_sphere Simulates a Walker Constellation and calculates the
-%fitness
+function [ fit ] = WalkerFitnessOscPat(x, nSatsT, nPlanesP, phasingF, timeVec,...
+                                       latGS, lonGS, elevMin, relTol, absTol)
+%WalkerFitnessOscPat Simulates a Walker Constellation and calculates the
+%fitness.  Used for patternsearch where T,P,F are given
 
 % Initialization
-inclination = x(1);
-altitude = x(2);
-GMST0 = x(3);
+inc = x(1);
+alt = x(2);
+gmst0 = x(3);
 
-WC = WalkerConstellation(T,P,F,inclination,altitude);
+WC = WalkerConstellation(nSatsT,nPlanesP,phasingF,inc,alt);
 Prop = Propagator(WC,relTol,absTol);
 
 % Propagate
-[tVec,X_ECI] = Prop.prop_ECI_J2(time);
+[propTime,xEci] = Prop.PropEciJ2(timeVec);
 
 % Evaluate Performance
-PDOP = get_PDOP_vec_WGS84(X_ECI,tVec,latGS,lonGS,GMST0,eMin);
-fit = max(PDOP);
+pdop = TdoaPdopVec(xEci,propTime,latGS,lonGS,gmst0,elevMin);
+fit = max(pdop);
 end

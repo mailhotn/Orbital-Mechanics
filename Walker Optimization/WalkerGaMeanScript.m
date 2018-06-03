@@ -4,6 +4,8 @@ Time = 0:600:5*86400;
 latGs = 30;
 lonGs = 0;
 elevMin  = 15;
+relTol = 1e-6;
+absTol = 1e-6;
 % Genome Definition:         [P, F, inc, alt, GMST0]
 nParams = 5;
 % Integer Values
@@ -32,7 +34,7 @@ datafolder = 'C:\Users\User\Dropbox\Walker Optimization Data';
 delete([datafolder '\error.txt']) % clear IFTT error file
 N = 300;
 p = primes(N);
-for T = 279:N
+for T = 10:N
     if ~any(T == p)
         GAsol = []; fit = []; sol = []; %#ok<NASGU>
         % Set T-dependant bounds
@@ -43,7 +45,7 @@ for T = 279:N
         % Optimize
         try
             tic
-            [GAsol, fit, ~] = ga(@(x)WalkerFitnessMean(x,T,Time,latGs,lonGs,elevMin)...
+            [GAsol, fit, ~] = ga(@(x)WalkerFitnessMean(x,T,Time,latGs,lonGs,elevMin,relTol,absTol)...
                 ,nParams,[],[],[],[],LB,UB,@(x)WalkerGaNonLinearConstraints(x,T),...
                 intCon,Options);
             optTime = toc;

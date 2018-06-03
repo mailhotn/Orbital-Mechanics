@@ -2,21 +2,21 @@ classdef WalkerConstellation < Constellation
     % WalkerConstellation is a subclass that defines an i:T/P/F Walker
     % constellation
     properties (SetAccess = private)% constellation properties
-        F    % between-plane phasing
-        inc  % inclination [deg]
-        alt  % altitude [km]        
-        S    % satellites per plane
-        PU   % pattern unit
+        phasingF      % between-plane phasing
+        inc           % inclination [deg]
+        alt           % altitude [km]        
+        S             % satellites per plane
+        PU            % pattern unit
     end
     
     methods
-        function WC = WalkerConstellation(T,P,F,inc,alt,primary)
+        function WC = WalkerConstellation(nSatsT,nPlanesP,phasingF,inc,alt,primary)
             %%%% Pre Initialization %%%%
             switch nargin
                 case 0 % GPS constellation in earth orbit
-                    T        = 24;
-                    P        = 6;
-                    F        = 2;
+                    nSatsT   = 24;
+                    nPlanesP = 6;
+                    phasingF = 2;
                     inc      = 55;
                     alt      = 20180;
                     primary  = earth();
@@ -28,52 +28,57 @@ classdef WalkerConstellation < Constellation
                     error('Wrong number of input arguments')
             end
             % Check input
-            if mod(T,P) ~= 0
+            if mod(nSatsT,nPlanesP) ~= 0
                 error(['T/P must be a whole number, T = '...
-                    num2str(T) ' P = ' num2str(P)])
+                    num2str(nSatsT) ' P = ' num2str(nPlanesP)])
             end
-            if F > P-1
+            if phasingF > nPlanesP-1
                 error('F must be less than P')
             end
             
             %%%% Object Initialization %%%%
             % Call superclass constructor before accessing object
-            WC = WC@Constellation(T,P,primary);
+            WC = WC@Constellation(nSatsT ,nPlanesP ,primary);
             
             %%%% Post Initialization %%%%
             % property assignment
-            WC.F   = F;
+            WC.phasingF = phasingF;
             WC.inc = inc;
             WC.alt = alt;
             % derived properties
-            WC.S   = WC.N_sats/WC.N_planes;
-            WC.PU  = 360/WC.N_sats;
+            WC.S  = WC.nSats/WC.nPlanes;
+            WC.PU = 360/WC.nSats;
         end
         
-        function OE = getInitElements(WC) %[a e i O w M]
-            OE_m = WC.getInitMeanElements();
-            OE = me2osc(OE_m,WC.J2,WC.Re);
+        function oe = InitialOeOsc(WC) %[a e i O w M]
+            % Returns Orbital Elements of constealltion as 6xnSats matrix
+            % of column vectors in the order:[a e i O w M].'
+            oeM = WC.InitialOeMean();
+            oe  = me2osc(oeM,WC.J2,WC.Re);
         end
         
-        function X = getInitECI(WC)
-            OE = WC.getInitElements;
-            OE(6,:) = me2ta(OE(6,:),OE(2,:));
-            [R, V] = oe2eci(OE,WC.mu);
+        function X = InitialStateEci(WC)
+            % Returns ECI state of constellation as 6xnSats matrix of
+            % column vectors
+            oe = WC.InitialOeOsc;
+            oe(6,:) = me2ta(oe(6,:),oe(2,:));
+            [R, V] = oe2eci(oe,WC.mu);
             X = [R; V];
         end
         
-        function OE_m = getInitMeanElements(WC)
+        function oeM = InitialOeMean(WC)
             % returns the orbital elements as a matrix of column vectors
             % each column represents [a,e,i,RAAN,AOP,Me].'
-            X = zeros(6,WC.N_sats);
+            X = zeros(6,WC.nSats);
             X(1,:) = WC.alt + WC.Re;
             X(3,:) = WC.inc;
-            for ii = 1:WC.N_planes
+            for ii = 1:WC.nPlanes
                 X(4,((ii-1)*WC.S+1):ii*WC.S) = wrapTo360((ii-1)*WC.S*WC.PU);
-                X(6,((ii-1)*WC.S+1):ii*WC.S) = wrapTo360((ii-1)*WC.PU*WC.F...
-                    :WC.PU*WC.N_planes:(ii-1)*WC.PU*WC.F+(WC.S-1)*WC.PU*WC.N_planes);
+                X(6,((ii-1)*WC.S+1):ii*WC.S) = wrapTo360((ii-1)*WC.PU*WC.phasingF...
+                    :WC.PU*WC.nPlanes:(ii-1)*WC.PU*WC.phasingF + ...
+                    (WC.S-1)*WC.PU*WC.nPlanes);
             end
-            OE_m = X;
+            oeM = X;
         end
     end
     
@@ -81,7 +86,8 @@ classdef WalkerConstellation < Constellation
         function propgroups = getPropertyGroups(WC) %#ok
             propgroups = matlab.mixin.util.PropertyGroup;
             propgroups(1).Title = 'Constellation Definitions';
-            propgroups(1).PropertyList = {'N_sats','N_planes','F','inc','alt','PU','S'};
+            propgroups(1).PropertyList = {'nSats','nPlanes','phasingF','inc',...
+                                          'alt','PU','S'};
             propgroups(2).Title = 'Primary Body Characteristics';
             propgroups(2).PropertyList = {'mu','Re','J2'};
         end

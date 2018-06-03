@@ -3,8 +3,8 @@ classdef Constellation < handle  &  matlab.mixin.CustomDisplay
     % propagated together.
     
     properties (SetAccess = protected)
-        N_sats   % Number of Satellites
-        N_planes % Number of planes
+        nSats   % Number of Satellites
+        nPlanes % Number of planes
         % environment
         mu % gravitational constant [km^3/s^2]
         Re  % primary radius [km]
@@ -15,11 +15,11 @@ classdef Constellation < handle  &  matlab.mixin.CustomDisplay
         % Access protected as a Constellation without a type is
         % meaningless. Constructor must be called only by subclasses,
         % never independantly.
-        function C = Constellation(N_sats, N_planes, primary)
+        function C = Constellation(nSats, nPlanes, primary)
             switch nargin
                 case 0 % single satellite constellation
-                    N_sats   = 1;
-                    N_planes = 1;
+                    nSats   = 1;
+                    nPlanes = 1;
                     primary = earth();
                 case 2 % Earth orbit
                     primary = earth();
@@ -28,8 +28,8 @@ classdef Constellation < handle  &  matlab.mixin.CustomDisplay
                 otherwise
                     error('Wrong number of input arguments')
             end
-            C.N_sats   = N_sats;
-            C.N_planes = N_planes;
+            C.nSats    = nSats;
+            C.nPlanes  = nPlanes;
             C.mu       = primary.mu;
             C.Re       = primary.Re;
             C.J2       = primary.J2;

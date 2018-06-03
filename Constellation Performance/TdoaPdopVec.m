@@ -1,5 +1,5 @@
-function [ PDOP ] = get_PDOP_vec_WGS84(X, T, lat_gs, lon_gs, GMST0, e_min)
-%get_PDOP_vec_sphere Calculates PDOP at each time step
+function [ pdop ] = TdoaPdopVec(X, T, latGs, lonGs, gmst0, elevMin)
+%TdoaPdopVec Calculates PDOP at each time step
 % Based on WGS-84 Earth Model
 %% Input Arguments
 % * X      - Mx(6N) matrix of ECI states for N satellites at M time steps
@@ -17,18 +17,18 @@ function [ PDOP ] = get_PDOP_vec_WGS84(X, T, lat_gs, lon_gs, GMST0, e_min)
 % 2. Return Mx1 Vector of PDOP at each time step
 % 
 %% 
+Earth = earth();
 M = length(T);
 N = size(X,2)/6;
-w_e = 7.2921150e-5; % rad/sec
-Re  = 6378.137; % km
-GMST = wrapTo360(GMST0 + 180/pi*T*w_e);
-GS = lla2ecef([lat_gs,lon_gs,0]).'/1000;
-PDOP = 20*ones(M,1);
+w_e = Earth.we;
+GMST = wrapTo360(gmst0 + T*w_e);
+GS = lla2ecef([latGs,lonGs,0]).'/1000;
+pdop = 20*ones(M,1);
 for ii = 1:M
     X_ECI = reshape(X(ii,:).',6,N);
     X_ECEF = eci2ecef(X_ECI,GMST(ii));
-    X_IS = sats_in_sight(X_ECEF,GS,e_min,norm(GS));
-    PDOP(ii) = get_TDOA_PDOP_WGS84(GS,X_IS);
+    X_IS = SatsInSight(X_ECEF,GS,elevMin,norm(GS));
+    pdop(ii) = CalcTdoaPdop(GS,X_IS);
 end
 end
 
