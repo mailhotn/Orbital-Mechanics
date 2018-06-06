@@ -20,8 +20,8 @@ function x = get_RGT_orbit(a,e,inc,j,k,mu,J2,Rb,T_day)
 if nargin < 6 % default is Earth
     mu = 398600.440;
     J2 = 0.0010826265;
-    Rb = 6378.14;
-    T_day = 8.6163084e4;
+    Rb = 6378.137;
+    T_day = 2*pi/7.29211585530e-5;
 end
 wb = 2*pi/T_day; % primary angular velocity
 if isempty(a)
@@ -37,15 +37,15 @@ elseif isempty(e)
     RAANdot = -3/2*J2*sqrt(mu)*Rb^2*a^(-7/2)*(1-e_var^2)^-2*cosd(inc);
     ArgPdot = 3/4*J2*sqrt(mu)*Rb^2*a^(-7/2)*(1-e_var^2)^-2*(5*(cosd(inc))^2 -1);
     MeAndot = 3/4*J2*sqrt(mu)*Rb^2*a^(-7/2)*(1-e_var^2)^(-3/2)*(3*(cosd(inc))^2 -1);
-    eq = mu/a_var^3 == (j/k*(wb - RAANdot) - (MeAndot + ArgPdot))^2;
+    eq = sqrt(mu)/a^(3/2) == j/k*(wb - RAANdot) - (MeAndot + ArgPdot);
     x = double(vpasolve(eq,e_var,[0,1]));
 elseif isempty(inc)
     syms inc_var real;
-    RAANdot = -3/2*J2*sqrt(mu)*Rb^2*a^(-7/2)*(1-e^2)^-2*cosd(inc_var);
-    ArgPdot = 3/4*J2*sqrt(mu)*Rb^2*a^(-7/2)*(1-e^2)^-2*(5*(cosd(inc_var))^2 -1);
-    MeAndot = 3/4*J2*sqrt(mu)*Rb^2*a^(-7/2)*(1-e^2)^(-3/2)*(3*(cosd(inc_var))^2 -1);
-    eq = mu/a_var^3 == (j/k*(wb - RAANdot) - (MeAndot + ArgPdot))^2;
-    x = double(vpasolve(eq,e_var,[0,180]));
+    RAANdot = -3/2*J2*sqrt(mu)*Rb^2*a^(-7/2)*(1-e^2)^-2*cos(inc_var);
+    ArgPdot = 3/4*J2*sqrt(mu)*Rb^2*a^(-7/2)*(1-e^2)^-2*(5*(cos(inc_var))^2 -1);
+    MeAndot = 3/4*J2*sqrt(mu)*Rb^2*a^(-7/2)*(1-e^2)^(-3/2)*(3*(cos(inc_var))^2 -1);
+    eq = sqrt(mu)/a^(3/2) == j/k*(wb - RAANdot) - (MeAndot + ArgPdot);
+    x = 180/pi*double(vpasolve(eq,inc_var,[0,pi]));
 else
     error('Orbit is already defined')
 end

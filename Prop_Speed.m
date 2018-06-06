@@ -33,7 +33,7 @@ tic
 toc
 WC = WalkerConstellation(200,20,2,55,1000);
 P = Propagator(WC,1e-6,1e-6);
-T = 0:100:5*86400;
+T = 0:1:60*60*2;
 disp('J2 Large Con:')
 tic
 [Time,X] = P.prop_ECI_J2(T);

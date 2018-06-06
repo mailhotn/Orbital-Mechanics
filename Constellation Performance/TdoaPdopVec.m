@@ -1,4 +1,4 @@
-function [ pdop ] = TdoaPdopVec(X, T, latGs, lonGs, gmst0, elevMin)
+function [ pdop , nSatsInSight] = TdoaPdopVec(X, T, latGs, lonGs, gmst0, elevMin)
 %TdoaPdopVec Calculates PDOP at each time step
 % Based on WGS-84 Earth Model
 %% Input Arguments
@@ -23,12 +23,14 @@ N = size(X,2)/6;
 w_e = Earth.we;
 GMST = wrapTo360(gmst0 + T*w_e);
 GS = lla2ecef([latGs,lonGs,0]).'/1000;
-pdop = 20*ones(M,1);
-for ii = 1:M
-    X_ECI = reshape(X(ii,:).',6,N);
-    X_ECEF = eci2ecef(X_ECI,GMST(ii));
+pdop = nan*ones(M,1);
+nSatsInSight = zeros(M,1);
+for iTime = 1:M
+    X_ECI = reshape(X(iTime,:).',6,N);
+    X_ECEF = eci2ecef(X_ECI,GMST(iTime));
     X_IS = SatsInSight(X_ECEF,GS,elevMin,norm(GS));
-    pdop(ii) = CalcTdoaPdop(GS,X_IS);
+    nSatsInSight(iTime) = size(X_IS,2);
+    pdop(iTime) = CalcTdoaPdop(GS,X_IS);
 end
 end
 

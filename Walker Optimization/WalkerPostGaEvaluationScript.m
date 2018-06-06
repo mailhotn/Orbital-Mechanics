@@ -42,7 +42,7 @@ datafolder = 'C:\Users\User\Dropbox\Walker Optimization Data';
 % Load previously run pattersearch solutions
 for iSats = 1:nCons
     if ~any((iSats + minSats - 1) == primeList)
-        load([datafolder '\Walker_Mean_Sol_T_' num2str(iSats-1) '.mat']);
+        load([datafolder '\Walker_Mean_Sol_T_' num2str(iSats + minSats -1) '.mat']);
         if sol.fit ~= 20
             % assign values to vectors
             T(iSats)        = sol.T;
@@ -53,7 +53,7 @@ for iSats = 1:nCons
             gaGmst0(iSats)  = sol.GMST0;
             meanFit(iSats)  = sol.fit;
             % Osc Sim
-            oscFit(iSats)   = WalkerFitness_WGS84_osc([P(iSats),...
+            oscFit(iSats)   = WalkerFitnessOsc([P(iSats),...
                 F(iSats),gaInc(iSats),gaAlt(iSats),...
                 gaGmst0(iSats)],T(iSats),timeVector,...
                 latGs,lonGs,elevMin,relTol,absTol);
@@ -129,7 +129,7 @@ end % end parfor
 % Save Pattern Solutions
 for iSats = 1:nCons
     patternSolExists = exist([datafolder '\GA Pattern Data\WalkerOscPatSol_T_'...
-            num2str(T(iSats-minSats)) '.mat'],'file');
+            num2str(T(iSats)) '.mat'],'file');
     isPrime = any((iSats + minSats - 1) == primeList);
     isBad = isnan(oscFit(iSats));
     if ~isPrime && ~patternSolExists && ~isBad
