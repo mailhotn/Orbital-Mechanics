@@ -8,6 +8,6 @@ nPlanesP = abs(x(1));
 phasingF = abs(x(2));
 c(1) = mod(nSatsT,nPlanesP)*100; % Added gain to help with failure when mod == 1. 
                      % Unclear if this works.
-c(2) = (phasingF - nPlanesP + 1);
+c(2) = (phasingF - nPlanesP + 1)*100;
 end
 

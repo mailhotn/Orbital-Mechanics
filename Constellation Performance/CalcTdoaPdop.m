@@ -5,7 +5,6 @@ function [ pdop ] = CalcTdoaPdop( xGs, xEcef)
 %
 % * X_GS   - 3x1 position vector of ground station in ECEF frame
 % * X_ECEF - 6xN matrix of satellite states in ECEF frame
-% * Re     - Primary radius (km)
 %
 %
 % N - Number of satellites in view

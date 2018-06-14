@@ -1,19 +1,20 @@
 %% Initialization
 
 % Simulation Parameters
-timeVector = 0:100:86400;
+timeVector = 0:100:86164;
 % latGs = 30;
 lonGs = 0;
 elevMin  = 5;
 relTol = 1e-6;
 absTol = 1e-6;
+maxPdop = 1000;
 % Genome Definition:         [P, F, j, inc, GMST0]
 nParams = 5;
 % Integer Values
 intCon = [1,2,3]; % P,F,j
 % GA Options
 Options = gaoptimset('UseParallel',true,...
-                     'PopulationSize',50);
+                     'PopulationSize',100);
 %     'PlotFcns',{@gaplotscorediversity,@gaplotrange,@gaplotexpectation});
 % Bounds
 P_LB = 1;
@@ -22,15 +23,14 @@ F_LB = 0;
 % F_UB = floor(T/2)-1; % set at each step
 inc_LB = 0;
 inc_UB = 90;
-j_LB = 12;
-j_UB = 16;
+j_LB = 14;
+j_UB = 15;
 GMST_LB = 0;
 GMST_UB = 90;
 
 datafolder = 'C:\Users\User\Dropbox\Walker Optimization Data';
 
 %% Massive For Loop
-% delete([datafolder '\error.txt']) % clear IFTT error file
 maxSats = 80;
 minSats = 20;
 primeList = primes(maxSats);
@@ -48,7 +48,7 @@ for latGs = 10:10:80
                 % Run GA
                 tic
                 [GAsol, fit, ~] = ga(@(x)WalkerFitnessRgtMean(x,T,timeVector,...
-                    latGs,lonGs,elevMin,relTol,absTol),nParams,[],[],[],[],...
+                    latGs,lonGs,elevMin,relTol,absTol,maxPdop),nParams,[],[],[],[],...
                     LB,UB,@(x)WalkerGaNonLinearConstraints(x,T),intCon,Options);
                 optTime = toc;
                 % Verbose Output Message
@@ -81,8 +81,8 @@ for latGs = 10:10:80
             catch ME
                 % Ga Error!
                 c = clock;
-                fileID = fopen([datafolder '\error'...
-                    num2str(c(3)) '_' num2str(c(2)) '_' num2str(c(4)) '_' num2str(c(5)) '.txt'],'w'); % create error file for IFTT phone notification
+                fileID = fopen([datafolder '\error_'...
+                    num2str(c(3)) '-' num2str(c(2)) '_' num2str(c(4)) '.' num2str(c(5)) '.txt'],'w'); % create error file for IFTT phone notification
                 fprintf(fileID,ME.message);
                 rethrow(ME)
             end

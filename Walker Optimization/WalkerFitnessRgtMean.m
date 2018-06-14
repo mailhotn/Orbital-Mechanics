@@ -1,5 +1,5 @@
 function [ fit ] = WalkerFitnessRgtMean(x, nSatsT, timeVec,...
-                                     latGs, lonGs, elevMin, relTol, absTol)
+                                     latGs, lonGs, elevMin, relTol, absTol, maxPdop)
 %WalkerFitnessRgtMean Simulates a Walker Constellation and calculates the
 %fitness
 
@@ -18,15 +18,15 @@ Prop = Propagator(WC, relTol, absTol);
 [propTime,propState] = Prop.PropOeMeanFast(timeVec);
 
 % Transform to ECI
-oeOsc = me2osc(reshape(propState.',6,length(propTime)*nSatsT));
-oeOsc(6,:) = me2ta(oeOsc(6,:),oeOsc(2,:));
-[R, V] = oe2eci(oeOsc);
+oeMean = reshape(propState.',6,length(propTime)*nSatsT);
+oeMean(6,:) = me2ta(oeMean(6,:),oeMean(2,:));
+[R, V] = oe2eci(oeMean);
 xEci  = reshape([R;V],6*nSatsT,length(propTime));
 xEci  = xEci.';
+
 % Evaluate Performance
-
 [pdop, ~] = TdoaPdopVec(xEci,propTime,latGs,lonGs,gmst0,elevMin);
-
-pdop(isnan(pdop)) = max(pdop)*10;
+pdop(find(pdop > maxPdop)) = maxPdop;
+pdop(isnan(pdop)) = maxPdop;
 fit = trapz(propTime,pdop)/(propTime(end)-propTime(1));
 end

@@ -33,7 +33,8 @@ classdef WalkerConstellation < Constellation
                     num2str(nSatsT) ' P = ' num2str(nPlanesP)])
             end
             if phasingF > nPlanesP-1
-                error('F must be less than P')
+                error(['F must be less than P, P = ' num2str(nPlanesP) ...
+                    ' F = ' num2str(phasingF)])
             end
             
             %%%% Object Initialization %%%%
