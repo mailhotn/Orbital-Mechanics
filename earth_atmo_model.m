@@ -30,7 +30,7 @@ A = [0 25 1.225 7.249;
     900 1000 5.24E-15 181.05];
 ind = find(h >= A(:,1) & h < A(:,2));
 if ~isempty(ind)
-    rho = A(ind,3)*exp((h-A(ind,1))/A(ind,4));
+    rho = A(ind,3)*exp(-(h-A(ind,1))/A(ind,4));
 else
     rho = 0;
 end

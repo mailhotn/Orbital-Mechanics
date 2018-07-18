@@ -82,7 +82,8 @@ for latGs = 10:10:80
                 % Ga Error!
                 c = clock;
                 fileID = fopen([datafolder '\error_'...
-                    num2str(c(3)) '-' num2str(c(2)) '_' num2str(c(4)) '.' num2str(c(5)) '.txt'],'w'); % create error file for IFTT phone notification
+                    num2str(c(3)) '-' num2str(c(2)) '_' num2str(c(4)) ...
+                    '.' num2str(c(5)) '.txt'],'w'); % create error file for IFTT phone notification
                 fprintf(fileID,ME.message);
                 rethrow(ME)
             end
