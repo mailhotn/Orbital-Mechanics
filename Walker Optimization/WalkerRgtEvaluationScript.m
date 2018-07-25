@@ -49,7 +49,7 @@ for iLat = 1:nLats
                 GaRgtSol.gmst0, GaRgtSol.elevMin);
             % Calculate Performance Indeces
             maxPdop(iLat,iSat) = max(pdop);
-            meanPdop(iLat,iSat) = mean(pdop);
+            meanPdop(iLat,iSat) = mean(pdop(~isnan(pdop)));
             coverage(iLat,iSat) = 100 - sum(isnan(pdop))/length(pdop)*100;
             pdop(isnan(pdop)) = max(pdop)*10;
             intPdop(iLat,iSat) = trapz(propTime,pdop)/(propTime(end)-propTime(1));
@@ -68,11 +68,12 @@ semilogy(nSatsT(1,:),intPdop(1,:),'o',...
     nSatsT(7,:),intPdop(7,:),'o',...
     nSatsT(8,:),intPdop(8,:),'s')
 title('Integral of PDOP')
-legend('LatGS: 10','LatGS: 20','LatGS: 30','LatGS: 40','LatGS: 50','LatGS: 60',...
-    'LatGS: 70','LatGS: 80')
+legend('\phi_0=10','\phi_0=20','\phi_0=30','\phi_0=40','\phi_0=50','\phi_0=60',...
+    '\phi_0=70','\phi_0=80')
 xlabel('# Sats')
 ylabel('$\frac{1}{T}\int^{T}_{0}{PDOPdt}$','interpreter','latex','fontsize',12)
-ylim([0,10])
+% ylim([0,10])
+grid minor
 
 figure(2) % max PDOP
 semilogy(nSatsT(1,:),maxPdop(1,:),'o',...
@@ -84,11 +85,12 @@ semilogy(nSatsT(1,:),maxPdop(1,:),'o',...
     nSatsT(7,:),maxPdop(7,:),'o',...
     nSatsT(8,:),maxPdop(8,:),'s')
 title('Max PDOP')
-legend('LatGS: 10','LatGS: 20','LatGS: 30','LatGS: 40','LatGS: 50','LatGS: 60',...
-    'LatGS: 70','LatGS: 80')
+legend('\phi_0=10','\phi_0=20','\phi_0=30','\phi_0=40','\phi_0=50','\phi_0=60',...
+    '\phi_0=70','\phi_0=80')
 xlabel('# Sats')
 ylabel('$\max{PDOP}$','interpreter','latex')
-ylim([0,10000])
+% ylim([0,10000])
+grid minor
 
 figure(3) % mean PDOP
 semilogy(nSatsT(1,:),meanPdop(1,:),'o',...
@@ -100,10 +102,11 @@ semilogy(nSatsT(1,:),meanPdop(1,:),'o',...
     nSatsT(7,:),meanPdop(7,:),'o',...
     nSatsT(8,:),meanPdop(8,:),'s')
 title('Mean PDOP')
-legend('LatGS: 10','LatGS: 20','LatGS: 30','LatGS: 40','LatGS: 50','LatGS: 60',...
-    'LatGS: 70','LatGS: 80')
+legend('\phi_0=10','\phi_0=20','\phi_0=30','\phi_0=40','\phi_0=50','\phi_0=60',...
+    '\phi_0=70','\phi_0=80')
 xlabel('# Sats')
 ylabel('mean PDOP')
+grid minor
 % ylim([0,100])
 
 figure(4) % coverage
@@ -117,8 +120,10 @@ plot(nSatsT(1,:),coverage(1,:),'o',...
     nSatsT(8,:),coverage(8,:),'s')
 title('Coverage')
 ylabel('Coverage %')
-legend('LatGS: 10','LatGS: 20','LatGS: 30','LatGS: 40','LatGS: 50','LatGS: 60',...
-    'LatGS: 70','LatGS: 80')
+legend('\phi_0=10','\phi_0=20','\phi_0=30','\phi_0=40','\phi_0=50','\phi_0=60',...
+    '\phi_0=70','\phi_0=80')
+xlabel('# Sats')
+grid minor
 ylim([0,100])
 
 figure(5) % Altitude
@@ -131,11 +136,12 @@ plot(nSatsT(1,:),gaAlt(1,:),'o',...
     nSatsT(7,:),gaAlt(7,:),'o',...
     nSatsT(8,:),gaAlt(8,:),'s')
 title('Altitude')
-legend('LatGS: 10','LatGS: 20','LatGS: 30','LatGS: 40','LatGS: 50','LatGS: 60',...
-    'LatGS: 70','LatGS: 80')
+legend('\phi_0=10','\phi_0=20','\phi_0=30','\phi_0=40','\phi_0=50','\phi_0=60',...
+    '\phi_0=70','\phi_0=80')
 % ylim([0,100])
 xlabel('# Sats')
 ylabel('Altitude [km]')
+grid minor
 
 figure(6) % Inclination
 plot(nSatsT(1,:),gaInc(1,:),'o',...
@@ -147,11 +153,12 @@ plot(nSatsT(1,:),gaInc(1,:),'o',...
     nSatsT(7,:),gaInc(7,:),'o',...
     nSatsT(8,:),gaInc(8,:),'s')
 title('Inclination')
-legend('LatGS: 10','LatGS: 20','LatGS: 30','LatGS: 40','LatGS: 50','LatGS: 60',...
-    'LatGS: 70','LatGS: 80')
+legend('\phi_0=10','\phi_0=20','\phi_0=30','\phi_0=40','\phi_0=50','\phi_0=60',...
+    '\phi_0=70','\phi_0=80')
 % ylim([0,100])
 xlabel('# Sats')
 ylabel('Inclination [°]')
+grid minor
 %% Save Data
 GaEval.nSatsT   = nSatsT;
 GaEval.nPlanesP = nPlanesP;

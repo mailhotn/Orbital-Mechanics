@@ -1,5 +1,6 @@
-function [ fit ] = WalkerFitnessRgtMean(x, nSatsT, timeVec,...
-                                     latGs, lonGs, elevMin, relTol, absTol, maxPdop)
+function [ fit ] = WalkerFitnessRgtMean(x, nSatsT, timeVec,latGs, lonGs,...
+                                        elevMin, relTol, absTol,maxPdop,...
+                                        fitFunc)
 %WalkerFitnessRgtMean Simulates a Walker Constellation and calculates the
 %fitness
 
@@ -26,7 +27,19 @@ xEci  = xEci.';
 
 % Evaluate Performance
 [pdop, ~] = TdoaPdopVec(xEci,propTime,latGs,lonGs,gmst0,elevMin);
-pdop(find(pdop > maxPdop)) = maxPdop;
-pdop(isnan(pdop)) = maxPdop;
-fit = trapz(propTime,pdop)/(propTime(end)-propTime(1));
+switch fitFunc
+    case 'Integral'
+        pdop(pdop > maxPdop) = maxPdop;
+        pdop(isnan(pdop)) = maxPdop;
+        fit = trapz(propTime,pdop)/(propTime(end)-propTime(1));
+    case 'Mean'
+        pdop(pdop > maxPdop) = maxPdop;
+        pdop(isnan(pdop)) = maxPdop;
+        fit = mean(pdop);
+    case 'Max'
+        pdop(pdop > maxPdop) = maxPdop;
+        pdop(isnan(pdop)) = maxPdop;
+        fit = max(pdop);
+    otherwise
+        fit = inf;
 end

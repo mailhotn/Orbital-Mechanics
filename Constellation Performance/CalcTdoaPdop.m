@@ -13,7 +13,7 @@ if size(xEcef,2) < 3
     pdop = nan;
     return
 end
-Qinv = inv(0.5*eye(size(xEcef,2)-1) + 0.5*ones(size(xEcef,2)-1));
+Qinv = inv(eye(size(xEcef,2)-1) + ones(size(xEcef,2)-1));
 e2 = 0.0818191908426215^2; % eccentricity squared
 R  = xEcef(1:3,:);
 dR = xGs-R;
@@ -29,4 +29,31 @@ if cond(G) <= 1e10
 else
     pdop = nan;
 end
-end
+
+
+%% Other Version - Numerically unstable, but not singular for latGs = 0
+% condTol = 1e15;
+% %% Calculate PDOP
+% if size(xEcef,2) < 3
+%     pdop = nan;
+%     return
+% end
+% Qinv = inv(eye(size(xEcef,2)-1) + ones(size(xEcef,2)-1));
+% 
+% R  = xEcef(1:3,:);
+% dR = xGs-R;
+% dR_hat = dR./sqrt(dot(dR,dR,1));
+% H = (dR_hat(:,2:end) - dR_hat(:,1)).';
+% 
+% fish = (H.'*Qinv*H);
+% 
+% if cond(fish) <= condTol
+%     e2 = 0.0818191908426215^2; % eccentricity squared
+%     w = [xGs(1:2);xGs(3)/(1-e2)];
+%     
+%     Xinv = inv(fish);
+%     G = Xinv - (Xinv*(w*w.')*Xinv)./(w.'*Xinv*w); %#ok<*MINV>
+%     pdop = sqrt(trace(G));
+% else
+%     pdop = nan;
+% end
