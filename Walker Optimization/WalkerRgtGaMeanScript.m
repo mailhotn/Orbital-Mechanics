@@ -14,7 +14,7 @@ nParams = 5;
 intCon = [1,2,3]; % P,F,j
 % GA Options
 Options = gaoptimset('UseParallel',true,...
-                     'PopulationSize',100);
+                     'PopulationSize',200);
 %     'PlotFcns',{@gaplotscorediversity,@gaplotrange,@gaplotexpectation});
 % Bounds
 P_LB = 1;

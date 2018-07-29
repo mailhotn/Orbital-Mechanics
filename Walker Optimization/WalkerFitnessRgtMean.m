@@ -38,7 +38,7 @@ switch fitFunc
         fit = mean(pdop);
     case 'Max'
         pdop(pdop > maxPdop) = maxPdop;
-        pdop(isnan(pdop)) = maxPdop;
+        pdop(isnan(pdop)) = maxPdop*10;
         fit = max(pdop);
     otherwise
         fit = inf;
