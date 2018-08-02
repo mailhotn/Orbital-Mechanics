@@ -8,10 +8,11 @@ classdef WalkerConstellation < Constellation
         alt           % altitude [km]        
         S             % satellites per plane
         PU            % pattern unit
+        raan0         % raan of first plane
     end
     
     methods
-        function WC = WalkerConstellation(nSatsT,nPlanesP,phasingF,inc,alt,primary)
+        function WC = WalkerConstellation(nSatsT,nPlanesP,phasingF,inc,alt,raan0,primary)
             %%%% Pre Initialization %%%%
             switch nargin
                 case 0 % GPS constellation in earth orbit
@@ -23,6 +24,7 @@ classdef WalkerConstellation < Constellation
                     primary  = earth();
                 case 5 % earth orbit
                     primary  = earth();
+                    raan0 = 0;
                 case 6
                     % do nothing
                 otherwise
@@ -48,6 +50,7 @@ classdef WalkerConstellation < Constellation
             WC.phasingF = phasingF;
             WC.inc = inc;
             WC.alt = alt;
+            WC.raan0 = raan0;
             % derived properties
             WC.S  = WC.nSats/WC.nPlanesP;
             WC.PU = 360/WC.nSats;
@@ -81,6 +84,7 @@ classdef WalkerConstellation < Constellation
                     :WC.PU*WC.nPlanesP:(ii-1)*WC.PU*WC.phasingF + ...
                     (WC.S-1)*WC.PU*WC.nPlanesP);
             end
+            X(4,:) = wrapTo360(X(4,:) + WC.raan0);
             oeM = X;
         end
     end
