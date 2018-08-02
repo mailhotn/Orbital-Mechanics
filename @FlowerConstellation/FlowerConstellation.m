@@ -1,29 +1,29 @@
 classdef FlowerConstellation < Constellation
-    % FlowerConstellation is a subclass that defines a 
-    % nPetals-nDays-nSats-fN-fD-fH-w-i-hP flower constellation about the Earth.
+    % FlowerConstellation subclass that defines a Flower Constellation
+    % nPetals-nDays-nSats-fN-fD-fH, (w-i-hP) flower constellation about the Earth.
     % The derivation is based off of D. Mortari and M. P. Wilkins, 
     % “Flower constellation set theory part I: Compatibility and phasing,” , 2008.
-    % This constellation has a repeating ground track 
-    %
-    % ~~~~~~~~~~ Parameters ~~~~~~~~~~
-    % nPetals - Number of orbits until repeat, number of "petals"
-    % nDays   - Number of days to Repeat
-    % 
+    % These satellites have the same repeating ground track 
+
     properties (SetAccess = private)% constellation properties
-        % Orbits
+        % Architecture
         nPetals  % number of petals, also number of Earth-Repeats
       % nSats    % in superclass
         nDays    % number of Days to repeat
         
         % Phasing
         fN       % Phasing Parameter
-        fd       % Total number of distinct orbits
+        fD       % Total number of distinct orbits
         fH       % Phasing Step
         
-        % Shape
+        % Orbits
         aop      % Argument of perigee [deg]
         inc      % Inclination [deg]
         altP     % Perigee Altitude [km]
+        
+        % Initial Conditions
+        raan0    % RAAN of first satellite [deg]
+        M0       % Mean anomaly of first satellite [deg]
         
         % derived
         sma      % Semimajor Axis [km]
@@ -34,56 +34,72 @@ classdef FlowerConstellation < Constellation
     end
     
     methods
-        function FC = FlowerConstellation(Orbits, Phasing, Shape)
+        function FC = FlowerConstellation(Architecture, Phasing, Orbits, Initial)
             %%%% Pre Initialization %%%%
             switch nargin
                 case 0
                     % Default Constellation
-                    Orbits.nPetals = 38;
-                    Orbits.nDays   = 23;
-                    Orbits.nSats   = 77;
+                    Architecture.nPetals = 12;
+                    Architecture.nDays   = 5;
+                    Architecture.nSats   = 30;
                     
-                    Phasing.fD = 77;
-                    Phasing.fN = 23;
-                    Phasing.fH = 0;
+                    Phasing.fD = 6;
+                    Phasing.fN = 5;
+                    Phasing.fH = 1;
                     
-                    Shape.inc  = 0;
-                    Shape.aop  = 270;
-                    Shape.altP = 1300;
-                case 3
+                    Orbits.inc  = 70;
+                    Orbits.aop  = 270;
+                    Orbits.altP = 1000;
+                    
+                    Initial.raan0 = 0;
+                    Initial.M0 = 0;
+                    
+                    primary = earth();
+                case 4
                     primary = earth();         
                 
                 otherwise
                     error('Wrong number of input arguments')
             end
             % Check input
-            if (gcd(Orbits.nPetals,Orbits.nDays) ~= 1) && ...
-                    (Orbits.nPetals ~= Orbits.nDays)
-                error('nP & nD are not relatively prime');
+            if (gcd(Architecture.nPetals,Architecture.nDays) ~= 1) && ...
+                    (Architecture.nPetals ~= Architecture.nDays)
+                Ct = gcd(Architecture.nPetals,Architecture.nDays);
+                Architecture.nPetals = Architecture.nPetals/Ct;
+                Architecture.nDays = Architecture.nDays/Ct;
+            end
+            if (Phasing.fN > Phasing.fD)
+                Phasing.fN = mod(Phasing.fN,Phasing.fD);
             end
             if (gcd(Phasing.fN,Phasing.fD) ~= 1) && ...
                     (Phasing.fN ~= Phasing.fD)
                 error('fN & fD are not relatively prime');
             end
-
+            if (Phasing.fH > (Architecture.nDays - 1))
+                error('fH is too large');
+            end
+            
             %%%% Object Initialization %%%%
             % Call superclass constructor before accessing object
-            FC = FC@Constellation(nSats,primary);
+            FC = FC@Constellation(Architecture.nSats,primary);
             
             %%%% Post Initialization %%%%
             % property assignment
             FC.wE = primary.we*pi/180;
             
-            FC.nPetals = Orbits.nPetals;
-            FC.nDays   = Orbits.nDays;
+            FC.nPetals = Architecture.nPetals;
+            FC.nDays   = Architecture.nDays;
             
             FC.fN = Phasing.fN;
             FC.fD = Phasing.fD;
             FC.fH = Phasing.fH;
             
-            FC.aop  = Shape.aop;
-            FC.inc  = Shape.inc;
-            FC.altP = Shape.altP;
+            FC.aop  = Orbits.aop;
+            FC.inc  = Orbits.inc;
+            FC.altP = Orbits.altP;
+            
+            FC.raan0 = Initial.raan0;
+            FC.M0 = Initial.M0;
             
             FC.CalcRgtOrbit();
         end
@@ -112,7 +128,9 @@ classdef FlowerConstellation < Constellation
             X(1,:) = FC.sma;
             X(2,:) = 1 - (FC.Re + FC.altP)/FC.sma;
             X(3,:) = FC.inc;
+            X(4,1) = FC.raan0;
             X(5,:) = FC.aop;
+            X(6,1) = FC.M0;
             % Assign RAAN
             for iSat = 1:(FC.nSats-1)
                 X(4,iSat+1) = X(4,iSat) + 360*FC.fN/FC.fD;

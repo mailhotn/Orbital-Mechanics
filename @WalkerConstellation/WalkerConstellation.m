@@ -2,6 +2,7 @@ classdef WalkerConstellation < Constellation
     % WalkerConstellation is a subclass that defines an i:T/P/F Walker
     % constellation
     properties (SetAccess = private)% constellation properties
+        nPlanesP      % number of orbital planes
         phasingF      % between-plane phasing
         inc           % inclination [deg]
         alt           % altitude [km]        
@@ -39,15 +40,16 @@ classdef WalkerConstellation < Constellation
             
             %%%% Object Initialization %%%%
             % Call superclass constructor before accessing object
-            WC = WC@Constellation(nSatsT ,nPlanesP ,primary);
+            WC = WC@Constellation(nSatsT ,primary);
             
             %%%% Post Initialization %%%%
             % property assignment
+            WC.nPlanesP = nPlanesP;
             WC.phasingF = phasingF;
             WC.inc = inc;
             WC.alt = alt;
             % derived properties
-            WC.S  = WC.nSats/WC.nPlanes;
+            WC.S  = WC.nSats/WC.nPlanesP;
             WC.PU = 360/WC.nSats;
         end
         
@@ -73,11 +75,11 @@ classdef WalkerConstellation < Constellation
             X = zeros(6,WC.nSats);
             X(1,:) = WC.alt + WC.Re;
             X(3,:) = WC.inc;
-            for ii = 1:WC.nPlanes
+            for ii = 1:WC.nPlanesP
                 X(4,((ii-1)*WC.S+1):ii*WC.S) = wrapTo360((ii-1)*WC.S*WC.PU);
                 X(6,((ii-1)*WC.S+1):ii*WC.S) = wrapTo360((ii-1)*WC.PU*WC.phasingF...
-                    :WC.PU*WC.nPlanes:(ii-1)*WC.PU*WC.phasingF + ...
-                    (WC.S-1)*WC.PU*WC.nPlanes);
+                    :WC.PU*WC.nPlanesP:(ii-1)*WC.PU*WC.phasingF + ...
+                    (WC.S-1)*WC.PU*WC.nPlanesP);
             end
             oeM = X;
         end
@@ -87,7 +89,7 @@ classdef WalkerConstellation < Constellation
         function propgroups = getPropertyGroups(WC) %#ok
             propgroups = matlab.mixin.util.PropertyGroup;
             propgroups(1).Title = 'Constellation Definitions';
-            propgroups(1).PropertyList = {'nSats','nPlanes','phasingF','inc',...
+            propgroups(1).PropertyList = {'nSats','nPlanesP','phasingF','inc',...
                                           'alt','PU','S'};
             propgroups(2).Title = 'Primary Body Characteristics';
             propgroups(2).PropertyList = {'mu','Re','J2'};
