@@ -5,8 +5,8 @@ function [ inc, sma, raan0 ] = VirtualSatOe( ecc, Rgt, GroundS, nOrbits, primary
 if nargin < 5
     primary = earth();
 end
-inc = fminbnd(@(x)VirtualSatCost(x, ecc, Rgt, GroundS, nOrbits, primary),0,180);
-
+% Bounds are chosen so that the inclination is higher than latGs
+[inc,~] = fminbnd(@(x)VirtualSatCost(x, ecc, Rgt, GroundS, nOrbits, primary),GroundS.lat+5,180-(GroundS.lat+5));
 sma = CalcRgtSma(ecc, inc, Rgt.jRepeats, Rgt.kDays, primary);
 
 n = sqrt(primary.mu/sma^3);

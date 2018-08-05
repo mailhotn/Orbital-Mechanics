@@ -19,9 +19,9 @@ classdef Constellation < handle  &  matlab.mixin.CustomDisplay
                 case 0 % single satellite constellation
                     nSats   = 1;
                     primary = earth();
-                case 2 % Earth orbit
+                case 1 % Earth orbit
                     primary = earth();
-                case 3 % Arbitrary
+                case 2 % Arbitrary
                     
                 otherwise
                     error('Wrong number of input arguments')

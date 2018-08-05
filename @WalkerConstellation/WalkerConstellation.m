@@ -22,11 +22,13 @@ classdef WalkerConstellation < Constellation
                     inc      = 55;
                     alt      = 20180;
                     primary  = earth();
-                case 5 % earth orbit
+                case 5 % Legacy Option
                     primary  = earth();
                     raan0 = 0;
-                case 6
-                    % do nothing
+                case 6 % Earth Orbit
+                    primary  = earth();
+                case 7 
+                    % Do Nothing
                 otherwise
                     error('Wrong number of input arguments')
             end
@@ -43,6 +45,9 @@ classdef WalkerConstellation < Constellation
             %%%% Object Initialization %%%%
             % Call superclass constructor before accessing object
             WC = WC@Constellation(nSatsT ,primary);
+            if size(nSatsT) ~= 1
+                disp(nSatsT)
+            end
             
             %%%% Post Initialization %%%%
             % property assignment
