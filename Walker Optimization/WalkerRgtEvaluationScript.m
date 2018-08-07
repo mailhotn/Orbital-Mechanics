@@ -26,7 +26,7 @@ intPdop   = nan(nLats,nCons);
 meanPdop  = nan(nLats,nCons);
 coverage  = nan(nLats,nCons);
 
-datafolder = 'C:\Users\User\Dropbox\Walker Optimization Data';
+datafolder = 'C:\Users\User\Dropbox\Walker Optimization Data\Previous Optimization Runs\Walker RGT GA mean pdop';
 
 %% Go over all solutions & sim Osculating to get new fitness
 tic
@@ -48,10 +48,12 @@ for iLat = 1:nLats
             [pdop, satsIs] = TdoaPdopVec(propState,propTime,GaRgtSol.latGs,GaRgtSol.lonGs,...
                 GaRgtSol.gmst0, GaRgtSol.elevMin);
             % Calculate Performance Indeces
-            maxPdop(iLat,iSat) = max(pdop);
-            meanPdop(iLat,iSat) = mean(pdop(~isnan(pdop)));
             coverage(iLat,iSat) = 100 - sum(isnan(pdop))/length(pdop)*100;
-            pdop(isnan(pdop)) = max(pdop)*10;
+            maxPdop(iLat,iSat) = max(pdop);
+            pdop(pdop>1000) = 1000;
+            pdop(isnan(pdop)) = 1000;
+            meanPdop(iLat,iSat) = mean(pdop(~isnan(pdop)));
+%             pdop(isnan(pdop)) = max(pdop)*10;
             intPdop(iLat,iSat) = trapz(propTime,pdop)/(propTime(end)-propTime(1));
         end
     end
@@ -144,13 +146,7 @@ ylabel('Altitude [km]')
 grid minor
 
 figure(6) % Inclination
-plot(nSatsT(1,:),gaInc(1,:),'o',...
-    nSatsT(2,:),gaInc(2,:),'o',...
-    nSatsT(3,:),gaInc(3,:),'o',...
-    nSatsT(4,:),gaInc(4,:),'o',...
-    nSatsT(5,:),gaInc(5,:),'o',...
-    nSatsT(6,:),gaInc(6,:),'o',...
-    nSatsT(7,:),gaInc(7,:),'o',...
+plot(nSatsT(1:7,:).',gaInc(1:7,:),'o',...
     nSatsT(8,:),gaInc(8,:),'s')
 title('Inclination')
 legend('\phi_0=10','\phi_0=20','\phi_0=30','\phi_0=40','\phi_0=50','\phi_0=60',...
