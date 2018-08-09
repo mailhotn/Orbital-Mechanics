@@ -22,6 +22,7 @@ classdef WalkerConstellation < Constellation
                     inc      = 55;
                     alt      = 20180;
                     primary  = earth();
+                    raan0    = 0;
                 case 5 % Legacy Option
                     primary  = earth();
                     raan0 = 0;

@@ -13,12 +13,14 @@ Rgt.kDays    = 1;
 primary = earth();
 nOrbits = 6;
 
-maxSats = 70;
+maxSats = 80;
 minSats = 20;
 
-delInc = 0;
+delInc = 25;
 
-save([PropParams.datafolder '\OptParams.mat']);
+incList = [5,10,20,25];
+
+% save([PropParams.datafolder '\OptParams.mat']);
 %% Massive For Loop
 
 parfor iLat = 1:length(latList)
@@ -71,3 +73,9 @@ parfor iLat = 1:length(latList)
         end
     end
 end
+
+c = clock;
+fileID = fopen(['C:\Users\User\Dropbox\zzzMatlab Notification\OptDone_'...
+    num2str(c(3)) '-' num2str(c(2)) '_' num2str(c(4)) ...
+    '.' num2str(c(5)) '.txt'],'w'); % create error file for IFTT phone notification
+fprintf(fileID,'done');

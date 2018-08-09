@@ -39,21 +39,25 @@ classdef FlowerConstellation < Constellation
             switch nargin
                 case 0
                     % Default Constellation
-                    Architecture.nPetals = 12;
-                    Architecture.nDays   = 5;
-                    Architecture.nSats   = 30;
+                    Architecture.nPetals = 7;
+                    Architecture.nDays   = 1;
+                    Architecture.nSats   = 6;
                     
-                    Phasing.fD = 6;
+                    Phasing.fD = 7;
                     Phasing.fN = 5;
-                    Phasing.fH = 1;
+                    Phasing.fH = 0;
                     
-                    Orbits.inc  = 70;
-                    Orbits.aop  = 270;
-                    Orbits.altP = 1000;
+                    Orbits.inc  = 50;
+                    Orbits.aop  = 0;
+                    Orbits.altP = 1.6751e+03;
                     
                     Initial.raan0 = 0;
                     Initial.M0 = 0;
                     
+                    primary = earth();
+                case 3
+                    Initial.raan0 = 0;
+                    Initial.M0 = 0;
                     primary = earth();
                 case 4
                     primary = earth();         
