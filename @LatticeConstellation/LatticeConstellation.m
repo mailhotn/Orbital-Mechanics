@@ -33,7 +33,7 @@ classdef LatticeConstellation < Constellation
     end
     
     methods
-        function LC = LatticeConstellation(Arch,Phase,Orbit,Init)
+        function LC = LatticeConstellation(Arch,Phase,Orbit,InitCon)
             %%%% Pre Initialization %%%%
             switch nargin
                 case 0
@@ -44,16 +44,16 @@ classdef LatticeConstellation < Constellation
                     Arch.nDays    = 1;
                     
                     Phase.nC1    = 1;
-                    Phase.nC2    = 2;
+                    Phase.nC2    = 1;
                     Phase.nC3    = 3;
                     
 %                     Orbit.inc   = asind(sqrt(4/5));
                     Orbit.inc   = 50;
                     Orbit.ecc   = 0.3;
                     
-                    Init.M1    = 0;
-                    Init.raan1 = 0;
-                    Init.aop1  = 0;
+                    InitCon.M1    = 0;
+                    InitCon.raan1 = 0;
+                    InitCon.aop1  = 90;
                     primary = earth();
                 case 3
                 case 4
@@ -79,9 +79,9 @@ classdef LatticeConstellation < Constellation
             LC.inc = Orbit.inc;
             LC.ecc = Orbit.ecc;
             
-            LC.M1    = Init.M1;
-            LC.raan1 = Init.raan1;
-            LC.aop1  = Init.aop1;
+            LC.M1    = InitCon.M1;
+            LC.raan1 = InitCon.raan1;
+            LC.aop1  = InitCon.aop1;
             
             LC.sma = CalcRgtSma(LC.ecc,LC.inc,LC.nRepeats,LC.nDays,LC.primary);
         end
