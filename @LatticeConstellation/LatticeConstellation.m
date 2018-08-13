@@ -2,17 +2,22 @@ classdef LatticeConstellation < Constellation
     %LatticeConstellation Defines a 3D Lattice Flower Constellation
 % Based on the work in J. J. Davis, · Martín, E. Avendaño, and D. Mortari,
 % “The 3-D lattice theory of Flower Constellations,” , 2013.
-% This implementation creates a constellation with a repeating earth ground
-% track.
+
+% To get a repeat ground track the orbital elements must be chosen
+% according to the RGT condition. In addition the phasing parameters must
+% fulfill:
+%              (1)   nRepeats = l*gcd(nPlanes,nC3) + m*nC1
+%              (2)   nDays    = m*nSatsPerAop
+% where l and m are any integers.
     
     properties (SetAccess = private)
         % General Architecture
-        % nSats (in superclass)
+        % nSats (in superclass) - Derived
         nPlanes     % N_o
         nAops       % N_w 
         nSatsPerAop % N_so'
-        nRepeats    % N_p
-        nDays       % N_d
+%         nRepeats    % N_p
+%         nDays       % N_d
         
         % Phasing
         nC1
@@ -22,14 +27,13 @@ classdef LatticeConstellation < Constellation
         % Orbits
         inc
         ecc
+        sma
         
         % Initial Conditions
         M1
         raan1
         aop1
         
-        % Derived
-        sma
     end
     
     methods
@@ -37,29 +41,33 @@ classdef LatticeConstellation < Constellation
             %%%% Pre Initialization %%%%
             switch nargin
                 case 0
-                    Arch.nSats    = 6;
-                    Arch.nPlanes  = 3;
-                    Arch.nAops    = 2;
-                    Arch.nRepeats = 7;
-                    Arch.nDays    = 1;
+                    Arch.nPlanes     = 3;
+                    Arch.nAops       = 2;
+                    Arch.nSatsPerAop = 1;
                     
                     Phase.nC1    = 1;
-                    Phase.nC2    = 1;
+                    Phase.nC2    = 2;
                     Phase.nC3    = 3;
                     
 %                     Orbit.inc   = asind(sqrt(4/5));
                     Orbit.inc   = 50;
                     Orbit.ecc   = 0.3;
+                    Orbit.sma   = CalcRgtSma(Orbit.ecc,Orbit.inc,7,1);
                     
                     InitCon.M1    = 0;
                     InitCon.raan1 = 0;
                     InitCon.aop1  = 90;
                     primary = earth();
                 case 3
+                    primary = earth();
+                    InitCon.M1    = 0;
+                    InitCon.raan1 = 0;
+                    InitCon.aop1  = 0;
                 case 4
+                    primary = earth();
             end
-            % Check input
-            
+            Arch.nSats = Arch.nPlanes*Arch.nAops*Arch.nSatsPerAop;
+                        
             %%%% Object Initialization %%%%
             % Call superclass constructor before accessing object
             LC = LC@Constellation(Arch.nSats,primary);
@@ -68,9 +76,7 @@ classdef LatticeConstellation < Constellation
             % property assignment
             LC.nPlanes     = Arch.nPlanes;
             LC.nAops       = Arch.nAops;
-            LC.nRepeats    = Arch.nRepeats;
-            LC.nDays       = Arch.nDays;
-            LC.nSatsPerAop = LC.nSats/LC.nPlanes/LC.nAops;
+            LC.nSatsPerAop = Arch.nSatsPerAop;
             
             LC.nC1 = Phase.nC1;
             LC.nC2 = Phase.nC2;
@@ -78,12 +84,11 @@ classdef LatticeConstellation < Constellation
             
             LC.inc = Orbit.inc;
             LC.ecc = Orbit.ecc;
+            LC.sma = Orbit.sma;
             
             LC.M1    = InitCon.M1;
             LC.raan1 = InitCon.raan1;
             LC.aop1  = InitCon.aop1;
-            
-            LC.sma = CalcRgtSma(LC.ecc,LC.inc,LC.nRepeats,LC.nDays,LC.primary);
         end
         
         function oe = InitialOeOsc(LC) %[a e i O w M]
@@ -133,7 +138,7 @@ classdef LatticeConstellation < Constellation
         function propgroups = getPropertyGroups(WC) %#ok
             propgroups = matlab.mixin.util.PropertyGroup;
             propgroups(1).Title = 'Constellation Structure';
-            propgroups(1).PropertyList = {'nSats','nRepeats','nDays'};
+            propgroups(1).PropertyList = {'nSats','nPlanes','nAops','nSatsPerAop'};
             propgroups(2).Title = 'Constellation Phasing Parameters';
             propgroups(2).PropertyList = {'nC1','nC2','nC3'};
             propgroups(3).Title = 'Orbit Parameters';
