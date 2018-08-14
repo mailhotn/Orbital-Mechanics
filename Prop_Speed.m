@@ -29,14 +29,14 @@ P = Propagator(WC);
 T = 0:1:86400;
 disp('J2 GPS:')
 tic
-[~,~] = P.prop_ECI_J2(T);
+[Time,X] = P.PropEciJ2(T);
 toc
 WC = WalkerConstellation(200,20,2,55,1000);
 P = Propagator(WC,1e-6,1e-6);
 T = 0:1:60*60*2;
 disp('J2 Large Con:')
 tic
-[Time,X] = P.prop_ECI_J2(T);
+[Time,X] = P.PropEciJ2(T);
 toc
 %% prop OE Mean
 % WC = SingleSat([10000,0.7,30,100,50,0]);
