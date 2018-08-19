@@ -1,6 +1,6 @@
 %% Load Optimization Parameters
 
-datafolder = 'C:\Users\User\Dropbox\Lattice Optimization Data';
+datafolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Lattice Version 2';
 walkerFolder = ['C:\Users\User\Dropbox\Walker Optimization Data'...
     '\Previous Optimization Runs\Walker RGT Ex Search delta inc 10'];
 
@@ -63,18 +63,19 @@ for iLat = 1:nLats
             % Lattice
             load([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latList(iLat))...
                 '_nSats_' num2str(nSats(iEcc,iSats)) '_ecc_' num2str(eccList(iEcc)) '.mat']);
-            latticeMaxPdop(iEcc,iSats,iLat) = ExSol.maxPdop(ExSol.optNC2,ExSol.optNPlanes);
-            latticeIntPdop(iEcc,iSats,iLat) = ExSol.intPdop(ExSol.optNC2,ExSol.optNPlanes);
-            latticeCoverage(iEcc,iSats,iLat) = ExSol.coverage(ExSol.optNC2,ExSol.optNPlanes);
+            latticeMaxPdop(iEcc,iSats,iLat) = ExSol.maxPdop(ExSol.iOpt);
+            latticeIntPdop(iEcc,iSats,iLat) = ExSol.intPdop(ExSol.iOpt);
+            latticeCoverage(iEcc,iSats,iLat) = ExSol.coverage(ExSol.iOpt);
             % Check Goal
             if isnan(nSatsToAchieve(iEcc+1,iLat))
                 achieveInt = ExSol.intPdop < intTarget;
                 achieveMax = ExSol.maxPdop < maxTarget;
                 achieveCov = ExSol.coverage > covTarget;
-                if any(any(achieveInt & achieveMax & achieveCov))
+                if any(achieveInt & achieveMax & achieveCov)
                     nSatsToAchieve(iEcc+1, iLat) = nSats(iEcc,iSats);
-                    planeVec = sum(achieveInt & achieveMax & achieveCov,1);
-                    [~,nPlanesToAchieve(iEcc + 1,iLat)] = min(~(planeVec>0));
+                    planeVec = achieveInt & achieveMax & achieveCov;
+                    [~,iMinPlanes] = min(~(planeVec>0));
+                    nPlanesToAchieve(iEcc+1,iLat) = ExSol.archMat(1,iMinPlanes);
                 end
             end
             % Walker
@@ -100,7 +101,7 @@ for iLat = 1:nLats
     semilogy(nSats(1,:),walkerIntPdop(:,:,iLat),'o',nSats.',latticeIntPdop(:,:,iLat).','o')
     title(['Integral of PDOP for \phi_0 = ' num2str(latList(iLat))])
     legend('Walker',['Lattice e = ' num2str(eccList(1))],['Lattice e = ' num2str(eccList(2))],...
-        ['Lattice e = ' num2str(eccList(3))],['Lattice e = ' num2str(eccList(4))])
+        ['Lattice e = ' num2str(eccList(3))])
     xlabel('# Sats')
     ylabel('$\frac{1}{T}\int^{T}_{0}{PDOPdt}$','interpreter','latex','fontsize',12)
     grid minor
@@ -109,7 +110,7 @@ for iLat = 1:nLats
     semilogy(nSats(1,:),walkerMaxPdop(:,:,iLat),'o',nSats.',latticeMaxPdop(:,:,iLat).','o')
     title(['Maximum of PDOP for \phi_0 = ' num2str(latList(iLat))])
     legend('Walker',['Lattice e = ' num2str(eccList(1))],['Lattice e = ' num2str(eccList(2))],...
-        ['Lattice e = ' num2str(eccList(3))],['Lattice e = ' num2str(eccList(4))])
+        ['Lattice e = ' num2str(eccList(3))])
     xlabel('# Sats')
     ylabel('$\max{PDOP}$','interpreter','latex')
     grid minor
@@ -118,7 +119,7 @@ for iLat = 1:nLats
     plot(nSats(1,:),walkerCoverage(:,:,iLat),'o',nSats.',latticeCoverage(:,:,iLat).','o')
     title(['Coverage for \phi_0 = ' num2str(latList(iLat))])
     legend('Walker',['Lattice e = ' num2str(eccList(1))],['Lattice e = ' num2str(eccList(2))],...
-        ['Lattice e = ' num2str(eccList(3))],['Lattice e = ' num2str(eccList(4))])
+        ['Lattice e = ' num2str(eccList(3))])
     xlabel('# Sats')
     ylabel('Coverage %')
     grid minor
@@ -131,7 +132,7 @@ title(['Min Sats for: Int PDOP < ' num2str(intTarget) ' & Max PDOP < ' ...
 xlabel('\phi_0 [°]')
 ylabel('# Satellites')
 legend('Walker',['Lattice e = ' num2str(eccList(1))],['Lattice e = ' num2str(eccList(2))],...
-    ['Lattice e = ' num2str(eccList(3))],['Lattice e = ' num2str(eccList(4))],'location','best')
+    ['Lattice e = ' num2str(eccList(3))],'location','best')
 grid minor
 
 figure()
@@ -141,7 +142,7 @@ title(['Min Planes for: Int PDOP < ' num2str(intTarget) ' & Max PDOP < ' ...
 xlabel('\phi_0 [°]')
 ylabel('# Planes')
 legend('Walker',['Lattice e = ' num2str(eccList(1))],['Lattice e = ' num2str(eccList(2))],...
-    ['Lattice e = ' num2str(eccList(3))],['Lattice e = ' num2str(eccList(4))],'location','best')
+    ['Lattice e = ' num2str(eccList(3))],'location','best')
 grid minor
 
 %% Find min Planes to Achieve Goal for each nSats
@@ -156,9 +157,10 @@ for iEcc = 1:length(eccList)
         achieveInt = ExSol.intPdop < intTarget;
         achieveMax = ExSol.maxPdop < maxTarget;
         achieveCov = ExSol.coverage > covTarget;
-        if any(any(achieveInt & achieveMax & achieveCov))
-            planeVec = sum(achieveInt & achieveMax & achieveCov,1);
-            [~,nPlanesToAchieve(iEcc + 1,iSats)] = min(~(planeVec>0));
+        if any(achieveInt & achieveMax & achieveCov)
+            planeVec = achieveInt & achieveMax & achieveCov;
+            [~,iMinPlanes] = min(~(planeVec>0));
+            nPlanesToAchieve(iEcc+1,iSats) = ExSol.archMat(1,iMinPlanes);
         end
 
         % Walker
@@ -182,5 +184,5 @@ title(['Min Planes for: Int PDOP < ' num2str(intTarget) ' & Max PDOP < ' ...
 xlabel('# Satellites')
 ylabel('# Planes')
 legend('Walker',['Lattice e = ' num2str(eccList(1))],['Lattice e = ' num2str(eccList(2))],...
-    ['Lattice e = ' num2str(eccList(3))],['Lattice e = ' num2str(eccList(4))],'location','best')
+    ['Lattice e = ' num2str(eccList(3))],'location','best')
 grid minor
