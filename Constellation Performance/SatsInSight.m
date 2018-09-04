@@ -28,4 +28,3 @@ sight = ((diff<1e-6).*(elev>=elevMin));
 
 xIs = xEcef(:,sight==1);
 end
-

@@ -127,9 +127,9 @@ classdef LatticeConstellation < Constellation
                     end
                 end
             end
-            X(4,:) = X(4,:) + LC.raan1;
-            X(5,:) = X(5,:) + LC.aop1;
-            X(6,:) = X(6,:) + LC.M1;
+            X(4,:) = wrapTo360(X(4,:) + LC.raan1);
+            X(5,:) = wrapTo360(X(5,:) + LC.aop1);
+            X(6,:) = wrapTo360(X(6,:) + LC.M1);
             oeM = X;
         end
     end

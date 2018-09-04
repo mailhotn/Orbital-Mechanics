@@ -3,14 +3,14 @@ datafolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Latt
 walkerFolder = ['C:\Users\User\Dropbox\Walker Optimization Data'...
     '\Previous Optimization Runs\Walker RGT Ex Search delta inc 10'];
 %% Choose Constellations
-latGs = 50;
+latGs = 20;
 lonGs = 0;
-ecc = 0.05;
-nSats = 51;
-nPlanes = 51;
+ecc = 0.02;
+nSats = 56;
+nPlanes = 8;
 
-nSatsW = 63;
-nPlanesW = 21;
+nSatsW = 56;
+nPlanesW = 8;
 Arch.nDays = 1;
 Arch.nRepeats = 14; 
 load ([datafolder '\OptParams.mat']);
@@ -54,8 +54,8 @@ PlotGroundTrack(propState,propTime,0)
 % xlabel('Time [hr]')
 % grid
 %% Plot PDOP Map
-lats = 5:5:85;
-lons = -180:5:180;
+lats = max([5,latGs-10]):1:min([latGs+10,85]);
+lons = -10:1:10;
 [LON,LAT] = meshgrid(lons,lats);
 PDOP = nan(size(LON));
 PDOPW = nan(size(LON));
@@ -76,15 +76,15 @@ parfor iLon = 1:length(lons)
         pdopW(isnan(pdopW)) = 100;
         PDOPW2(iLat) = mean(pdopW(~isnan(pdopW)));
     end
-    PDOP(:,iLon) =PDOP2;
-    PDOPW(:,iLon) =PDOPW2;
+    PDOP(:,iLon) = PDOP2;
+    PDOPW(:,iLon) = PDOPW2;
 end
 toc
 figure(3)
 subplot(2,1,1)
 
 contourf(LON,LAT,PDOP,2000,'LineColor','none')
-title('Lattice Flower Constellation 51/51')
+title(['Lattice Flower Constellation ' num2str(nSats) '/' num2str(nPlanes)])
 hold on
 
 colormap jet
@@ -97,15 +97,15 @@ load coastlines
 geoshow(coastlat,coastlon)
 plot(lonGs,latGs,'y*','LineWidth',1.5)
 axis equal
-xlim([-180,180])
-ylim([0,90])
+xlim([-20,20])
+ylim([0,40])
 grid on
 hold off
 
 subplot(2,1,2)
 
 contourf(LON,LAT,PDOPW,2000,'LineColor','none')
-title('Walker Constellation 64/8')
+title(['Walker Constellation ' num2str(nSatsW) '/' num2str(nPlanesW)])
 hold on
 
 colormap jet
@@ -118,7 +118,7 @@ load coastlines
 geoshow(coastlat,coastlon)
 plot(lonGs,latGs,'y*','LineWidth',1.5)
 axis equal
-xlim([-180,180])
-ylim([0,90])
+xlim([-20,20])
+ylim([0,40])
 grid on
 hold off

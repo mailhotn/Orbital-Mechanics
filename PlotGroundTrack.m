@@ -1,6 +1,10 @@
 function PlotGroundTrack( xEci, timeVec, gmst0 )
 %plotGroundTrack Plots the ground tracks of a constellation
-%   Detailed explanation goes here
+%   xEci is a Mx(6*N) matrix of ECI states
+%   timeVec is a Mx1 or 1xM vector of time values
+if nargin < 3
+    gmst0 = 0;
+end
 primary = earth();
 gmst = gmst0 + primary.we*timeVec;
 nSats = size(xEci,2)/6;
@@ -16,7 +20,7 @@ hold on
 load coastlines
 geoshow(coastlat,coastlon)
 for iSat = 1:nSats
-    plot(wrapTo180(tracks(2*iSat,:)),tracks(2*iSat-1,:),'.','LineWidth',1.5)
+    plot(wrapTo180(tracks(2*iSat,:)),tracks(2*iSat-1,:),'.','LineWidth',1.5);
 end
 axis equal
 xlim([-180,180])

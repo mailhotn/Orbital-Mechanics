@@ -1,6 +1,6 @@
 %% Load Optimization Parameters
 
-datafolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Lattice Version 2';
+datafolder = 'C:\Users\User\Dropbox\Lattice Optimization Data';
 walkerFolder = ['C:\Users\User\Dropbox\Walker Optimization Data'...
     '\Previous Optimization Runs\Walker RGT Ex Search delta inc 10'];
 
@@ -44,8 +44,8 @@ walkerCoverage  = nan(1,nCons,nLats);
 nSats           = repmat(minSats:maxSats,nEcc,1);
 
 %% Performance Goals
-intTarget = 20;
-maxTarget = 100;
+intTarget = 5;
+maxTarget = 20;
 covTarget = 99.5;
 nSatsToAchieve = nan(nEcc+1,nLats);
 nPlanesToAchieve = nan(nEcc+1,nLats);
@@ -98,7 +98,7 @@ for iLat = 1:nLats
     end
     % Plot Results for latitude
     figure()% Int PDOP
-    semilogy(nSats(1,:),walkerIntPdop(:,:,iLat),'o',nSats.',latticeIntPdop(:,:,iLat).','o')
+    semilogy(nSats(1,:),walkerIntPdop(:,:,iLat),'*',nSats.',latticeIntPdop(:,:,iLat).','o')
     title(['Integral of PDOP for \phi_0 = ' num2str(latList(iLat))])
     legend('Walker',['Lattice e = ' num2str(eccList(1))],['Lattice e = ' num2str(eccList(2))],...
         ['Lattice e = ' num2str(eccList(3))])
@@ -107,7 +107,7 @@ for iLat = 1:nLats
     grid minor
     
     figure()% Max PDOP
-    semilogy(nSats(1,:),walkerMaxPdop(:,:,iLat),'o',nSats.',latticeMaxPdop(:,:,iLat).','o')
+    semilogy(nSats(1,:),walkerMaxPdop(:,:,iLat),'*',nSats.',latticeMaxPdop(:,:,iLat).','o')
     title(['Maximum of PDOP for \phi_0 = ' num2str(latList(iLat))])
     legend('Walker',['Lattice e = ' num2str(eccList(1))],['Lattice e = ' num2str(eccList(2))],...
         ['Lattice e = ' num2str(eccList(3))])
@@ -116,38 +116,41 @@ for iLat = 1:nLats
     grid minor
     
     figure()% Coverage
-    plot(nSats(1,:),walkerCoverage(:,:,iLat),'o',nSats.',latticeCoverage(:,:,iLat).','o')
+    plot(nSats(1,:),walkerCoverage(:,:,iLat),'*',nSats.',latticeCoverage(:,:,iLat).','o')
     title(['Coverage for \phi_0 = ' num2str(latList(iLat))])
     legend('Walker',['Lattice e = ' num2str(eccList(1))],['Lattice e = ' num2str(eccList(2))],...
         ['Lattice e = ' num2str(eccList(3))])
     xlabel('# Sats')
     ylabel('Coverage %')
+    ylim([0,100])
     grid minor
 end
 
 figure()
-plot(latList,nSatsToAchieve,'o')
+plot(latList,nSatsToAchieve(1,:),'*'...
+    ,latList,nSatsToAchieve(2:end,:),'o')
 title(['Min Sats for: Int PDOP < ' num2str(intTarget) ' & Max PDOP < ' ...
     num2str(maxTarget) ' & Coverage > ' num2str(covTarget)])
 xlabel('\phi_0 [°]')
 ylabel('# Satellites')
 legend('Walker',['Lattice e = ' num2str(eccList(1))],['Lattice e = ' num2str(eccList(2))],...
-    ['Lattice e = ' num2str(eccList(3))],'location','best')
+    ['Lattice e = ' num2str(eccList(3))],['Lattice e = ' num2str(eccList(4))],'location','best')
 grid minor
 
 figure()
-plot(latList,nPlanesToAchieve,'o')
+plot(latList,nPlanesToAchieve(1,:),'*'...
+    ,latList,nPlanesToAchieve(2:end,:),'o')
 title(['Min Planes for: Int PDOP < ' num2str(intTarget) ' & Max PDOP < ' ...
     num2str(maxTarget) ' & Coverage > ' num2str(covTarget)])
 xlabel('\phi_0 [°]')
 ylabel('# Planes')
 legend('Walker',['Lattice e = ' num2str(eccList(1))],['Lattice e = ' num2str(eccList(2))],...
-    ['Lattice e = ' num2str(eccList(3))],'location','best')
+    ['Lattice e = ' num2str(eccList(3))],['Lattice e = ' num2str(eccList(4))],'location','best')
 grid minor
 
 %% Find min Planes to Achieve Goal for each nSats
 nPlanesToAchieve = nan(nEcc+1,nCons);
-latGs = 50;
+latGs = 20;
 for iEcc = 1:length(eccList)
     for iSats = 1:nCons
         % Lattice
@@ -177,12 +180,13 @@ for iEcc = 1:length(eccList)
 end
 
 figure()
-plot(nSats(1,:),nPlanesToAchieve,'o')
+plot(nSats(1,:),nPlanesToAchieve(1,:),'*'...
+    ,nSats(1,:),nPlanesToAchieve(2:end,:),'o')
 title(['Min Planes for: Int PDOP < ' num2str(intTarget) ' & Max PDOP < ' ...
     num2str(maxTarget) ' & Coverage > ' num2str(covTarget)...
     ' \phi_0 = ' num2str(latGs)])
 xlabel('# Satellites')
 ylabel('# Planes')
 legend('Walker',['Lattice e = ' num2str(eccList(1))],['Lattice e = ' num2str(eccList(2))],...
-    ['Lattice e = ' num2str(eccList(3))],'location','best')
+    ['Lattice e = ' num2str(eccList(3))],['Lattice e = ' num2str(eccList(4))],'location','best')
 grid minor
