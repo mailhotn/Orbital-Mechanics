@@ -2,3 +2,5 @@
 *.asv
 
 error\.txt
+
+*.lyx

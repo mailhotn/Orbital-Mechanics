@@ -1,14 +1,16 @@
 
-datafolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Lattice Version 1';
+datafolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Lattice Version 2';
 walkerFolder = ['C:\Users\User\Dropbox\Walker Optimization Data'...
     '\Previous Optimization Runs\Walker RGT Ex Search delta inc 10'];
-%% Choose Constellation
-latGs = 50;
+%% Choose Constellations
+latGs = 20;
 lonGs = 0;
-ecc = 0.05;
-nSats = 51;
-nPlanes = 51;
-nC2 = 1;
+ecc = 0.02;
+nSats = 56;
+nPlanes = 8;
+
+nSatsW = 56;
+nPlanesW = 8;
 Arch.nDays = 1;
 Arch.nRepeats = 14; 
 load ([datafolder '\OptParams.mat']);
@@ -17,26 +19,20 @@ load([datafolder '\LatticeExSol_Lat_' num2str(latGs) ...
 %% Create Constellation
 Arch.nSats = nSats;
 Arch.nPlanes = nPlanes;
-Phase.nC3 = Arch.nPlanes; % Constraint! can be different, would increase number of relative orbits.
-Arch.nSatsPerAop = Arch.nDays; % Constraint!  can be different if nDays > 1
-Arch.nAops = Arch.nSats/Arch.nPlanes/Arch.nSatsPerAop;
-gcdOrbits = gcd(Arch.nPlanes,Phase.nC3);
-if gcdOrbits > Arch.nRepeats
-    Phase.nC1 = Arch.nRepeats;
-else
-    l = floor(Arch.nRepeats/gcdOrbits);
-    if l*gcdOrbits == Arch.nRepeats
-        l = l-1;
-    end
-    Phase.nC1 = Arch.nRepeats - l*gcdOrbits;
-end
-Phase.nC2 = nC2;
+iPlane = ExSol.archMat(1,:) == nPlanes;
+Arch.nAops = ExSol.archMat(2,iPlane);
+Arch.nSatsPerAop = ExSol.archMat(3,iPlane);
+
+Phase.nC1 = ExSol.phaseMat(1,iPlane);
+Phase.nC2 = ExSol.phaseMat(2,iPlane);
+Phase.nC3 = ExSol.phaseMat(3,iPlane);
 
 LC = LatticeConstellation(Arch,Phase,ExSol.Orbit,ExSol.InitCon);
-nSatsW = 64;
 load([walkerFolder '\WalkerRgtExSol_Lat_' num2str(latGs)...
                 '_T_' num2str(nSatsW) '.mat']);
-WC = WalkerConstellation(64,8,2,ExSol.inc,ExSol.alt,ExSol.raan0);
+[~,iOpt] = min(ExSol.intPdop(:,nPlanesW));
+phasingFW = iOpt - 1;
+WC = WalkerConstellation(nSatsW,nPlanesW,phasingFW,ExSol.inc,ExSol.alt,ExSol.raan0);
 %% Propagate
 Prop = Propagator(LC,PropParams.relTol,PropParams.absTol);
 PropW = Propagator(WC,PropParams.relTol,PropParams.absTol);
@@ -58,8 +54,8 @@ PlotGroundTrack(propState,propTime,0)
 % xlabel('Time [hr]')
 % grid
 %% Plot PDOP Map
-lats = 40:1:60;
-lons = -20:1:20;
+lats = max([5,latGs-10]):1:min([latGs+10,85]);
+lons = -10:1:10;
 [LON,LAT] = meshgrid(lons,lats);
 PDOP = nan(size(LON));
 PDOPW = nan(size(LON));
@@ -80,15 +76,15 @@ parfor iLon = 1:length(lons)
         pdopW(isnan(pdopW)) = 100;
         PDOPW2(iLat) = mean(pdopW(~isnan(pdopW)));
     end
-    PDOP(:,iLon) =PDOP2;
-    PDOPW(:,iLon) =PDOPW2;
+    PDOP(:,iLon) = PDOP2;
+    PDOPW(:,iLon) = PDOPW2;
 end
 toc
 figure(3)
 subplot(2,1,1)
 
 contourf(LON,LAT,PDOP,2000,'LineColor','none')
-title('Lattice Flower Constellation 51/51')
+title(['Lattice Flower Constellation ' num2str(nSats) '/' num2str(nPlanes)])
 hold on
 
 colormap jet
@@ -101,15 +97,15 @@ load coastlines
 geoshow(coastlat,coastlon)
 plot(lonGs,latGs,'y*','LineWidth',1.5)
 axis equal
-xlim([-30,30])
-ylim([30,70])
+xlim([-20,20])
+ylim([0,40])
 grid on
 hold off
 
 subplot(2,1,2)
 
 contourf(LON,LAT,PDOPW,2000,'LineColor','none')
-title('Walker Constellation 64/8')
+title(['Walker Constellation ' num2str(nSatsW) '/' num2str(nPlanesW)])
 hold on
 
 colormap jet
@@ -122,7 +118,7 @@ load coastlines
 geoshow(coastlat,coastlon)
 plot(lonGs,latGs,'y*','LineWidth',1.5)
 axis equal
-xlim([-30,30])
-ylim([30,70])
+xlim([-20,20])
+ylim([0,40])
 grid on
 hold off

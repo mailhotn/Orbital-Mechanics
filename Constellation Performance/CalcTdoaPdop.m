@@ -22,7 +22,7 @@ dR_hat = dR./sqrt(dot(dR,dR,1));
 H = (dR_hat(:,2:end) - dR_hat(:,1)).';
 PHI = [eye(2);
     -(1-e2)*xGs(1)/xGs(3),-(1-e2)*xGs(2)/xGs(3)];
-G = PHI.'*(H.'*Qinv*H)*PHI; %#ok<*MINV>
+G = PHI.'*(H.'*Qinv*H)*PHI;
 % SOLVE SINGULARITY ISSUE WITH LAT == 0!!!
 if cond(G) <= 1e10
     pdop = sqrt(trace(PHI*inv(G)*PHI.'));

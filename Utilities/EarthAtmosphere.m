@@ -1,4 +1,4 @@
-function [ rho ] = earth_atmo_model( r )
+function [ rho, hBase, rhoBase, hScale] = EarthAtmosphere( r )
 %atmo_model Calculates the density of the atmosphere at a given radius
 h = r - 6378;
 A = [0 25 1.225 7.249;
@@ -28,10 +28,16 @@ A = [0 25 1.225 7.249;
     700 800 3.61E-14 88.667;
     800 900 1.17E-14 124.64;
     900 1000 5.24E-15 181.05];
-ind = find(h >= A(:,1) & h < A(:,2));
+ind = (h >= A(:,1)) & (h < A(:,2));
 if ~isempty(ind)
-    rho = A(ind,3)*exp(-(h-A(ind,1))/A(ind,4));
+    hBase = A(ind,1);
+    rhoBase = A(ind,3);
+    hScale = A(ind,4);
+    rho = rhoBase*exp(-(h-hBase)/hScale);
 else
     rho = 0;
+    rhoBase = 0;
+    hBase = 0;
+    hScale = inf;
 end
 
