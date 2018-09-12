@@ -1,7 +1,7 @@
 function [rGsEst, estError, pdop, flagVec] = ...
-    Geolocate3SatsVec(xEci, time, latGs,lonGs, elevMin, timeVar)
+    GeolocateSphereVec(xEci, time, latGs,lonGs, elevMin, timeVar)
 %Geolocate3SatsVec Estimates the ground station position over time
-%   Spherical Earth model, only 3 satellites taken into account
+%   Spherical Earth model
 %% Input Arguments
 % * xEci    - Mx(6N) matrix of ECI states for N satellites at M time steps
 % * time    - Mx1 vector of time steps
@@ -23,7 +23,7 @@ for iTime = 1:nTime
     xEciNow = reshape(xEci(iTime,:).',6,nSats);
     xEcef = eci2ecef(xEciNow,gmst(iTime));
     xInSight = SatsInSight(xEcef,rGs,elevMin,primary.Re);
-    [rGsNow, pdopNow, flagNow] = Geolocate3Sats(rGs,xInSight,timeVar,elevMin);
+    [rGsNow, pdopNow, flagNow] = GeolocateSphere(rGs,xInSight,timeVar);
     flagVec(iTime) = flagNow;
     pdop(iTime) = pdopNow;
     if flagNow ~= 5
