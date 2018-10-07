@@ -1,13 +1,13 @@
 # Orbital-Mechanics
 
-This repository includes a number of classes and functions used to simulate and evaluate the performance of constellations of satellies.
+This repository includes a number of classes and functions used to simulate and evaluate the performance of constellations of satellites.
 The main focus of this code base is constellations for TDOA based geolocation.
 
 ## The Constellation class & subclasses
 In order to simulate a constellation's dynamics, the constellation must be defined using one of the available constellation classes.
-Each such class is a subclass of the Constellation superclass. This superclass contains the properties that are universal to all types of constellation.
-Each Constellation class must have a certain set of methods which create the initial state of the constellation.
-Each Constellation class must have the following methods:
+Each such class is a subclass of the Constellation superclass. This superclass contains the properties that are universal to all types of constellation such as the number of satellites and the properties of the primary body.
+
+Each Constellation class must have a certain set of methods which create the initial state of the constellation in various forms:
 - _InitialOeOsc_
 - _InitialStateEci_
 - _InitialOeMean_

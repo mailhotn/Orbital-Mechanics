@@ -36,7 +36,7 @@ for iLat = 1:length(latList)
         delV(iLat,iEcc) = delVF;
     end
 end
-
+delV = delV*14*365*1000;
 %% Function Definition
 function [J] = FuelCostElliptical(x,sma,ecc,delSma,delEcc)
 primary = earth();

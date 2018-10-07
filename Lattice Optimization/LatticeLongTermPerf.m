@@ -3,8 +3,8 @@ load([datafolder '\OptParams.mat']);
 
 %%
 ecc = 0.05;
-nSats = 72;
-nPlanes = 12;
+nSats = 51;
+nPlanes = 51;
 latGs = 50;
 load([datafolder '\LatticeExSol_Lat_' num2str(latGs) ...
     '_nSats_' num2str(nSats) '_ecc_' num2str(ecc) '.mat']);
