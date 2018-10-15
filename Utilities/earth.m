@@ -10,12 +10,9 @@ function earthstruct = earth()
 % we - earth rotation rate (deg/s)
 % Tday - length of sidereal day (s)
 
-earthstruct.mu = 398600.440;
-% earthstruct.mu = 398600.4415;
-earthstruct.Re = 6378.137;
-% earthstruct.Re = 6378.1363;
-earthstruct.J2 = 0.0010826265;
-% earthstruct.J2 = 1.08262617385222e-3;
+earthstruct.mu = 398600.4415;
+earthstruct.Re = 6378.1363;
+earthstruct.J2 = 1.08262617385222e-3;
 earthstruct.J3 = -2.53241051856772e-6;
 earthstruct.we = 180/pi*7.29211585530e-5;
 earthstruct.Tday = 2*pi/7.29211585530e-5;
