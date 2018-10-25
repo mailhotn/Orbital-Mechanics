@@ -13,7 +13,7 @@ nRepeats = 14;
 nDays    = 1;
 
 latList = 10:10:60;
-maxSats = 80;
+maxSats = 100;
 minSats = 20;
 
 eccList = [0, 0.01, 0.02, 0.05];

@@ -27,8 +27,10 @@ fVal = ones(2,1);
 iter = 0;
 maxIter = 20;
 
-x = [J2;
-    (((k*Tday/j)/2/pi)^2*mu)^(1/3)];
+initSma = (((k*Tday/j)/2/pi)^2*mu)^(1/3);
+initEcc = -J3/2/J2*Re/initSma*sin(inc);
+x = [initEcc;
+    initSma];
 
 while norm(delX) > tol && iter < maxIter
     J2Effects = 3/4*J2*Re^2/(1 - x(1)^2)^2 * ...
@@ -62,7 +64,7 @@ while norm(delX) > tol && iter < maxIter
     x = x + delX;
     iter = iter + 1;
 end
-if x(1) > 0
+if x(1) > 0 && isreal(x)
     ecc = x(1);
     sma = x(2);
 else

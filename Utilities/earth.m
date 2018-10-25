@@ -16,6 +16,4 @@ earthstruct.J2 = 1.08262617385222e-3;
 earthstruct.J3 = -2.53241051856772e-6;
 earthstruct.we = 180/pi*7.29211585530e-5;
 earthstruct.Tday = 2*pi/7.29211585530e-5;
-
 end
-
