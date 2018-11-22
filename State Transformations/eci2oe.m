@@ -1,4 +1,4 @@
-function OE = eci2oe( R, V ,mu )
+function OE = eci2oe( R, V ,primary )
 %state2elements calculate orbital elements from state in geocentric
 %equatorial reference frame. Accepts R and V matrices of N different points
 %and outputs the elements as a 6xN matrix
@@ -13,8 +13,10 @@ function OE = eci2oe( R, V ,mu )
 % w  - argument of periapsis (deg)
 % th - true anomaly (deg)
 if nargin < 3
-    mu = 398600; % default is earth orbit of satellite with negligible mass
+    primary = earth();
+     % default is earth orbit of satellite with negligible mass
 end
+mu = primary.mu;
 [rows, ~] = size(R);
 if rows ~= 3
     R = R.'; % Make sure R is a wide matrix

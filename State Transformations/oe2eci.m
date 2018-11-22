@@ -1,4 +1,4 @@
-function [R, V] = oe2eci (OE, mu)
+function [R, V] = oe2eci (OE, primary)
 %elements2state calculates Position & velocity vectors in ECI Frame
 % from the orbital elements
 % input is a 6xN matrix of orbital elements:
@@ -17,11 +17,13 @@ function [R, V] = oe2eci (OE, mu)
 %  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % 
 if nargin < 2
-    mu = 398600.440; % default is earth orbit of satellite with negligible mass
+    primary = earth();
+     % default is earth orbit of satellite with negligible mass
 end
 if size(OE,1) ~=6
     OE = OE.';
 end
+mu = primary.mu;
 R = zeros(3,size(OE,2));
 V = zeros(3,size(OE,2));
 a  = OE(1,:);
