@@ -26,7 +26,7 @@ vr0 = dot(V0,R0)/r0;
 a = 2/r0 - v0^2/mu; % inverse of semimajor axis
 X = sqrt(mu)*abs(a)*dt;
 ratio = inf;
-while ratio > tol % Newton - Raphson
+while abs(ratio) > tol % Newton - Raphson
     F = (r0*vr0/sqrt(mu))*X^2*StumC(a*X^2) +...
         (1-a*r0)*X^3*StumS(a*X^2) + r0*X - sqrt(mu)*dt;
     dF = (r0*vr0/sqrt(mu))*X*(1 - a*X^2*StumS(a*X^2)) +...
