@@ -40,4 +40,3 @@ else
     hBase = 0;
     hScale = inf;
 end
-

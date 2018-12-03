@@ -78,20 +78,22 @@ for iLat = 1:nLats
                     nPlanesToAchieve(iEcc+1,iLat) = ExSol.archMat(1,iMinPlanes);
                 end
             end
-            % Walker
-            load([walkerFolder '\WalkerRgtExSol_Lat_' num2str(latList(iLat))...
-                '_T_' num2str(nSats(iEcc,iSats)) '.mat']);
-            walkerMaxPdop(1,iSats,iLat)  = ExSol.maxPdop(ExSol.optF+1,ExSol.optP);
-            walkerIntPdop(1,iSats,iLat)  = ExSol.intPdop(ExSol.optF+1,ExSol.optP);
-            walkerCoverage(1,iSats,iLat) = ExSol.coverage(ExSol.optF+1,ExSol.optP);
-            if isnan(nSatsToAchieve(1,iLat))
-                achieveInt = ExSol.intPdop < intTarget;
-                achieveMax = ExSol.maxPdop < maxTarget;
-                achieveCov = ExSol.coverage > covTarget;
-                if any(any(achieveInt & achieveMax & achieveCov))
-                    nSatsToAchieve(1, iLat) = nSats(1,iSats);
-                    planeVec = sum(achieveInt & achieveMax & achieveCov,1);
-                    [~,nPlanesToAchieve(1,iLat)] = min(~(planeVec>0));
+            if nSats(iEcc,iSats) <= 80
+                % Walker
+                load([walkerFolder '\WalkerRgtExSol_Lat_' num2str(latList(iLat))...
+                    '_T_' num2str(nSats(iEcc,iSats)) '.mat']);
+                walkerMaxPdop(1,iSats,iLat)  = ExSol.maxPdop(ExSol.optF+1,ExSol.optP);
+                walkerIntPdop(1,iSats,iLat)  = ExSol.intPdop(ExSol.optF+1,ExSol.optP);
+                walkerCoverage(1,iSats,iLat) = ExSol.coverage(ExSol.optF+1,ExSol.optP);
+                if isnan(nSatsToAchieve(1,iLat))
+                    achieveInt = ExSol.intPdop < intTarget;
+                    achieveMax = ExSol.maxPdop < maxTarget;
+                    achieveCov = ExSol.coverage > covTarget;
+                    if any(any(achieveInt & achieveMax & achieveCov))
+                        nSatsToAchieve(1, iLat) = nSats(1,iSats);
+                        planeVec = sum(achieveInt & achieveMax & achieveCov,1);
+                        [~,nPlanesToAchieve(1,iLat)] = min(~(planeVec>0));
+                    end
                 end
             end
         end
@@ -150,7 +152,7 @@ grid minor
 
 %% Find min Planes to Achieve Goal for each nSats
 nPlanesToAchieve = nan(nEcc+1,nCons);
-latGs = 20;
+latGs = 40;
 for iEcc = 1:length(eccList)
     for iSats = 1:nCons
         % Lattice
@@ -165,16 +167,18 @@ for iEcc = 1:length(eccList)
             [~,iMinPlanes] = min(~(planeVec>0));
             nPlanesToAchieve(iEcc+1,iSats) = ExSol.archMat(1,iMinPlanes);
         end
-
-        % Walker
-        load([walkerFolder '\WalkerRgtExSol_Lat_' num2str(latGs)...
-            '_T_' num2str(nSats(iEcc,iSats)) '.mat']);
-        achieveInt = ExSol.intPdop < intTarget;
-        achieveMax = ExSol.maxPdop < maxTarget;
-        achieveCov = ExSol.coverage > covTarget;
-        if any(any(achieveInt & achieveMax & achieveCov))
-            planeVec = sum(achieveInt & achieveMax & achieveCov,1);
-            [~,nPlanesToAchieve(1,iSats)] = min(~(planeVec>0));
+        
+        if nSats(iEcc,iSats) <= 80
+            % Walker
+            load([walkerFolder '\WalkerRgtExSol_Lat_' num2str(latGs)...
+                '_T_' num2str(nSats(iEcc,iSats)) '.mat']);
+            achieveInt = ExSol.intPdop < intTarget;
+            achieveMax = ExSol.maxPdop < maxTarget;
+            achieveCov = ExSol.coverage > covTarget;
+            if any(any(achieveInt & achieveMax & achieveCov))
+                planeVec = sum(achieveInt & achieveMax & achieveCov,1);
+                [~,nPlanesToAchieve(1,iSats)] = min(~(planeVec>0));
+            end
         end
     end
 end

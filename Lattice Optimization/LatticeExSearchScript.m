@@ -12,11 +12,10 @@ primary = earth();
 nRepeats = 14;
 nDays    = 1;
 
-latList = 10:10:80;
-maxSats = 80;
+latList = 10:10:60;
+maxSats = 100;
 minSats = 20;
 
-delInc = 10;
 eccList = [0, 0.01, 0.02, 0.05];
 save([PropParams.datafolder '\OptParams.mat']);
 
@@ -26,7 +25,7 @@ parfor iLat = 1:length(latList)
     for iEcc = 1:length(eccList)
         Orbit = struct();
         Orbit.ecc = eccList(iEcc);
-        Orbit.inc = min([90,latList(iLat)+delInc]);
+        Orbit.inc = asind(2/sqrt(5));
         Orbit.sma = CalcRgtSma(Orbit.ecc,Orbit.inc,nRepeats,nDays);
         InitCon = InitConElliptical(Orbit.ecc,Orbit.inc,Orbit.sma,latList(iLat),lonGs);
         for nSats = minSats:maxSats
