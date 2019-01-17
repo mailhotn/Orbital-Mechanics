@@ -1,6 +1,6 @@
 %% Load Optimization Parameters
 
-datafolder = 'C:\Users\User\Dropbox\Lattice Optimization Data';
+datafolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Lattice Version 3';
 walkerFolder = ['C:\Users\User\Dropbox\Walker Optimization Data'...
     '\Previous Optimization Runs\Walker RGT Ex Search delta inc 10'];
 
@@ -61,7 +61,7 @@ for iLat = 1:nLats
     for iEcc = 1:length(eccList)
         for iSats = 1:nCons
             % Lattice
-            load([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latList(iLat))...
+            load([datafolder '\LatticeExSol_Lat_' num2str(latList(iLat))...
                 '_nSats_' num2str(nSats(iEcc,iSats)) '_ecc_' num2str(eccList(iEcc)) '.mat']);
             latticeMaxPdop(iEcc,iSats,iLat) = ExSol.maxPdop(ExSol.iOpt);
             latticeIntPdop(iEcc,iSats,iLat) = ExSol.intPdop(ExSol.iOpt);
@@ -156,7 +156,7 @@ latGs = 40;
 for iEcc = 1:length(eccList)
     for iSats = 1:nCons
         % Lattice
-        load([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latGs)...
+        load([datafolder '\LatticeExSol_Lat_' num2str(latGs)...
             '_nSats_' num2str(nSats(iEcc,iSats)) '_ecc_' num2str(eccList(iEcc)) '.mat']);
         % Check Goal
         achieveInt = ExSol.intPdop < intTarget;

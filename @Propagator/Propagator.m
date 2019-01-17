@@ -45,12 +45,16 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         end
         
         function [Time, X] = PropOeMean(P,T)
+            % Basically useless, propagates equations of motion with linear
+            % solution
             opts = odeset('reltol',P.relTol,'abstol',P.absTol);
             IC = reshape(P.Con.InitialOeMean,[6*P.Con.nSats,1]);
             [Time, X] = ode45(@P.DynOeMean,T,IC,opts);
         end
         
         function [Time, X] = PropOeMeanFast(P,T)
+            % Directly calculates linear solution without numerical
+            % integration
             IC = reshape(P.Con.InitialOeMean,[6*P.Con.nSats,1]);
             % move stuff around
             order = 6*P.Con.nSats;
@@ -238,7 +242,6 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             dX = circshift(V2,-3) + ...
                  circshift(-P.Con.mu*R2./r.^3 + f_J2 + f_J3,3);
         end
-        
         
     end
     
