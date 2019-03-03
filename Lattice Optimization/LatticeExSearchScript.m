@@ -16,18 +16,14 @@ latList = 10:10:60;
 maxSats = 100;
 minSats = 20;
 
-eccList = [0, 0.01, 0.02, 0.05];
+eccList = [0];
 save([PropParams.datafolder '\OptParams.mat']);
 
 %% Perform Search
 
 parfor iLat = 1:length(latList)
     for iEcc = 1:length(eccList)
-        Orbit = struct();
-        Orbit.ecc = eccList(iEcc);
-        Orbit.inc = asind(2/sqrt(5));
-        Orbit.sma = CalcRgtSma(Orbit.ecc,Orbit.inc,nRepeats,nDays);
-        InitCon = InitConElliptical(Orbit.ecc,Orbit.inc,Orbit.sma,latList(iLat),lonGs);
+        Orbit = OptimizeCircleLatInc(nRepeats,nDays,latList(iLat),PropParams.elevMin);
         for nSats = minSats:maxSats
             % Optimize
             try
@@ -37,7 +33,7 @@ parfor iLat = 1:length(latList)
                 Arch.nSats = nSats;
                 Arch.nRepeats = nRepeats;
                 Arch.nDays = nDays;
-                
+                InitCon = struct();
                 ExSol = LatticeExSearch(Arch,Orbit,InitCon,latList(iLat),PropParams);
                 optTime = toc;
                 % Verbose Output Message

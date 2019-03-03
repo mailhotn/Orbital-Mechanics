@@ -29,6 +29,7 @@ if ~exist([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latGs)...
                 for iLam = 1:length(lamList)
                     Phase.nC1 = Arch.nRepeats - lamList(iLam)*gcdO;
                     % Create Constellation and propagate
+                    InitCon = InitConDistOptimal(Arch,Phase,Orbit,latGs,0);
                     LC = LatticeConstellation(Arch,Phase,Orbit,InitCon);
                     Prop = Propagator(LC,PropParams.relTol,PropParams.absTol);
                     [propTime, propState] = Prop.PropEciJ2(PropParams.timeVec);

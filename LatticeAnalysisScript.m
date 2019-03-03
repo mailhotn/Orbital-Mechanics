@@ -1,5 +1,5 @@
 % Orbits
-inc = 11;
+inc = 50;
 ecc = 0;
 nRepeats = 14;
 nDays = 1;
@@ -9,14 +9,14 @@ primary = earth();
 n = sqrt(primary.mu/sma^3);
 eta = sqrt(1-ecc^2);
 
-latGs = 10;
-lonGs = 300;
+latEm = 40;
+lonEm = 300;
 
 % Ground Station Coordinates
-meanAGs = wrapTo360([asind(sind(latGs)/sind(inc));
-                     180 - asind(sind(latGs)/sind(inc))]);
-raanGs = wrapTo360([lonGs - acosd(cosd(meanAGs(1))/cosd(latGs));
-                    lonGs - acosd(cosd(meanAGs(2))/cosd(latGs))]);
+meanAGs = wrapTo360([asind(sind(latEm)/sind(inc));
+                     180 - asind(sind(latEm)/sind(inc))]);
+raanGs = wrapTo360([lonEm - acosd(cosd(meanAGs(1))/cosd(latEm));
+                    lonEm - acosd(cosd(meanAGs(2))/cosd(latEm))]);
                 
 
 
@@ -32,8 +32,8 @@ raanRoi1 = nan(1,nPoints);
 meanRoi2 = nan(1,nPoints);
 raanRoi2 = nan(1,nPoints);
 for iPoint = 1:nPoints
-    latPoint = min([latGs + roiRad*imag(z^iPoint),inc]);
-    lonPoint = lonGs + roiRad*real(z^iPoint);
+    latPoint = min([latEm + roiRad*imag(z^iPoint),inc]);
+    lonPoint = lonEm + roiRad*real(z^iPoint);
     
     meanRoi1(iPoint) = wrapTo360(asind(sind(latPoint)/sind(inc)));
     raanRoi1(iPoint) = wrapTo360(360+(lonPoint - ...
@@ -47,8 +47,20 @@ Area = polyarea(raanRoi1,meanRoi1);
 % Create Constellation
 latMat = [10,0;
           4,5];
-raan0 = -40.6813;
-meanA0 = 0;
+Arch.nPlanes = latMat(1,1);
+Arch.nAops = 1;
+Arch.nSatsPerAop = latMat(2,2);
+Phase.nC1 = latMat(2,1);
+Phase.nC2 = 0;
+Phase.nC3 = 0;
+Orbit.inc = inc;
+Orbit.ecc = 0;
+Orbit.sma = sma;
+
+InitCon = InitConDistOptimal(Arch,Phase,Orbit,latEm,lonEm);
+% InitCon = InitConElliptical(ecc, inc, sma, latEm, lonEm);
+raan0 = InitCon.raan1;
+meanA0 = InitCon.M1;
 [v,l] = eig(latMat);
 nRelTraj = gcd(det(latMat),gcd(latMat(1,1)*nDays - latMat(1,2)*nRepeats,...
                                latMat(2,1)*nDays - latMat(2,2)*nRepeats));
