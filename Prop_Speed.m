@@ -64,20 +64,20 @@ plot(T,wrapTo360(X1(:,5)+X1(:,6)),T,wrapTo360(X_ECI(:,5)+X_ECI(:,6)))
 % legend('O1','w1','M1','O2','w2','M2')
 % plot(T,X(:,4:6))
 %% prop OE Osc vs prop ECI
-WC = WalkerConstellation(6,3,1,55,1000);
+WC = WalkerConstellation();
 P = Propagator(WC);
-T = [0 86400];
+T = 0:10:86400;
 tic
-[ECI_T,X_ECI] = P.prop_ECI_J2(T);
+[ECI_T,X_ECI] = P.PropEciJ2(T);
 eci_time = toc;
 M = size(X_ECI,1);
-X_ECI = reshape(X_ECI.',6,P.Con.N_sats*M);
-X_ECI = eci2oe(X_ECI(1:3,:),X_ECI(4:6,:),P.Con.mu);
+X_ECI = reshape(X_ECI.',6,P.Con.nSats*M);
+X_ECI = eci2oe(X_ECI(1:3,:),X_ECI(4:6,:),P.Con.primary);
 X_ECI(6,:) = ta2me(X_ECI(6,:),X_ECI(2,:));
-X_ECI = reshape(X_ECI,6*P.Con.N_sats,M).';
+X_ECI = reshape(X_ECI,6*P.Con.nSats,M).';
 tic
-[oe_T,X_OE] = P.prop_OE_Osc(T);
+[oe_T,X_OE] = P.PropOeOsc(T);
 oe_time = toc;
 diff = sum(sqrt(dot(X_ECI-X_OE,X_ECI-X_OE,1)));
 disp([newline 'ECI Time: ' num2str(eci_time) newline ' OE Time: ' num2str(oe_time) newline ' Error: ' num2str(diff)])
-plot(T,X_ECI(:,3:6),T,X_OE(:,3:6))
+plot(T,X_ECI(:,6)+X_ECI(:,5),T,X_OE(:,6)+X_OE(:,5))

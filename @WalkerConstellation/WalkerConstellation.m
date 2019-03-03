@@ -74,7 +74,7 @@ classdef WalkerConstellation < Constellation
             % column vectors
             oe = WC.InitialOeOsc;
             oe(6,:) = me2ta(oe(6,:),oe(2,:));
-            [R, V] = oe2eci(oe,WC.mu);
+            [R, V] = oe2eci(oe,WC.primary);
             X = [R; V];
         end
         

@@ -2,7 +2,7 @@ function [OE_osc] = me2osc(OE_m,J2,Re)
 %me2osc Calculates the osculating orbital elements of a satellite
 %   Based on algorithm in appendix F of "Analytical Mechanics of Space
 %   Systems" Schaub & Junkins- Second Edition
-%   Accepts a 6xN Matrix of oscillating elements in the following order:
+%   Accepts a 6xN Matrix of osculating elements in the following order:
 %
 % a  - semimajor axis (km)
 % e  - eccentricity

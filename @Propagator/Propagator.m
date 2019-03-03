@@ -95,6 +95,16 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             X(:,inddeg) = wrapTo360(180/pi*X(:,inddeg));
         end
         
+        function [Time, X] = PropOeOsc2(P,T)
+            opts = odeset('reltol',P.relTol,'abstol',P.absTol);
+            OE = P.Con.InitialOeOsc;
+            OE(3:end,:) = OE(3:end,:)*pi/180;
+            IC = reshape(OE,[6*P.Con.nSats,1]);
+            [Time, X] = ode45(@P.DynOeOsc2,T,IC,opts);
+            inddeg = reshape((3:6).'+(0:P.Con.nSats-1)*6,4*P.Con.nSats,1);
+            X(:,inddeg) = wrapTo360(180/pi*X(:,inddeg));
+        end
+        
         function [Time, X] = PropEciJ3(P,T)
             % Propagate for time T in ECI frame with J2 & J3 perturbations
             % Complexity ~O(T)
@@ -169,7 +179,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             dX = dO + dw + dM;
         end
         
-        function dX = DynOeOsc(P,t,X)  %#ok<INUSL>
+        function dX = DynOeOsc2(P,t,X)  %#ok<INUSL>
             OE  = reshape(X,6,P.Con.nSats);
             % Element vectors (angles already in radians)
             a   = OE(1,:);
@@ -212,9 +222,43 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             dX = B*F + K;
         end
         
-%         function dX = dyn_OE_Osc2(P,t,X) 
-%             
-%         end
+        function dX = DynOeOsc(P,t,X)  %#ok<INUSL>
+            OE  = reshape(X,6,P.Con.nSats);
+            % Element vectors (angles already in radians)
+            a   = OE(1,:);
+            e   = OE(2,:);
+            inc = OE(3,:);
+            w   = OE(5,:);
+            Me  = OE(6,:);
+            th  = pi/180*me2ta(Me*180/pi,e);
+            % Secondary definitions
+            p = a.*(1-e.^2);
+            h = sqrt(P.Con.mu*p);
+            r = p./(1+e.*cos(th));
+            MJ2 = -3*P.Con.mu./r.^4.*P.Con.J2.*P.Con.Re.^2;
+            n = sqrt(P.Con.mu./a.^3);
+            aol = th + w;
+            % Forces
+            fR = MJ2/2.*(1-3*sin(inc).^2.*sin(aol).^2);
+            fTh = MJ2.*sin(inc).^2.*sin(aol).*cos(aol);
+            fH = MJ2.*sin(inc).*cos(inc).*sin(aol);
+            % Element Rates
+            da = 2*a.^2./h.*e.*sin(th).*fR +...
+                2*a.^2./h.*(1 + e.*cos(th)).*fTh;            
+            de = p./h.*sin(th).*fR +...
+                r./h.*(e + 2*cos(th) + e.*cos(th).^2).*fTh;
+            di = r./h.*cos(aol).*fH;
+            dO = r.*sin(aol)./(h.*sin(inc)).*fH;
+            dw = -p./(h.*e).*cos(th).*fR +...
+                r./(h.*e).*(2+e.*cos(th)).*sin(th).*fTh +...
+                -r./h.*sin(aol).*cos(inc)./sin(inc).*fH;
+            dM = (p.*cos(th)-2*r.*e)./(n.*a.^2.*e).*fR +...
+                -(p+r).*sin(th)./(n.*a.^2.*e).*fTh;
+            
+            dOe = reshape([da;de;di;dO;dw;dM + n],6*P.Con.nSats,1);
+            % Equations of Motion
+            dX = dOe;
+        end
 
         function dX = DynEciJ3(P,t,X) %#ok<INUSL>
             % move stuff around

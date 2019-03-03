@@ -41,9 +41,9 @@ classdef LatticeConstellation < Constellation
             %%%% Pre Initialization %%%%
             switch nargin
                 case 0
-                    Arch.nPlanes     = 3;
-                    Arch.nAops       = 2;
-                    Arch.nSatsPerAop = 1;
+                    Arch.nPlanes     = 3; % N_o
+                    Arch.nAops       = 2; % N_w
+                    Arch.nSatsPerAop = 1; % N'_so
                     
                     Phase.nC1    = 1;
                     Phase.nC2    = 2;
@@ -103,7 +103,7 @@ classdef LatticeConstellation < Constellation
             % column vectors
             oe = LC.InitialOeOsc;
             oe(6,:) = me2ta(oe(6,:),oe(2,:));
-            [R, V] = oe2eci(oe,LC.mu);
+            [R, V] = oe2eci(oe,LC.primary);
             X = [R; V];
         end
         

@@ -1,5 +1,5 @@
 % Orbits
-inc = 50;
+inc = 11;
 ecc = 0;
 nRepeats = 14;
 nDays = 1;
@@ -9,34 +9,44 @@ primary = earth();
 n = sqrt(primary.mu/sma^3);
 eta = sqrt(1-ecc^2);
 
-latGs = 40;
-lonGs = 0;
+latGs = 10;
+lonGs = 300;
 
-dLat = 10;
-dLon = 10;
-
+% Ground Station Coordinates
 meanAGs = wrapTo360([asind(sind(latGs)/sind(inc));
                      180 - asind(sind(latGs)/sind(inc))]);
 raanGs = wrapTo360([lonGs - acosd(cosd(meanAGs(1))/cosd(latGs));
                     lonGs - acosd(cosd(meanAGs(2))/cosd(latGs))]);
-meanRoi1 = nan(1,8);
-raanRoi1 = nan(1,8);
-meanRoi2 = nan(1,8);
-raanRoi2 = nan(1,8);
-dLatList = min([-1,-1,-1,0,1,1,1,0]*dLat,ones(1,8)*(inc-latGs));
-dLonList = [-1,0,1,1,1,0,-1,-1]*dLon;
-for iPoint = 1:8
-    meanRoi1(iPoint) = (asind(sind(latGs + dLatList(iPoint))/sind(inc)));
-    raanRoi1(iPoint) = 360+(lonGs + dLonList(iPoint) - ...
-        acosd(cosd(meanRoi1(iPoint))/cosd(latGs + dLatList(iPoint))));
-    
-    meanRoi2(iPoint) = (180-asind(sind(latGs + dLatList(iPoint))/sind(inc)));
-    raanRoi2(iPoint) = 360+(lonGs + dLonList(iPoint) - ...
-        acosd(cosd(meanRoi2(iPoint))/cosd(latGs + dLatList(iPoint))));
-end
+                
 
-latMat = [13,0;
-          6,5];
+
+% Create ROI
+elevMin = 5;
+% roiRad = 1;
+roiRad = 90 - elevMin - asind(primary.Re/sma*sind(elevMin+90));
+nPoints = 100;
+z = cos(2*pi/nPoints) + 1i*sin(2*pi/nPoints);
+
+meanRoi1 = nan(1,nPoints);
+raanRoi1 = nan(1,nPoints);
+meanRoi2 = nan(1,nPoints);
+raanRoi2 = nan(1,nPoints);
+for iPoint = 1:nPoints
+    latPoint = min([latGs + roiRad*imag(z^iPoint),inc]);
+    lonPoint = lonGs + roiRad*real(z^iPoint);
+    
+    meanRoi1(iPoint) = wrapTo360(asind(sind(latPoint)/sind(inc)));
+    raanRoi1(iPoint) = wrapTo360(360+(lonPoint - ...
+        acosd(cosd(meanRoi1(iPoint))/cosd(latPoint))));
+    
+    meanRoi2(iPoint) = wrapTo360(180-asind(sind(latPoint)/sind(inc)));
+    raanRoi2(iPoint) = wrapTo360(360+(lonPoint - ...
+        acosd(cosd(meanRoi2(iPoint))/cosd(latPoint))));
+end
+Area = polyarea(raanRoi1,meanRoi1);
+% Create Constellation
+latMat = [10,0;
+          4,5];
 raan0 = -40.6813;
 meanA0 = 0;
 [v,l] = eig(latMat);
@@ -81,6 +91,6 @@ ylabel('\theta*')
 
 % Draw Direction of movement
 quiver(raan,meanA,rateVec(1)*ones(1,nSats),rateVec(2)*ones(1,nSats))
-% quiver(0,0,v(1,2)*100,v(2,2)*100)
+% quiver(raan,meanA,repmat(v(1,2)*100,1,nSats),repmat(v(2,2)*100,1,nSats),'linewidth',2)
 legend([roi,p(1),p(2)],'ROI','Satellites','Ground Station')
 hold off

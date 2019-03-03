@@ -73,7 +73,7 @@ classdef GeneralFormation < Constellation
             X = zeros(6,GF.nSats);
             X(:,1) = GF.oeChief;
             X(:,2:end) = GF.oeChief + GF.dOeDeputy;
-
+            
             oeM = X;
         end
     end

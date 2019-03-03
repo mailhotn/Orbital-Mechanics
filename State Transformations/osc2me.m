@@ -2,7 +2,7 @@ function [OE_m] = osc2me(OE_osc,J2,Re)
 %osc2me Calculates the mean orbital elements of a satellite
 %   Based on algorithm in appendix F of "Analytical Mechanics of Space
 %   Systems" Schaub & Junkins- Second Edition
-%   Accepts a 6xN Matrix of oscillating elements in the following order:
+%   Accepts a 6xN Matrix of osculating elements in the following order:
 % 
 % a  - semimajor axis (km)
 % e  - eccentricity
