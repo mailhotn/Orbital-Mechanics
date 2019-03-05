@@ -26,7 +26,7 @@ raanEm = wrapTo360([lonEm - acosd(cosd(meanAEm(1))/cosd(latEm));
 
 % Optimize Initial Condition
 ub = [360/nSatsOrb,360/Arch.nPlanes].';
-% options = optimoptions('fmincon','Display','iter'); % For debugging
+options = optimoptions('fmincon','Display','off'); % For debugging
 x0 = fmincon(@(x) DistCost(x,meanA,raan,meanAEm,raanEm),ub./2,eye(2),...
     360*ones(2,1),[],[],[0,0].',ub,[],options);
 InitCon.M1 = x0(1);
@@ -37,5 +37,5 @@ end
 function totDist = DistCost(x,meanA,raan,meanAEm,raanEm)
 relPos1 = wrapTo360([meanA;raan]+x) - [meanAEm(1);raanEm(1)];
 relPos2 = wrapTo360([meanA;raan]+x) - [meanAEm(2);raanEm(2)];
-totDist = sum(dot(relPos1,relPos1,1) + dot(relPos2,relPos2,1));
+totDist = sum(min([dot(relPos1,relPos1,1),dot(relPos2,relPos2,1)]));
 end

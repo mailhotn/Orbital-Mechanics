@@ -12,8 +12,8 @@ primary = earth();
 nRepeats = 14;
 nDays    = 1;
 
-latList = 10:10:60;
-maxSats = 100;
+latList = 10:10:80;
+maxSats = 80;
 minSats = 20;
 
 eccList = [0];
@@ -23,7 +23,7 @@ save([PropParams.datafolder '\OptParams.mat']);
 
 parfor iLat = 1:length(latList)
     for iEcc = 1:length(eccList)
-        Orbit = OptimizeCircleLatInc(nRepeats,nDays,latList(iLat),PropParams.elevMin);
+        Orbit = OptimizeCircLatInc(nRepeats,nDays,latList(iLat),5);
         for nSats = minSats:maxSats
             % Optimize
             try
