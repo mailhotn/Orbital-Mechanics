@@ -1,7 +1,7 @@
 %% Load Optimization Parameters
 
 lat10Folder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Lattice Version 3';
-latIncFolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Lattice O-M Optimal Inc';
+latIncFolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Lattice O-M Optimal Inc + Start v1';
 latOptFolder = 'C:\Users\User\Dropbox\Lattice Optimization Data';
 
 walkerFolder = ['C:\Users\User\Dropbox\Walker Optimization Data'...

@@ -1,6 +1,6 @@
 %% Load Optimization Parameters
 
-datafolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Lattice Version 3';
+datafolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Lattice Version 2';
 walkerFolder = ['C:\Users\User\Dropbox\Walker Optimization Data'...
     '\Previous Optimization Runs\Walker RGT Ex Search delta inc 10'];
 
@@ -152,7 +152,7 @@ grid minor
 
 %% Find min Planes to Achieve Goal for each nSats
 nPlanesToAchieve = nan(nEcc+1,nCons);
-latGs = 40;
+latGs = 50;
 for iEcc = 1:length(eccList)
     for iSats = 1:nCons
         % Lattice
