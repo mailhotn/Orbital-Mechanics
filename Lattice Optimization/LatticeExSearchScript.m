@@ -4,19 +4,19 @@ PropParams.maxPdop = 1000;
 PropParams.timeVec = 0:10:86164;
 lonGs = 0;
 PropParams.elevMin = 5;
-PropParams.relTol  = 1e-6;
-PropParams.absTol  = 1e-6;
+PropParams.relTol  = 1e-8;
+PropParams.absTol  = 1e-8;
 PropParams.datafolder = 'C:\Users\User\Dropbox\Lattice Optimization Data';
 primary = earth();
 
 nRepeats = 14;
 nDays    = 1;
 
-latList = 10:10:60;
-maxSats = 100;
-minSats = 20;
+latList = 30;
+maxSats = 80;
+minSats = 30;
 
-eccList = [0, 0.01, 0.02, 0.05];
+eccList = [0, 0.01, 0.02];
 save([PropParams.datafolder '\OptParams.mat']);
 
 %% Perform Search
@@ -25,7 +25,7 @@ parfor iLat = 1:length(latList)
     for iEcc = 1:length(eccList)
         Orbit = struct();
         Orbit.ecc = eccList(iEcc);
-        Orbit.inc = asind(2/sqrt(5));
+        Orbit.inc = latList(iLat) + 10;
         Orbit.sma = CalcRgtSma(Orbit.ecc,Orbit.inc,nRepeats,nDays);
         InitCon = InitConElliptical(Orbit.ecc,Orbit.inc,Orbit.sma,latList(iLat),lonGs);
         for nSats = minSats:maxSats
