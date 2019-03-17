@@ -2,7 +2,7 @@ function [ ExSol ] = LatticeExSearch( Arch, Orbit, InitCon, latGs, PropParams)
 %LatticeExSearch Exhaustively checks nPlanes, nC1, nC2, nC3 for the best ones
 % Constrained to have a minimal number of seperate ground tracks.
 if ~exist([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latGs)...
-        '_nSats_' num2str(Arch.nSats) '_ecc_' num2str(Orbit.ecc) '.mat'],'file')
+        '_nSats_' num2str(Arch.nSats) '_hA_' num2str(Orbit.hA) '.mat'],'file')
     pList = divisors(Arch.nSats);
     
     % initialize Performance Arrays
@@ -71,8 +71,8 @@ if ~exist([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latGs)...
     ExSol.intPdop  = intVec;
     ExSol.fit = fit;
     save([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latGs)...
-        '_nSats_' num2str(Arch.nSats) '_ecc_' num2str(Orbit.ecc) '.mat'],'ExSol');
+        '_nSats_' num2str(Arch.nSats) '_hA_' num2str(Orbit.hA) '.mat'],'ExSol');
 else
     load([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latGs)...
-        '_nSats_' num2str(Arch.nSats) '_ecc_' num2str(Orbit.ecc) '.mat']);
+        '_nSats_' num2str(Arch.nSats) '_hA_' num2str(Orbit.hA) '.mat']);
 end

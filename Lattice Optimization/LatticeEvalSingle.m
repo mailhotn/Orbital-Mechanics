@@ -1,21 +1,21 @@
-
-datafolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Lattice Version 2';
+datafolder = ['C:\Users\User\Dropbox\Graduate Research Day 2019\'...
+    'Optimization Data\Lattice Alt lat 30'];
 walkerFolder = ['C:\Users\User\Dropbox\Walker Optimization Data'...
     '\Previous Optimization Runs\Walker RGT Ex Search delta inc 10'];
 %% Choose Constellations
-latGs = 20;
-lonGs = 0;
-ecc = 0.02;
-nSats = 56;
+latEm = 30;
+lonEm = 0;
+hA = 900;
+nSats = 64;
 nPlanes = 8;
 
-nSatsW = 56;
+nSatsW = 64;
 nPlanesW = 8;
 Arch.nDays = 1;
 Arch.nRepeats = 14; 
 load ([datafolder '\OptParams.mat']);
-load([datafolder '\LatticeExSol_Lat_' num2str(latGs) ...
-    '_nSats_' num2str(nSats) '_ecc_' num2str(ecc) '.mat']);
+load([datafolder '\LatticeExSol_Lat_' num2str(latEm) ...
+    '_nSats_' num2str(nSats) '_hA_' num2str(hA) '.mat']);
 %% Create Constellation
 Arch.nSats = nSats;
 Arch.nPlanes = nPlanes;
@@ -28,7 +28,7 @@ Phase.nC2 = ExSol.phaseMat(2,iPlane);
 Phase.nC3 = ExSol.phaseMat(3,iPlane);
 
 LC = LatticeConstellation(Arch,Phase,ExSol.Orbit,ExSol.InitCon);
-load([walkerFolder '\WalkerRgtExSol_Lat_' num2str(latGs)...
+load([walkerFolder '\WalkerRgtExSol_Lat_' num2str(latEm)...
                 '_T_' num2str(nSatsW) '.mat']);
 [~,iOpt] = min(ExSol.intPdop(:,nPlanesW));
 phasingFW = iOpt - 1;
@@ -39,7 +39,7 @@ PropW = Propagator(WC,PropParams.relTol,PropParams.absTol);
 [propTime, propState] = Prop.PropEciJ2(PropParams.timeVec);
 [propTimeW, propStateW] = PropW.PropEciJ2(PropParams.timeVec);
 % Evaluate PDOP
-[pdop, satsIs] = TdoaPdopVec(propState,propTime,latGs,0,0,PropParams.elevMin);
+[pdop, satsIs] = TdoaPdopVec(propState,propTime,latEm,0,0,PropParams.elevMin);
 %% Plot Stuff
 figure(1)
 PlotGroundTrack(propState,propTime,0)
@@ -54,7 +54,7 @@ PlotGroundTrack(propState,propTime,0)
 % xlabel('Time [hr]')
 % grid
 %% Plot PDOP Map
-lats = max([5,latGs-10]):1:min([latGs+10,85]);
+lats = max([5,latEm-10]):1:min([latEm+10,85]);
 lons = -10:1:10;
 [LON,LAT] = meshgrid(lons,lats);
 PDOP = nan(size(LON));
@@ -95,10 +95,10 @@ xlabel('Longitude')
 ylabel('Latitude')
 load coastlines
 geoshow(coastlat,coastlon)
-plot(lonGs,latGs,'y*','LineWidth',1.5)
+plot(lonEm,latEm,'y*','LineWidth',1.5)
 axis equal
-xlim([-20,20])
-ylim([0,40])
+xlim([lonEm-10,lonEm+10])
+ylim([latEm-10,latEm+10])
 grid on
 hold off
 
@@ -116,9 +116,9 @@ xlabel('Longitude')
 ylabel('Latitude')
 load coastlines
 geoshow(coastlat,coastlon)
-plot(lonGs,latGs,'y*','LineWidth',1.5)
+plot(lonEm,latEm,'y*','LineWidth',1.5)
 axis equal
-xlim([-20,20])
-ylim([0,40])
+xlim([lonEm-10,lonEm+10])
+ylim([latEm-10,latEm+10])
 grid on
 hold off

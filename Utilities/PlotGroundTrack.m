@@ -20,11 +20,17 @@ hold on
 load coastlines
 geoshow(coastlat,coastlon)
 for iSat = 1:nSats
-    plot(wrapTo180(tracks(2*iSat,:)),tracks(2*iSat-1,:),'.','LineWidth',1.5);
+    plot(wrapTo180(tracks(2*iSat,:)),tracks(2*iSat-1,:),'.');
 end
 axis equal
 xlim([-180,180])
 ylim([-90,90])
+yticks(-90:30:90)
+yticklabels({'90°S','60°S','30°S','0°','30°N','60°N','90°N'})
+xticks(-180:60:180)
+xticklabels({'180°W','120°W','60°W','0°','60°E','120°E','180°E'})
+% xlabel('Longitude')
+% ylabel('Latitude')
 grid on
 hold off
 end

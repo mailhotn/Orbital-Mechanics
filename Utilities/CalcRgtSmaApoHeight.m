@@ -1,6 +1,7 @@
 function [ sma, ecc, fVal] = CalcRgtSmaApoHeight( inc, hA, j, k )
 %CalcRgtSmaApoHeight calculates e & a for an RGT Orbit with given apogee
 %height
+% Setting hA to 0 will result in a circular orbit
 %   Uses multivariate Newton - Raphson method
 
 %   ~~~~~~~~~~~~~  INPUTS  ~~~~~~~~~~~~~~
@@ -9,6 +10,12 @@ function [ sma, ecc, fVal] = CalcRgtSmaApoHeight( inc, hA, j, k )
 %   j   - number of repeats
 %   k   - number of days to repeat
 
+if hA == 0
+    ecc = 0;
+    sma = CalcRgtSma(ecc,inc,j,k);
+    fVal = 0;
+    return
+end
 % Planet
 primary = earth();
 J2 = primary.J2;
