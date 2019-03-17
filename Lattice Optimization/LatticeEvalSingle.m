@@ -5,12 +5,12 @@ walkerFolder = ['C:\Users\User\Dropbox\Walker Optimization Data'...
 %% Choose Constellations
 latEm = 30;
 lonEm = 0;
-hA = 900;
-nSats = 64;
-nPlanes = 8;
+hA = 1000;
+nSats = 63;
+nPlanes = 9;
 
-nSatsW = 64;
-nPlanesW = 8;
+nSatsW = 63;
+nPlanesW = 9;
 Arch.nDays = 1;
 Arch.nRepeats = 14; 
 load ([datafolder '\OptParams.mat']);
@@ -39,7 +39,7 @@ PropW = Propagator(WC,PropParams.relTol,PropParams.absTol);
 [propTime, propState] = Prop.PropEciJ2(PropParams.timeVec);
 [propTimeW, propStateW] = PropW.PropEciJ2(PropParams.timeVec);
 % Evaluate PDOP
-[pdop, satsIs] = TdoaPdopVec(propState,propTime,latEm,0,0,PropParams.elevMin);
+[pdop, satsIs] = TdoaPdopVec(propState,propTime,latEm,lonEm,0,PropParams.elevMin);
 %% Plot Stuff
 figure(1)
 PlotGroundTrack(propState,propTime,0)
@@ -54,8 +54,8 @@ PlotGroundTrack(propState,propTime,0)
 % xlabel('Time [hr]')
 % grid
 %% Plot PDOP Map
-lats = max([5,latEm-10]):1:min([latEm+10,85]);
-lons = -10:1:10;
+lats = max([5,latEm-20]):5:min([latEm+20,85]);
+lons = [-20:5:20] + lonEm;
 [LON,LAT] = meshgrid(lons,lats);
 PDOP = nan(size(LON));
 PDOPW = nan(size(LON));
@@ -66,14 +66,14 @@ parfor iLon = 1:length(lons)
     for iLat = 1:length(lats)
         pdop = TdoaPdopVec(propState,propTime,LAT(iLat,iLon),LON(iLat,iLon)...
             ,0,PropParams.elevMin);
-        pdop(pdop>100) = 100;
-        pdop(isnan(pdop)) = 100;
+        pdop(pdop>100) = 1000;
+        pdop(isnan(pdop)) = 1000;
         PDOP2(iLat) = mean(pdop(~isnan(pdop)));
         
         pdopW = TdoaPdopVec(propStateW,propTimeW,LAT(iLat,iLon),LON(iLat,iLon)...
             ,0,PropParams.elevMin);
-        pdopW(pdopW>100) = 100;
-        pdopW(isnan(pdopW)) = 100;
+        pdopW(pdopW>1000) = 1000;
+        pdopW(isnan(pdopW)) = 1000;
         PDOPW2(iLat) = mean(pdopW(~isnan(pdopW)));
     end
     PDOP(:,iLon) = PDOP2;
@@ -97,8 +97,8 @@ load coastlines
 geoshow(coastlat,coastlon)
 plot(lonEm,latEm,'y*','LineWidth',1.5)
 axis equal
-xlim([lonEm-10,lonEm+10])
-ylim([latEm-10,latEm+10])
+xlim([lonEm-20,lonEm+20])
+ylim([latEm-20,latEm+20])
 grid on
 hold off
 
@@ -118,7 +118,7 @@ load coastlines
 geoshow(coastlat,coastlon)
 plot(lonEm,latEm,'y*','LineWidth',1.5)
 axis equal
-xlim([lonEm-10,lonEm+10])
-ylim([latEm-10,latEm+10])
+xlim([lonEm-20,lonEm+20])
+ylim([latEm-20,latEm+20])
 grid on
 hold off

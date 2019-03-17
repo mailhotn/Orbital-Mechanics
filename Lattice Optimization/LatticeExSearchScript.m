@@ -16,7 +16,7 @@ lonEm = 0;
 maxSats = 80;
 minSats = 45;
 
-hAList = [0, 900, 1000, 1100];
+hAList = [0, 900, 1000];
 save([PropParams.datafolder '\OptParams.mat']);
 
 %% Perform Search

@@ -44,8 +44,8 @@ nSats           = repmat(minSats:maxSats,nHA,1);
 
 %% Performance Goals
 intTarget = 3;
-maxTarget = 20;
-covTarget = 99;
+maxTarget = 10000000;
+covTarget = 98;
 nSatsToAchieve = nan(nHA+1,1);
 nPlanesToAchieve = nan(nHA+1,1);
 

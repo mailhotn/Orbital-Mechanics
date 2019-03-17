@@ -8,6 +8,9 @@ meanMat = nan(max(pList));
 maxMat  = nan(max(pList));
 intMat  = nan(max(pList));
 covMat  = nan(max(pList));
+p90Mat  = nan(max(pList));
+p75Mat  = nan(max(pList));
+p50Mat  = nan(max(pList));
 % Go over all P anf F
 for iPlanes = 1:length(pList)
     for phasingF = 0:(pList(iPlanes)-1)
@@ -27,11 +30,14 @@ for iPlanes = 1:length(pList)
             meanMat(phasingF+1,pList(iPlanes)) = mean(pdop);
             intMat(phasingF+1,pList(iPlanes))  = trapz(propTime,pdop)/...
                 (propTime(end)-propTime(1));
+            p90Mat(phasingF+1,pList(iPlanes)) = prctile(pdop,90);
+            p75Mat(phasingF+1,pList(iPlanes)) = prctile(pdop,75);
+            p50Mat(phasingF+1,pList(iPlanes)) = prctile(pdop,50);
         end
     end
 end
 % Find Best Solution
-[minForP,indP] = min(intMat);
+[minForP,indP] = min(p90Mat);
 [~,optP] = min(minForP);
 optF = indP(optP) - 1;
 % Assign Values to Output Struct
@@ -47,6 +53,9 @@ ExSol.coverage = covMat;
 ExSol.maxPdop = maxMat;
 ExSol.meanPdop = meanMat;
 ExSol.intPdop = intMat;
+ExSol.p90 = p90Mat;
+ExSol.p75 = p75Mat;
+ExSol.p50 = p50Mat;
 ExSol.fit = ExSol.intPdop(ExSol.optF + 1,ExSol.optP);
 
 save([PropParams.datafolder '\WalkerRgtExSol_Lat_' num2str(latGs)...
