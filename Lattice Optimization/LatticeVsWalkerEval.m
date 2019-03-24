@@ -1,8 +1,9 @@
 %% Load Optimization Parameters
 
-datafolder = 'C:\Users\User\Dropbox\Graduate Research Day 2019\Optimization Data\Lattice Alt lat 30';
-walkerFolder = ['C:\Users\User\Dropbox\Walker Optimization Data'...
-    '\Previous Optimization Runs\Walker RGT Ex Search delta inc 10'];
+datafolder = ['C:\Users\User\Dropbox\Graduate Research Day 2019'...
+    '\Optimization Data\Lattice Alt lat 30'];
+walkerFolder = ['C:\Users\User\Dropbox\Graduate Research Day 2019'...
+    '\Optimization Data\Walker lat 30'];
 
 load ([datafolder '\OptParams.mat']);
 % OptParams.mat contains the following variables and structures:
@@ -45,7 +46,7 @@ nSats           = repmat(minSats:maxSats,nHA,1);
 %% Performance Goals
 intTarget = 3;
 maxTarget = 10000000;
-covTarget = 98;
+covTarget = 10;
 nSatsToAchieve = nan(nHA+1,1);
 nPlanesToAchieve = nan(nHA+1,1);
 
@@ -99,31 +100,31 @@ end
 % Plot Results for latitude
 figure()% Int PDOP
 semilogy(nSats(1,:),walkerIntPdop,'*',nSats.',latticeIntPdop.','o')
-title(['Integral of PDOP for \phi_0 = ' num2str(latEm)])
+% title(['Integral of PDOP for \phi_0 = ' num2str(latEm)])
 legend('Walker','Lattice Circular',['Lattice h_a = ' num2str(hAList(2))],...
     ['Lattice h_a = ' num2str(hAList(3))])
-xlabel('# Sats')
-ylabel('$\frac{1}{T}\int^{T}_{0}{PDOPdt}$','interpreter','latex','fontsize',12)
-grid minor
+xlabel('# Satellites')
+ylabel('$\frac{1}{T}\int^{T}_{0}{PDOP(t)dt}$','interpreter','latex','fontsize',12)
+grid on
+% 
+% figure()% Max PDOP
+% semilogy(nSats(1,:),walkerMaxPdop,'*',nSats.',latticeMaxPdop.','o')
+% title(['Maximum of PDOP for \phi_0 = ' num2str(latEm)])
+% legend('Walker','Lattice Circular',['Lattice h_a = ' num2str(hAList(2))],...
+%     ['Lattice h_a = ' num2str(hAList(3))])
+% xlabel('# Satellites')
+% ylabel('$\max{PDOP}$','interpreter','latex')
+% grid on
 
-figure()% Max PDOP
-semilogy(nSats(1,:),walkerMaxPdop,'*',nSats.',latticeMaxPdop.','o')
-title(['Maximum of PDOP for \phi_0 = ' num2str(latEm)])
-legend('Walker','Lattice Circular',['Lattice h_a = ' num2str(hAList(2))],...
-    ['Lattice h_a = ' num2str(hAList(3))])
-xlabel('# Sats')
-ylabel('$\max{PDOP}$','interpreter','latex')
-grid minor
-
-figure()% Coverage
-plot(nSats(1,:),walkerCoverage,'*',nSats.',latticeCoverage.','o')
-title(['Coverage for \phi_0 = ' num2str(latEm)])
-legend('Walker','Lattice Circular',['Lattice h_a = ' num2str(hAList(2))],...
-    ['Lattice h_a = ' num2str(hAList(3))])
-xlabel('# Sats')
-ylabel('Coverage %')
-ylim([0,100])
-grid minor
+% figure()% Coverage
+% plot(nSats(1,:),walkerCoverage,'*',nSats.',latticeCoverage.','o')
+% title(['Coverage for \phi_0 = ' num2str(latEm)])
+% legend('Walker','Lattice Circular',['Lattice h_a = ' num2str(hAList(2))],...
+%     ['Lattice h_a = ' num2str(hAList(3))])
+% xlabel('# Satellites')
+% ylabel('Coverage %')
+% ylim([0,100])
+% grid on
 
 %% Find min Planes to Achieve Goal for each nSats
 nPlanesToAchieve = nan(nHA+1,nCons);
@@ -164,13 +165,20 @@ for iHA = 1:length(hAList)+1
     end
 end
 figure()
-plot(nSats(1,:),nPlanesToAchieve(1,:),'--*'...
-    ,nSats(1,:),nPlanesToAchieve(2:end,:),'--o')
-title(['Min Planes for: Int PDOP < ' num2str(intTarget) ' & Max PDOP < ' ...
-    num2str(maxTarget) ' & Coverage > ' num2str(covTarget)...
-    ' \phi_0 = ' num2str(latEm)])
+plot(nSats(1,~isnan(nPlanesToAchieve(1,:)))...
+    ,nPlanesToAchieve(1,~isnan(nPlanesToAchieve(1,:))),'-s'...
+    ,nSats(1,~isnan(nPlanesToAchieve(2,:)))...
+    ,nPlanesToAchieve(2,~isnan(nPlanesToAchieve(2,:))),'--x'...
+    ,nSats(1,~isnan(nPlanesToAchieve(3,:)))...
+    ,nPlanesToAchieve(3,~isnan(nPlanesToAchieve(3,:))),'--x'...
+    ,nSats(1,~isnan(nPlanesToAchieve(4,:)))...
+    ,nPlanesToAchieve(4,~isnan(nPlanesToAchieve(4,:))),'--x',...
+    'linewidth',1.5,'markersize',10)
+% title(['Min Planes for: Int PDOP < ' num2str(intTarget) ' & Max PDOP < ' ...
+%     num2str(maxTarget) ' & Coverage > ' num2str(covTarget)...
+%     ' \phi_0 = ' num2str(latEm)])
 xlabel('# Satellites')
 ylabel('# Planes')
 legend('Walker','Lattice Circular',['Lattice h_a = ' num2str(hAList(2))],...
     ['Lattice h_a = ' num2str(hAList(3))])
-grid minor
+grid on

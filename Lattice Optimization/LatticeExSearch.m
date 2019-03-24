@@ -44,16 +44,14 @@ if ~exist([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latGs)...
                         pdop(pdop > PropParams.maxPdop)    = PropParams.maxPdop;
                         pdop(isnan(pdop)) = PropParams.maxPdop;
                         intPdop  = trapz(propTime,pdop)/(propTime(end)-propTime(1));
-                        p90 = prctile(pdop,90);
-                        p75 = prctile(pdop,75);
-                        p50 = prctile(pdop,50);
-                        if p90 < p90Vec(iPlanes)
+                        
+                        if intPdop < intVec(iPlanes)
                             intVec(iPlanes) = intPdop;
                             maxVec(iPlanes) = maxPdop;
                             covVec(iPlanes) = coverage;
-                            p90Vec(iPlanes) = p90;
-                            p75Vec(iPlanes) = p75;
-                            p50Vec(iPlanes) = p50;
+                            p90Vec(iPlanes) = prctile(pdop,90);
+                            p75Vec(iPlanes) = prctile(pdop,75);
+                            p50Vec(iPlanes) = prctile(pdop,50);
                             phaseParams(:,iPlanes) = [Phase.nC1;Phase.nC2;Phase.nC3];
                             archParams(:,iPlanes)  = [Arch.nPlanes;Arch.nAops;Arch.nSatsPerAop];
                         end

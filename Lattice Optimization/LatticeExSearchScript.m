@@ -11,7 +11,7 @@ primary = earth();
 nRepeats = 14;
 nDays    = 1;
 
-latEm = 30;
+latEm = 40;
 lonEm = 0;
 maxSats = 80;
 minSats = 45;

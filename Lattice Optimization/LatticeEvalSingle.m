@@ -1,11 +1,11 @@
-datafolder = ['C:\Users\User\Dropbox\Graduate Research Day 2019\'...
-    'Optimization Data\Lattice Alt lat 30'];
-walkerFolder = ['C:\Users\User\Dropbox\Walker Optimization Data'...
-    '\Previous Optimization Runs\Walker RGT Ex Search delta inc 10'];
+datafolder = ['C:\Users\User\Dropbox\Graduate Research Day 2019'...
+    '\Optimization Data\Lattice Alt lat 30'];
+walkerFolder = ['C:\Users\User\Dropbox\Graduate Research Day 2019'...
+    '\Optimization Data\Walker lat 30'];
 %% Choose Constellations
 latEm = 30;
-lonEm = 0;
-hA = 1000;
+lonEm = 35;
+hA = 900;
 nSats = 63;
 nPlanes = 9;
 
@@ -26,10 +26,11 @@ Arch.nSatsPerAop = ExSol.archMat(3,iPlane);
 Phase.nC1 = ExSol.phaseMat(1,iPlane);
 Phase.nC2 = ExSol.phaseMat(2,iPlane);
 Phase.nC3 = ExSol.phaseMat(3,iPlane);
-
+ExSol.InitCon.raan1 = ExSol.InitCon.raan1 + lonEm;
 LC = LatticeConstellation(Arch,Phase,ExSol.Orbit,ExSol.InitCon);
 load([walkerFolder '\WalkerRgtExSol_Lat_' num2str(latEm)...
                 '_T_' num2str(nSatsW) '.mat']);
+ExSol.raan0 = ExSol.raan0 + lonEm;
 [~,iOpt] = min(ExSol.intPdop(:,nPlanesW));
 phasingFW = iOpt - 1;
 WC = WalkerConstellation(nSatsW,nPlanesW,phasingFW,ExSol.inc,ExSol.alt,ExSol.raan0);
@@ -54,8 +55,10 @@ PlotGroundTrack(propState,propTime,0)
 % xlabel('Time [hr]')
 % grid
 %% Plot PDOP Map
-lats = max([5,latEm-20]):5:min([latEm+20,85]);
-lons = [-20:5:20] + lonEm;
+dLon = 10;
+dLat = 10;
+lats = max([5,latEm-dLat]):1:min([latEm+dLat,85]);
+lons = [-dLon:1:dLon] + lonEm;
 [LON,LAT] = meshgrid(lons,lats);
 PDOP = nan(size(LON));
 PDOPW = nan(size(LON));
@@ -68,57 +71,65 @@ parfor iLon = 1:length(lons)
             ,0,PropParams.elevMin);
         pdop(pdop>100) = 1000;
         pdop(isnan(pdop)) = 1000;
-        PDOP2(iLat) = mean(pdop(~isnan(pdop)));
+        PDOP2(iLat) = trapz(propTime,pdop)/propTime(end);
         
         pdopW = TdoaPdopVec(propStateW,propTimeW,LAT(iLat,iLon),LON(iLat,iLon)...
             ,0,PropParams.elevMin);
         pdopW(pdopW>1000) = 1000;
         pdopW(isnan(pdopW)) = 1000;
-        PDOPW2(iLat) = mean(pdopW(~isnan(pdopW)));
+        PDOPW2(iLat) = trapz(propTimeW,pdopW)/propTimeW(end);
     end
     PDOP(:,iLon) = PDOP2;
     PDOPW(:,iLon) = PDOPW2;
 end
 toc
-figure(3)
-subplot(2,1,1)
+%% Actually Plot
+figure(2)
+% subplot(2,1,1)
 
-contourf(LON,LAT,PDOP,2000,'LineColor','none')
-title(['Lattice Flower Constellation ' num2str(nSats) '/' num2str(nPlanes)])
+contourf(LON,LAT,PDOP,0:0.1:20,'LineColor','none')
+% title(['Lattice Flower Constellation ' num2str(nSats) '/' num2str(nPlanes)])
 hold on
 
 colormap jet
 shading interp
-c = colorbar;
-c.Label.String = 'Mean PDOP';
+% c = colorbar;
+% c.Label.String = 'Mean PDOP';
+% c.FontSize = 10;
+% c.Position = [0.6 0.1099 0.05 0.8154];
 xlabel('Longitude')
 ylabel('Latitude')
 load coastlines
-geoshow(coastlat,coastlon)
-plot(lonEm,latEm,'y*','LineWidth',1.5)
+geoshow(coastlat,coastlon,'color','m','linewidth',1.5)
+plot(lonEm,latEm,'yo','LineWidth',1.5)
 axis equal
-xlim([lonEm-20,lonEm+20])
-ylim([latEm-20,latEm+20])
-grid on
+xlim([lonEm-dLon,lonEm+dLon])
+xticks([lonEm-dLon:5:lonEm+dLon])
+ylim([latEm-dLat,latEm+dLat])
+yticks([latEm-dLat:5:latEm+dLat])
+% grid on
 hold off
 
-subplot(2,1,2)
+% subplot(2,1,2)
+figure(3)
 
-contourf(LON,LAT,PDOPW,2000,'LineColor','none')
-title(['Walker Constellation ' num2str(nSatsW) '/' num2str(nPlanesW)])
+contourf(LON,LAT,PDOPW,0:0.1:20,'LineColor','none')
+% title(['Walker Constellation ' num2str(nSatsW) '/' num2str(nPlanesW)])
 hold on
 
 colormap jet
 shading interp
-c = colorbar;
-c.Label.String = 'Mean PDOP';
-xlabel('Longitude')
-ylabel('Latitude')
+% c = colorbar;
+% c.Label.String = 'Mean PDOP';
+% xlabel('Longitude')
+% ylabel('Latitude')
 load coastlines
-geoshow(coastlat,coastlon)
-plot(lonEm,latEm,'y*','LineWidth',1.5)
+geoshow(coastlat,coastlon,'color','m','linewidth',1.5)
+plot(lonEm,latEm,'yo','LineWidth',1.5)
 axis equal
-xlim([lonEm-20,lonEm+20])
-ylim([latEm-20,latEm+20])
-grid on
+xlim([lonEm-dLon,lonEm+dLon])
+xticks([lonEm-dLon:5:lonEm+dLon])
+ylim([latEm-dLat,latEm+dLat])
+yticks([latEm-dLat:5:latEm+dLat])
+% grid on
 hold off

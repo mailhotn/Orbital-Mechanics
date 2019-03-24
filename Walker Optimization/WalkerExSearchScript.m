@@ -7,7 +7,7 @@ PropParams.relTol = 1e-6;
 PropParams.absTol = 1e-6;
 PropParams.datafolder = 'C:\Users\User\Dropbox\Walker Optimization Data';
 
-latEm = 30;
+latEm = 40;
 Rgt.jRepeats = 14;
 Rgt.kDays    = 1;
 primary = earth();
