@@ -1,9 +1,12 @@
-function [ inc, sma ] = OptimizeCircLatInc(nRepeats,nDays,latGs,elevMin)
+function [ Orbit ] = OptimizeCircLatInc(nRepeats,nDays,latGs,elevMin)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 primary = earth();
 inc = fminbnd(@(x) CalcRoiArea(x,nRepeats,nDays,latGs,elevMin,primary),latGs,89);
 sma = CalcRgtSma(0,inc,nRepeats,nDays);
+Orbit.ecc = 0;
+Orbit.inc = inc;
+Orbit.sma = sma;
 end
 
 function cost = CalcRoiArea(x,nRepeats,nDays,latGs,elevMin,primary)

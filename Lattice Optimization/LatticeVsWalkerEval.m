@@ -1,9 +1,11 @@
 %% Load Optimization Parameters
 
+
 datafolder = ['C:\Users\User\Dropbox\Graduate Research Day 2019'...
     '\Optimization Data\Lattice Alt lat 30'];
 walkerFolder = ['C:\Users\User\Dropbox\Graduate Research Day 2019'...
     '\Optimization Data\Walker lat 30'];
+
 
 load ([datafolder '\OptParams.mat']);
 % OptParams.mat contains the following variables and structures:
@@ -127,8 +129,10 @@ grid on
 % grid on
 
 %% Find min Planes to Achieve Goal for each nSats
+
 nPlanesToAchieve = nan(nHA+1,nCons);
 for iHA = 1:length(hAList)
+
     for iSats = 1:nCons
         % Lattice
         load([datafolder '\LatticeExSol_Lat_' num2str(latEm)...

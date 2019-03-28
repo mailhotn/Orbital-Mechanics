@@ -12,16 +12,19 @@ nRepeats = 14;
 nDays    = 1;
 
 latList = 10:10:80;
+
 % latEm = 40;
 lonEm = 0;
 maxSats = 80;
 minSats = 30;
 
 hAList = [0, 900, 1000];
+
 save([PropParams.datafolder '\OptParams.mat']);
 
 %% Perform Search
 parfor iLat = 1:length(latList)
+
     latEm = latList(iLat)
     for iHA = 1:length(hAList)
         Orbit = struct();
@@ -31,6 +34,7 @@ parfor iLat = 1:length(latList)
         Orbit.ecc = ecc;
         Orbit.hA = hAList(iHA);
         InitCon = InitConElliptical(Orbit.ecc,Orbit.inc,Orbit.sma,latEm,lonEm);
+
         for nSats = minSats:maxSats
             % Optimize
             try
@@ -40,8 +44,10 @@ parfor iLat = 1:length(latList)
                 Arch.nSats = nSats;
                 Arch.nRepeats = nRepeats;
                 Arch.nDays = nDays;
+
                 
                 ExSol = LatticeExSearch(Arch,Orbit,InitCon,latEm,PropParams);
+
                 optTime = toc;
                 % Verbose Output Message
                 c = clock;
@@ -56,7 +62,7 @@ parfor iLat = 1:length(latList)
                     '/' num2str(ExSol.phaseMat(1,ExSol.iOpt)) ...
                     '/' num2str(ExSol.phaseMat(2,ExSol.iOpt)) ...
                     '/' num2str(ExSol.phaseMat(3,ExSol.iOpt)) ...
-                    newline 'Inclination: ' num2str(Orbit.inc) '°'...
+                    newline 'Inclination: ' num2str(Orbit.inc) 'Â°'...
                     newline 'Eccentricity: ' num2str(Orbit.ecc)...
                     newline 'Semimajor Axis: ' num2str(Orbit.sma) ' km' ...
                     newline 'Earth Repeats: ' num2str(nRepeats)])
