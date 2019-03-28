@@ -2,12 +2,15 @@ function [ ExSol ] = LatticeExSearch( Arch, Orbit, InitCon, latGs, PropParams)
 %LatticeExSearch Exhaustively checks nPlanes, nC1, nC2, nC3 for the best ones
 % Constrained to have a minimal number of seperate ground tracks.
 if ~exist([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latGs)...
-        '_nSats_' num2str(Arch.nSats) '_ecc_' num2str(Orbit.ecc) '.mat'],'file')
+        '_nSats_' num2str(Arch.nSats) '_hA_' num2str(Orbit.hA) '.mat'],'file')
     pList = divisors(Arch.nSats);
     
     % initialize Performance Arrays
     maxVec = inf(1,length(pList));
     intVec = inf(1,length(pList));
+    p90Vec = inf(1,length(pList));
+    p75Vec = inf(1,length(pList));
+    p50Vec = inf(1,length(pList));
     covVec = zeros(1,length(pList));
     
     % Initialize Constellation Parameter Arrays
@@ -42,10 +45,14 @@ if ~exist([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latGs)...
                         pdop(pdop > PropParams.maxPdop)    = PropParams.maxPdop;
                         pdop(isnan(pdop)) = PropParams.maxPdop;
                         intPdop  = trapz(propTime,pdop)/(propTime(end)-propTime(1));
+                        
                         if intPdop < intVec(iPlanes)
                             intVec(iPlanes) = intPdop;
                             maxVec(iPlanes) = maxPdop;
                             covVec(iPlanes) = coverage;
+                            p90Vec(iPlanes) = prctile(pdop,90);
+                            p75Vec(iPlanes) = prctile(pdop,75);
+                            p50Vec(iPlanes) = prctile(pdop,50);
                             phaseParams(:,iPlanes) = [Phase.nC1;Phase.nC2;Phase.nC3];
                             archParams(:,iPlanes)  = [Arch.nPlanes;Arch.nAops;Arch.nSatsPerAop];
                         end
@@ -70,10 +77,13 @@ if ~exist([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latGs)...
     ExSol.coverage = covVec;
     ExSol.maxPdop  = maxVec;
     ExSol.intPdop  = intVec;
+    ExSol.p90 = p90Vec;
+    ExSol.p75 = p75Vec;
+    ExSol.p50 = p50Vec;
     ExSol.fit = fit;
     save([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latGs)...
-        '_nSats_' num2str(Arch.nSats) '_ecc_' num2str(Orbit.ecc) '.mat'],'ExSol');
+        '_nSats_' num2str(Arch.nSats) '_hA_' num2str(Orbit.hA) '.mat'],'ExSol');
 else
     load([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latGs)...
-        '_nSats_' num2str(Arch.nSats) '_ecc_' num2str(Orbit.ecc) '.mat']);
+        '_nSats_' num2str(Arch.nSats) '_hA_' num2str(Orbit.hA) '.mat']);
 end
