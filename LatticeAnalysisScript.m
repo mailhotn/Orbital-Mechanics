@@ -1,5 +1,5 @@
 % Orbits
-inc = 50;
+inc = 24.6415;
 ecc = 0;
 nRepeats = 14;
 nDays = 1;
@@ -9,7 +9,7 @@ primary = earth();
 n = sqrt(primary.mu/sma^3);
 eta = sqrt(1-ecc^2);
 
-latEm = 40;
+latEm = 10;
 lonEm = 300;
 
 % Ground Station Coordinates
@@ -32,8 +32,9 @@ raanRoi1 = nan(1,nPoints);
 meanRoi2 = nan(1,nPoints);
 raanRoi2 = nan(1,nPoints);
 for iPoint = 1:nPoints
-    latPoint = min([latEm + roiRad*imag(z^iPoint),inc]);
-    lonPoint = lonEm + roiRad*real(z^iPoint);
+    latPoint = sign(latEm + roiRad*imag(z^iPoint))*...
+        min([abs(latEm + roiRad*imag(z^iPoint)),inc]);
+    lonPoint = lonEm + roiRad*real(z^iPoint)/cosd(latPoint);
     
     meanRoi1(iPoint) = wrapTo360(asind(sind(latPoint)/sind(inc)));
     raanRoi1(iPoint) = wrapTo360(360+(lonPoint - ...

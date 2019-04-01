@@ -16,6 +16,7 @@ latList = 10:10:80;
 lonEm = 0;
 maxSats = 80;
 minSats = 30;
+hAList = [0];
 
 save([PropParams.datafolder '\OptParams.mat']);
 

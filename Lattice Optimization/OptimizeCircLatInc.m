@@ -18,8 +18,9 @@ z = cos(2*pi/nPoints) + 1i*sin(2*pi/nPoints);
 meanRoi1 = nan(1,nPoints);
 raanRoi1 = nan(1,nPoints);
 for iPoint = 1:nPoints
-    latPoint = min([latGs + roiRad*imag(z^iPoint),x]);
-    lonPoint = roiRad*real(z^iPoint);
+    latPoint = sign(latGs + roiRad*imag(z^iPoint))*...
+        min([abs(latGs + roiRad*imag(z^iPoint)),x]);
+    lonPoint = roiRad*real(z^iPoint)/cosd(latPoint);
     
     meanRoi1(iPoint) = (asind(sind(latPoint)/sind(x)));
     raanRoi1(iPoint) = (360 + (lonPoint - ...

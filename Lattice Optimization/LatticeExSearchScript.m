@@ -18,7 +18,7 @@ lonEm = 0;
 maxSats = 80;
 minSats = 30;
 
-hAList = [0, 900, 1000];
+hAList = [0];
 
 save([PropParams.datafolder '\OptParams.mat']);
 
@@ -28,10 +28,11 @@ parfor iLat = 1:length(latList)
     latEm = latList(iLat)
     for iHA = 1:length(hAList)
         Orbit = struct();
-        Orbit.inc = min([89,latEm + 10]);
-        [sma, ecc] = CalcRgtSmaApoHeight(Orbit.inc, hAList(iHA), nRepeats, nDays);
-        Orbit.sma = sma;
-        Orbit.ecc = ecc;
+        Orbit = OptimizeCircLatInc(nRepeats,nDays,latEm,PropParams.elevMin);
+%         Orbit.inc = min([89,latEm + 10]);
+%         [sma, ecc] = CalcRgtSmaApoHeight(Orbit.inc, hAList(iHA), nRepeats, nDays);
+%         Orbit.sma = sma;
+%         Orbit.ecc = ecc;
         Orbit.hA = hAList(iHA);
         InitCon = InitConElliptical(Orbit.ecc,Orbit.inc,Orbit.sma,latEm,lonEm);
 
@@ -62,7 +63,7 @@ parfor iLat = 1:length(latList)
                     '/' num2str(ExSol.phaseMat(1,ExSol.iOpt)) ...
                     '/' num2str(ExSol.phaseMat(2,ExSol.iOpt)) ...
                     '/' num2str(ExSol.phaseMat(3,ExSol.iOpt)) ...
-                    newline 'Inclination: ' num2str(Orbit.inc) 'Â°'...
+                    newline 'Inclination: ' num2str(Orbit.inc) '°'...
                     newline 'Eccentricity: ' num2str(Orbit.ecc)...
                     newline 'Semimajor Axis: ' num2str(Orbit.sma) ' km' ...
                     newline 'Earth Repeats: ' num2str(nRepeats)])
