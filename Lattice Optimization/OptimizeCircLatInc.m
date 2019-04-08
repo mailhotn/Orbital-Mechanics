@@ -1,6 +1,6 @@
 function [ Orbit ] = OptimizeCircLatInc(nRepeats,nDays,latGs,elevMin)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+%OptimizeCircLatInc Finds optimal inclination from ROI area
+%   Circular Orbits only
 primary = earth();
 inc = fminbnd(@(x) CalcRoiArea(x,nRepeats,nDays,latGs,elevMin,primary),latGs,89);
 sma = CalcRgtSma(0,inc,nRepeats,nDays);
