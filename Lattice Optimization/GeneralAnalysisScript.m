@@ -1,10 +1,13 @@
 %% Define Scenarios for Analysis
-folderList = {'C:\Users\User\Dropbox\Walker Optimization Data\Previous Optimization Runs\Latticified Walker',...
-    'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Apogee Height, delta inc',...
-    'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Apogee Height, opt inc(pre-fix)',...
-    'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Apogee Height x3, opt inc'};
-markerList = {'*','o','x','s'};
-nameList = {'Walker','Lattice Basic','Lattice Optimal 1','Lattice Optimal 2'};
+folderList = {...
+    'C:\Users\User\Dropbox\Walker Optimization Data\Previous Optimization Runs\Walker Lat 40 inc test',...
+%     'C:\Users\User\Dropbox\Walker Optimization Data\Previous Optimization Runs\Latticified Walker Opt Inc',...
+%     'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Apogee Height, delta inc',...
+%     'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Apogee Height, opt inc(pre-fix)',...
+%     'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Apogee Height x3, opt inc 2',...
+    };
+markerList = {'*','^','o','x','s'};
+nameList = {'Walker','Walker Opt','Lattice Basic','Lattice Optimal 1','Lattice Optimal 2'};
 nScenarios = numel(folderList);
 
 %% Set Performance Goals
@@ -18,7 +21,7 @@ close all
 nLeg = 0;
 for iScenario = 1:nScenarios
     load([folderList{iScenario} '\OptParams.mat']);
-    hAList = 0;
+%     hAList = 0;
     nSats = minSats:maxSats;
     maxPdop = nan(numel(hAList),numel(nSats));
     intPdop = nan(numel(hAList),numel(nSats));
@@ -103,8 +106,10 @@ for iScenario = 1:nScenarios
         
         figure(iLat*10 + 4) % Pareto Frontier
         hold on
-        plot(paretoSats{:},paretoPlanes{:},['--' markerList{iScenario}]...
+        for iHA = 1:numel(hAList)
+        plot(paretoSats{iHA},paretoPlanes{iHA},['--' markerList{iScenario}]...
         ,'linewidth',1.5,'markersize',10)
+        end
         title(['Pareto Frontier \phi_0 = ' num2str(latList(iLat))])
         xlabel('# Sats')
         ylabel('# Planes')

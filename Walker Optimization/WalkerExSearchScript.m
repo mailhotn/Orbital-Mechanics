@@ -11,25 +11,27 @@ primary = earth();
 nRepeats = 14;
 nDays    = 1;
 
-latList = 10:10:80;
-% latEm = 40;
+% latList = 10:10:80;
+latList = 40;
+latEm = 40;
 lonEm = 0;
 maxSats = 80;
 minSats = 30;
 hAList = [0];
-
+dInc = 0:2:20;
+hAList = dInc;
 save([PropParams.datafolder '\OptParams.mat']);
 
 %% Massive For Loop
 
-parfor iLat = 1:length(latList)
-    latEm = latList(iLat);
+parfor iInc = 1:length(dInc)
+%     latEm = latList(iLat);
     Orbit = struct();
     Orbit.ecc = 0;
-    Orbit.inc = min([89,latEm + 10]);
+    Orbit.inc = min([89,latEm + dInc(iInc)]);
     Orbit.sma = CalcRgtSma(Orbit.ecc,Orbit.inc,nRepeats,nDays);
-    Orbit.hA = 0;
-    
+    Orbit.hA = dInc(iInc);
+%     Orbit = CalcOptIncRoiA(nRepeats,nDays,latEm,0,5);
     InitCon = InitConElliptical(Orbit.ecc,Orbit.inc,Orbit.sma,latEm,lonEm);
     for nSats = minSats:maxSats
         % Optimize
