@@ -15,7 +15,7 @@ latList = 10:10:80;
 
 % latEm = 40;
 lonEm = 0;
-maxSats = 80;
+maxSats = 90;
 minSats = 30;
 
 hAList = [0, 900, 1000];
@@ -27,13 +27,13 @@ parfor iLat = 1:length(latList)
 
     latEm = latList(iLat)
     for iHA = 1:length(hAList)
-%         Orbit = struct();
-        Orbit = CalcOptIncRoiA(nRepeats,nDays,latEm,hAList(iHA),PropParams.elevMin);
-%         Orbit.inc = min([89,latEm + 10]);
-%         [sma, ecc] = CalcRgtSmaApoHeight(Orbit.inc, hAList(iHA), nRepeats, nDays);
-%         Orbit.sma = sma;
-%         Orbit.ecc = ecc;
-%         Orbit.hA = hAList(iHA);
+        Orbit = struct();
+        [sma, ecc, inc] = RgtSunSynElements(hAList(iHA), nRepeats, nDays);
+        Orbit.sma = sma;
+        Orbit.ecc = ecc;
+        Orbit.inc = inc;
+        Orbit.hA = hAList(iHA);
+        
         InitCon = InitConElliptical(Orbit.ecc,Orbit.inc,Orbit.sma,latEm,lonEm);
 
         for nSats = minSats:maxSats
