@@ -1,6 +1,6 @@
 %% Circular Orbits
 % Orbits
-inc = 70;
+inc = 54.18;
 ecc = 0;
 nRepeats = 14;
 nDays = 1;
@@ -19,10 +19,10 @@ meanAGs = wrapTo360([asind(sind(latEm)/sind(inc));
 raanGs = wrapTo360([lonEm - acosd(cosd(meanAGs(1))/cosd(latEm));
                     lonEm - acosd(cosd(meanAGs(2))/cosd(latEm))]);
 
-% Create ROI
+% Create region of interest with earth central angle
 elevMin = 5;
 % roiRad = 1;
-roiRad = 90 - elevMin - asind(primary.Re/sma*sind(elevMin+90));
+roiEca = 90 - elevMin - asind(primary.Re/sma*cosd(elevMin));
 nPoints = 100;
 z = cos(2*pi/nPoints) + 1i*sin(2*pi/nPoints);
 
@@ -37,7 +37,7 @@ for iPoint = 1:nPoints
 
     phiE = wrapTo360(angle(z^iPoint)*180/pi);
     latPEm = 90 - latEm;
-    latPP = acosd(cosd(roiRad)*cosd(latPEm) + sind(roiRad)*sind(latPEm)*cosd(phiE));
+    latPP = acosd(cosd(roiEca)*cosd(latPEm) + sind(roiEca)*sind(latPEm)*cosd(phiE));
     latPoint = 90 - latPP;
     
     latPoint = sign(latPoint)*min([abs(latPoint),inc]);
@@ -45,18 +45,18 @@ for iPoint = 1:nPoints
     roiTrue = atan2d(sind(latPEm)*cosd(phiE),cosd(latPEm)) +...
         atan2d(sqrt(cosd(latPEm)^2 + (sind(latPEm)*cosd(phiE))^2 - cosd(latPP)^2), cosd(latPP));
     
-    dLon = real(acosd((cosd(roiRad) - cosd(latPP)*cosd(latPEm))/...
+    dLon = real(acosd((cosd(roiEca) - cosd(latPP)*cosd(latPEm))/...
         (hemid(latPEm)*sind(latPEm)*sind(latPP))) - 90*(hemid(latPEm)-1));
     lonPoint = lonEm - dLon*hemid(phiE);
     
     lats(iPoint) = latPoint;
     lons(iPoint) = lonPoint;
     
-    meanRoi1(iPoint) = wrapTo360(asind(sind(latPoint)/sind(inc)));
+    meanRoi1(iPoint) = (asind(sind(latPoint)/sind(inc)));
     raanRoi1(iPoint) = wrapTo360(360+(lonPoint - ...
         acosd(cosd(meanRoi1(iPoint))/cosd(latPoint))));
     
-    meanRoi2(iPoint) = wrapTo360(180-asind(sind(latPoint)/sind(inc)));
+    meanRoi2(iPoint) = (180-asind(sind(latPoint)/sind(inc)));
     raanRoi2(iPoint) = wrapTo360(360+(lonPoint - ...
         acosd(cosd(meanRoi2(iPoint))/cosd(latPoint))));
 end
@@ -102,6 +102,10 @@ gsRate = primary.we;
 
 rateVec = [raanRate - gsRate;
            meanRate];
+
+% meanRoi1 = meanRoi1*rateVec(2);
+% raanRo11 = raanRoi1*abs(rateVec(1));
+ScaledArea = polyarea(raanRoi1,meanRoi1)
 
 figure(1)
 clf
@@ -152,7 +156,7 @@ raanGs = wrapTo360([lonEm - acosd(cosd(meanAGs(1))/cosd(latEm));
 % Create ROI
 elevMin = 5;
 % roiRad = 1;
-roiRad = 90 - elevMin - asind(primary.Re/(sma*(1-ecc))*sind(elevMin+90));
+roiEca = 90 - elevMin - asind(primary.Re/(sma*(1-ecc))*sind(elevMin+90));
 nPoints = 100;
 z = cos(2*pi/nPoints) + 1i*sin(2*pi/nPoints);
 
@@ -161,9 +165,9 @@ raanRoi1 = nan(1,nPoints);
 meanRoi2 = nan(1,nPoints);
 raanRoi2 = nan(1,nPoints);
 for iPoint = 1:nPoints
-    latPoint = sign(latEm + roiRad*imag(z^iPoint))*...
-        min([abs(latEm + roiRad*imag(z^iPoint)),inc]);
-    lonPoint = lonEm + roiRad*real(z^iPoint)/cosd(latPoint);
+    latPoint = sign(latEm + roiEca*imag(z^iPoint))*...
+        min([abs(latEm + roiEca*imag(z^iPoint)),inc]);
+    lonPoint = lonEm + roiEca*real(z^iPoint)/cosd(latPoint);
     
     meanRoi1(iPoint) = wrapTo360(asind(sind(latPoint)/sind(inc)));
     raanRoi1(iPoint) = wrapTo360(360+(lonPoint - ...
