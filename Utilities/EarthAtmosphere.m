@@ -29,7 +29,7 @@ A = [0 25 1.225 7.249;
     800 900 1.17E-14 124.64;
     900 1000 5.24E-15 181.05];
 ind = (h >= A(:,1)) & (h < A(:,2));
-if ~isempty(ind)
+if any(ind)
     hBase = A(ind,1);
     rhoBase = A(ind,3);
     hScale = A(ind,4);

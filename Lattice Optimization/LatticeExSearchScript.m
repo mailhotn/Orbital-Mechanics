@@ -2,7 +2,6 @@
 clear
 PropParams.maxPdop = 1000;
 PropParams.timeVec = 0:10:86164;
-lonGs = 0;
 PropParams.elevMin = 5;
 PropParams.relTol  = 1e-6;
 PropParams.absTol  = 1e-6;
@@ -12,22 +11,31 @@ primary = earth();
 nRepeats = 14;
 nDays    = 1;
 
-latList = 10:10:60;
-maxSats = 100;
-minSats = 20;
+latList = 10:10:80;
 
-eccList = [0, 0.01, 0.02, 0.05];
+% latEm = 40;
+lonEm = 0;
+maxSats = 80;
+minSats = 30;
+
+hAList = [0, 900, 1000];
+
 save([PropParams.datafolder '\OptParams.mat']);
 
 %% Perform Search
-
 parfor iLat = 1:length(latList)
-    for iEcc = 1:length(eccList)
-        Orbit = struct();
-        Orbit.ecc = eccList(iEcc);
-        Orbit.inc = asind(2/sqrt(5));
-        Orbit.sma = CalcRgtSma(Orbit.ecc,Orbit.inc,nRepeats,nDays);
-        InitCon = InitConElliptical(Orbit.ecc,Orbit.inc,Orbit.sma,latList(iLat),lonGs);
+
+    latEm = latList(iLat)
+    for iHA = 1:length(hAList)
+%         Orbit = struct();
+        Orbit = CalcOptIncRoiA(nRepeats,nDays,latEm,hAList(iHA),PropParams.elevMin);
+%         Orbit.inc = min([89,latEm + 10]);
+%         [sma, ecc] = CalcRgtSmaApoHeight(Orbit.inc, hAList(iHA), nRepeats, nDays);
+%         Orbit.sma = sma;
+%         Orbit.ecc = ecc;
+%         Orbit.hA = hAList(iHA);
+        InitCon = InitConElliptical(Orbit.ecc,Orbit.inc,Orbit.sma,latEm,lonEm);
+
         for nSats = minSats:maxSats
             % Optimize
             try
@@ -37,14 +45,16 @@ parfor iLat = 1:length(latList)
                 Arch.nSats = nSats;
                 Arch.nRepeats = nRepeats;
                 Arch.nDays = nDays;
+
                 
-                ExSol = LatticeExSearch(Arch,Orbit,InitCon,latList(iLat),PropParams);
+                ExSol = LatticeExSearch(Arch,Orbit,InitCon,latEm,PropParams);
+
                 optTime = toc;
                 % Verbose Output Message
                 c = clock;
                 disp([newline num2str(c(3)) '/' num2str(c(2)) ' ' num2str(c(4)) ':' num2str(c(5)) ':' num2str(c(6),2)...
                     newline 'Optimization Complete for nSats = ' num2str(nSats) ...
-                    ' and Latitude = ' num2str(latList(iLat))...
+                    ' and Latitude = ' num2str(latEm)...
                     newline 'Fitness: ' num2str(ExSol.fit)...
                     newline 'Elapsed Time: ' num2str((optTime-mod(optTime,60))/60) ' min '...
                     num2str(mod(optTime,60),3) ' sec'...
