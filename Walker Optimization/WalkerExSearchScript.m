@@ -17,8 +17,9 @@ latList = 30:10:60;
 lonEm = 0;
 maxSats = 90;
 minSats = 20;
-hAList = [0];
-dIncList = 0:20;
+
+dIncList = 21:30;
+hAList = dIncList;
 save([PropParams.datafolder '\OptParams.mat']);
 
 %% Massive For Loop
