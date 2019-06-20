@@ -11,15 +11,16 @@ primary = earth();
 nRepeats = 14;
 nDays    = 1;
 
-latList = 30:10:60;
+latList = 10:10:80;
 
 % latEm = 40;
 lonEm = 0;
-maxSats = 90;
-minSats = 20;
+maxSats = 120;
+minSats = 15;
 
-dIncList = 21:30;
-hAList = dIncList;
+dIncList = 0:30;
+% hAList = dIncList;
+hAList = 0;
 save([PropParams.datafolder '\OptParams.mat']);
 
 %% Massive For Loop

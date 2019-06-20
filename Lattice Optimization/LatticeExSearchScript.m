@@ -15,7 +15,7 @@ latList = 10:10:80;
 
 % latEm = 40;
 lonEm = 0;
-maxSats = 120;
+maxSats = 130;
 minSats = 15;
 
 hAList = [0, 900, 1000];
