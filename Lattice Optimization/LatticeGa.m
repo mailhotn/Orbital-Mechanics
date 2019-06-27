@@ -22,7 +22,7 @@ if ~exist([OptParams.datafolder '\LatticeGaSol_Lat_' num2str(latEm)...
         Arch.nPlanes = pList(iPlanes);
         Arch.nSatsPerAop = OptParams.nDays; % Constraint!  can be different if nDays > 1
         Arch.nAops = Arch.nSats/Arch.nPlanes/Arch.nSatsPerAop;
-%         GaOptions = gaoptimset('UseParallel',true);
+        GaOptions = gaoptimset('PopulationSize',20);
         intCon = [1,3,4,5];
         lBounds = [1,... % hA
             5,... % Inc
@@ -36,7 +36,7 @@ if ~exist([OptParams.datafolder '\LatticeGaSol_Lat_' num2str(latEm)...
             Arch.nPlanes];              % nC3
         % Optimize
         Sol = ga(@(x) LatticeGaFitness(x,Arch,latEm,OptParams),5,[],...
-            [],[],[],lBounds,uBounds,[],intCon);
+            [],[],[],lBounds,uBounds,[],intCon,GaOptions);
         
         % Re-evaluate (Should prob use exit function instead)
         hA = OptParams.hAList(Sol(1));
@@ -53,7 +53,7 @@ if ~exist([OptParams.datafolder '\LatticeGaSol_Lat_' num2str(latEm)...
         Orbit.hA = hA;
         
         % Initial Conditions
-        InitCon = InitConElliptical(Arch,Phase,Orbit,latEm,0);
+        InitCon = InitConElliptical(ecc,inc,sma,latEm,0);
         
         % Create Constellation & Propagate
         LC = LatticeConstellation(Arch,Phase,Orbit,InitCon);
@@ -92,10 +92,10 @@ if ~exist([OptParams.datafolder '\LatticeGaSol_Lat_' num2str(latEm)...
     GaSol.phaseMat = phaseParams;
     GaSol.Orbit = Orbit;
     GaSol.InitCon = InitCon;
-    GaSol.latGs = latGs;
+    GaSol.latEm = latEm;
     GaSol.optNPlanes = archParams(1,iOpt);
     GaSol.iOpt = iOpt;
-    GaSol.PropParams = PropParams;
+    GaSol.OptParams = OptParams;
     GaSol.coverage = covMat;
     GaSol.maxPdop  = maxMat;
     GaSol.intPdop  = intMat;
@@ -103,9 +103,9 @@ if ~exist([OptParams.datafolder '\LatticeGaSol_Lat_' num2str(latEm)...
     GaSol.p75 = p75Mat;
     GaSol.p50 = p50Mat;
     GaSol.fit = fit;
-    save([PropParams.datafolder '\LatticeGaSol_Lat_' num2str(latGs)...
+    save([OptParams.datafolder '\LatticeGaSol_Lat_' num2str(latEm)...
         '_nSats_' num2str(Arch.nSats) '.mat'],'GaSol');
 else
-    load([PropParams.datafolder '\LatticeGaSol_Lat_' num2str(latGs)...
+    load([OptParams.datafolder '\LatticeGaSol_Lat_' num2str(latEm)...
         '_nSats_' num2str(Arch.nSats) '.mat']);
 end         
