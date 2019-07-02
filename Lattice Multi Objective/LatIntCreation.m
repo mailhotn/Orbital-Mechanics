@@ -27,5 +27,5 @@ for iPop = 1:totalPopulation
     % Set hA
     primary = earth();
     hACirc = CalcRgtSmaApoHeight(Population(iPop,6),0,14,1)-primary.Re;
-    Population(iPop,7) = hACirc + rand*(1000-hACirc);
+    Population(iPop,7) = hACirc + rand*(1000-hACirc - 1e-3) + 1e-3;
 end

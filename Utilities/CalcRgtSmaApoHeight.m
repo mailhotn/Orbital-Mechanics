@@ -71,6 +71,6 @@ if x(1) > 0 && isreal(x)
     ecc = x(1);
     sma = x(2);
 else
-    error('No viable solution found!')
+    error(['No viable solution found! inc = ' num2str(inc*180/pi) ' hA = ' num2str(hA)])
 end
 end
