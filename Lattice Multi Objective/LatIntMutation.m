@@ -4,7 +4,7 @@ function mutants = LatIntMutation(parents, options, GenomeLength, ...
 %IntCon constraints
 IntCon = [1, 2, 3, 4 ,5];
 range = options.PopInitRange;
-mutRate = 0.05;
+mutRate = 0.1;
 shrink = 0.5;
 scale = 1;
 scale = scale - shrink * scale * state.Generation/options.Generations;
@@ -16,14 +16,14 @@ hAStd = 50; % km
 nMutants =  length(parents);
 mutants =  zeros(nMutants, GenomeLength);
 % array indicating which genes should mutate in which parents
-genes2Mut = rand(nMutants,5) < mutRate; 
+genes2Mut = rand(nMutants,5) < mutRate;
+randNum = randn(nMutants,3);
 for iMut = 1:nMutants
     parent = thisPopulation(parents(iMut),:);
-    randNum = randn(1,3);
     
     %% Mutate nSats - Creep sometimes
     if genes2Mut(iMut,1) % mutate
-        mutants(iMut,1) = round(parent(1) + scale*nSatsStd*randNum(1));
+        mutants(iMut,1) = round(parent(1) + scale*nSatsStd*randNum(iMut,1));
         if mutants(iMut,1) < range(1,1)
             mutants(iMut,1) = range(1,1);
         elseif mutants(iMut,1) > range(2,1)
@@ -64,7 +64,7 @@ for iMut = 1:nMutants
     mutants(iMut,4) = 1 + mod(mutants(iMut,4),nAops);
     
     %% Mutate inc - Creep always
-    mutants(iMut,6) = parent(6) + scale*incStd*randNum(2);
+    mutants(iMut,6) = parent(6) + scale*incStd*randNum(iMut,2);
     % Verify that new inc is in bounds
     if mutants(iMut,6) < range(1,6)
         mutants(iMut,6) = range(1,6);
@@ -72,7 +72,7 @@ for iMut = 1:nMutants
         mutants(iMut,6) = range(2,6);
     end
     %% Mutate hA - Creep always
-    mutants(iMut,7) = parent(7) + scale*hAStd*randNum(3);
+    mutants(iMut,7) = parent(7) + scale*hAStd*randNum(iMut,3);
     % Check that hA is above hA circ
     primary = earth();
     hACirc = CalcRgtSmaApoHeight(mutants(iMut,6),0,14,1)-primary.Re;
