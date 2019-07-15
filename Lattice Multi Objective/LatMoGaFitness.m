@@ -49,4 +49,4 @@ intPdopSouth = trapz(propTime,pdopS)/(propTime(end)-propTime(1));
 fitness = inf(1,3);
 fitness(1) = x(1);
 fitness(2) = x(2);
-fitness(3) = min([(intPdopNom + intPdopNorth + intPdopSouth)/3,100]);
+fitness(3) = min([(intPdopNom + intPdopNorth + intPdopSouth)/3,20]);

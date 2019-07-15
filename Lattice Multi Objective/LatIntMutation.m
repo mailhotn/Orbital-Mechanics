@@ -4,7 +4,7 @@ function mutants = LatIntMutation(parents, options, GenomeLength, ...
 %IntCon constraints
 IntCon = [1, 2, 3, 4 ,5];
 range = options.PopInitRange;
-mutRate = 0.1;
+mutRate = 0.2;
 shrink = 0.5;
 scale = 1;
 scale = scale - shrink * scale * state.Generation/options.Generations;

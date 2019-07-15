@@ -6,12 +6,13 @@ PropParams.elevMin = 5;
 PropParams.relTol  = 1e-6;
 PropParams.absTol  = 1e-6;
 PropParams.datafolder = 'C:\Users\User\Dropbox\Lattice Optimization Data';
+PropParams.delLat = 5;
 primary = earth();
 
 nRepeats = 14;
 nDays    = 1;
 
-latList = 10:10:80;
+latList = 60;
 
 % latEm = 40;
 lonEm = 0;
@@ -23,9 +24,9 @@ hAList = [0, 900, 1000];
 save([PropParams.datafolder '\OptParams.mat']);
 
 %% Perform Search
-parfor iLat = 1:length(latList)
+for iLat = 1:length(latList)
 
-    latEm = latList(iLat)
+    latEm = latList(iLat);
     for iHA = 1:length(hAList)
         Orbit = struct();
         [sma, ecc, inc] = RgtSunSynElements(hAList(iHA), nRepeats, nDays);

@@ -3,7 +3,7 @@ intTarget = 10;
 p90Target = 5;
 covTarget = 99;
 maxTarget = 10;
-latList = 30:10:60;
+latList = 60;
 %% Loop
 for iLat = 1:numel(latList)
     load([datafolder '\LatticeGaSol_Lat_' num2str(latList(iLat)) '.mat'])
