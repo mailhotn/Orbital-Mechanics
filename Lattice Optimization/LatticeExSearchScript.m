@@ -16,8 +16,8 @@ latList = 60;
 
 % latEm = 40;
 lonEm = 0;
-maxSats = 130;
-minSats = 15;
+maxSats = 100;
+minSats = 30;
 
 hAList = [0, 900, 1000];
 
@@ -29,7 +29,9 @@ for iLat = 1:length(latList)
     latEm = latList(iLat);
     for iHA = 1:length(hAList)
         Orbit = struct();
-        [sma, ecc, inc] = RgtSunSynElements(hAList(iHA), nRepeats, nDays);
+        inc = min([90,latEm + 10]);
+        [sma, ecc] = CalcRgtSmaApoHeight(inc,hAList(iHA),nRepeats, nDays);
+%         [sma, ecc, inc] = RgtSunSynElements(hAList(iHA), nRepeats, nDays);
         Orbit.sma = sma;
         Orbit.ecc = ecc;
         Orbit.inc = inc;
@@ -37,7 +39,7 @@ for iLat = 1:length(latList)
         
         InitCon = InitConElliptical(Orbit.ecc,Orbit.inc,Orbit.sma,latEm,lonEm);
 
-        for nSats = minSats:maxSats
+        parfor nSats = minSats:maxSats
             % Optimize
             try
                 % Run Search for T & latGs
