@@ -1,6 +1,6 @@
 datafolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Multi Objective';
 intTarget = 10;
-p90Target = 5;
+p90Target = 3;
 covTarget = 99;
 maxTarget = 10;
 latList = 60;
