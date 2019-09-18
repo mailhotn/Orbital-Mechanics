@@ -19,8 +19,14 @@ gcf
 hold on
 load coastlines
 geoshow(coastlat,coastlon)
-for iSat = 1:nSats
-    plot(wrapTo180(tracks(2*iSat,:)),tracks(2*iSat-1,:),'.');
+if length(timeVec) ~= 1
+    for iSat = 1:nSats
+        plot(wrapTo180(tracks(2*iSat,:)),tracks(2*iSat-1,:),'.');
+    end
+else
+    for iSat = 1:nSats
+        plot(wrapTo180(tracks(2*iSat,:)),tracks(2*iSat-1,:),'r.','markersize',20);
+    end
 end
 axis equal
 xlim([-180,180])
