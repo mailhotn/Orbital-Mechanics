@@ -25,4 +25,3 @@ for iLat = 1:numel(latList)
     figure(10*iLat + 1)
     plot(parSats,parPlanes,'--o')
 end
-

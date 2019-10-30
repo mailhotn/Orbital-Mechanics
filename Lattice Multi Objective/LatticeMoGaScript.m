@@ -87,7 +87,7 @@ for iLat = 1:length(latList)
         c = clock;
         fileID = fopen(['C:\Users\User\Dropbox\zzzMatlab Errors\error_'...
             num2str(c(3)) '-' num2str(c(2)) '_' num2str(c(4)) ...
-            '.' num2str(c(5)) '.txt'],'w'); % create error file for IFTT phone notification
+            '.' num2str(c(5)) '.txt'],'w'); % create error file for IFTTT phone notification
         fprintf(fileID,ME.message);
         rethrow(ME)
     end
@@ -97,5 +97,5 @@ end
 c = clock;
 fileID = fopen(['C:\Users\User\Dropbox\zzzMatlab Notification\OptDone_'...
     num2str(c(3)) '-' num2str(c(2)) '_' num2str(c(4)) ...
-    '.' num2str(c(5)) '.txt'],'w'); % create error file for IFTT phone notification
+    '.' num2str(c(5)) '.txt'],'w'); % create file for IFTTT phone notification
 fprintf(fileID,'done');

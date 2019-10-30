@@ -9,9 +9,9 @@ shrink = 0.2;
 scale = 1;
 scale = scale - shrink * scale * state.Generation/options.Generations;
 
-nSatsStd = 5; % Satellites
-incStd = 5; % deg
-hAStd = 50; % km
+nSatsStd = 1; % Satellites
+incStd = 1; % deg
+hAStd = 5; % km
 
 nMutants =  length(parents);
 mutants =  zeros(nMutants, GenomeLength);

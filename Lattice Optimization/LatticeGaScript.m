@@ -5,21 +5,21 @@ OptParams.timeVec = 0:10:86164;
 OptParams.elevMin = 5;
 OptParams.relTol  = 1e-6;
 OptParams.absTol  = 1e-6;
-OptParams.datafolder = 'C:\Users\User\Dropbox\Lattice Optimization Data';
+OptParams.datafolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\GA Standard';
 OptParams.nRepeats = 14;
 OptParams.nDays    = 1;
 OptParams.hAList = [0, 900, 1000];
 OptParams.delLat = 5;
 
-latList = 30:10:60;
+latList = 60;
 maxSats = 80;
 minSats = 40;
 
 save([OptParams.datafolder '\OptParams.mat']);
 %% Run Genetic Algorithm
-parfor iLat = 1:length(latList)
-    latEm = latList(iLat)
-    for nSats = minSats:maxSats
+for iLat = 1:length(latList)
+    latEm = latList(iLat);
+    parfor nSats = minSats:maxSats
         % Optimize
         try
             tic
