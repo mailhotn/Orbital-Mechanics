@@ -1,25 +1,27 @@
 %% Define Scenarios for Analysis
 clear
 folderList = {...
-%     'C:\Users\User\Dropbox\Walker Optimization Data\Previous Optimization Runs\Latticified Walker',...
-%         'C:\Users\User\Dropbox\Walker Optimization Data\Previous Optimization Runs\Sun-Synch',...
-%         'C:\Users\User\Dropbox\Lattice Optimization Data',...
-        'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Apogee Height, delta inc',...
-    %     'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Apogee Height x3, opt inc 2',...
+%     'C:\Users\User\Dropbox\Walker Optimization Data\Previous Optimization Runs\Latticified Walker';...
+%     'C:\Users\User\Dropbox\Walker Optimization Data\Previous Optimization Runs\Sun-Synch';...
+%     'C:\Users\User\Dropbox\Lattice Optimization Data';...
+    'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Apogee Height, delta inc';...
+    'C:\Users\User\Dropbox\Lattice Optimization Data\GA Standard\Previous Runs\Version 2 - all lats';...
+%     'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Apogee Height x3, opt inc 2';...
     };
 markerList = {...
-    '*',...
-%     '^',...
-    'o',...
-%     'x',...
-%     's'...
+%     '*';...
+%     '^';...
+    'o';...
+    'x';...
+%     's';...
     };
 nameList = {...
-    'Nominal',...
-%     'Walker Opt',...
-    'Sun-Synch',...
-%     'Lattice Optimal 1',...
-%     'Lattice Optimal 2'...
+    'Nominal';...
+%         'Walker Opt';...
+    'Nominal 2';...
+    'Ga';...
+    %     'Lattice Optimal 1';...
+    %     'Lattice Optimal 2';...
     };
 nScenarios = numel(folderList);
 
@@ -34,28 +36,75 @@ close all
 nLeg = 0;
 for iScenario = 1:nScenarios
     load([folderList{iScenario} '\OptParams.mat']);
+    if exist('OptParams','var')
+        % adjust for different data structure
+        hAList = 1; % No separation of results by hA
+        PropParams.maxPdop = OptParams.maxPdop;
+        PropParams.timeVec = OptParams.timeVec;
+        PropParams.elevMin = OptParams.elevMin;
+        PropParams.relTol = OptParams.relTol;
+        PropParams.absTol = OptParams.absTol;
+        PropParams.datafolder = OptParams.datafolder;
+        PropParams.delLat = OptParams.delLat;
+        clear OptParams;
+        gaFlag = true;
+    else
+        gaFlag = false;
+    end
     nSats = minSats:maxSats;
     maxPdop = nan(numel(hAList),numel(nSats));
     intPdop = nan(numel(hAList),numel(nSats));
     coverage = nan(numel(hAList),numel(nSats));
     p90 = nan(numel(hAList),numel(nSats));
+    latList = 30:10:60;
     for iLat = 1:numel(latList)
         paretoSats = mat2cell(inf(numel(hAList),1),ones(1,numel(hAList)));
         paretoPlanes = mat2cell(inf(numel(hAList),1),ones(1,numel(hAList)));
-        for iHA = 1:numel(hAList)
+        if ~gaFlag
+            for iHA = 1:numel(hAList)
+                for iSats = 1:numel(nSats)
+                    load([folderList{iScenario} '\LatticeExSol_Lat_'...
+                        num2str(latList(iLat)) '_nSats_' num2str(nSats(iSats)) ...
+                        '_hA_' num2str(hAList(iHA)) '.mat']);
+                    
+                    achieveInt = ExSol.intPdop < intTarget;
+                    achieveMax = ExSol.maxPdop < maxTarget;
+                    achieveCov = ExSol.coverage > covTarget;
+                    achievep90 = ExSol.p90 < p90Target;
+                    if any(achieveInt & achieveMax & achieveCov & achievep90)
+                        planeVec = achieveInt & achieveMax & achieveCov & achievep90;
+                        [~,iMinPlanes] = min(~(planeVec>0));
+                        nPlanesToAchieve = ExSol.archMat(1,iMinPlanes);
+                        if nPlanesToAchieve < min(paretoPlanes{iHA})
+                            if min(paretoPlanes{iHA}) < inf
+                                paretoSats{iHA} = [paretoSats{iHA}, nSats(iSats)];
+                                paretoPlanes{iHA} = [paretoPlanes{iHA}, nPlanesToAchieve];
+                            else
+                                paretoSats{iHA} = [nSats(iSats)];
+                                paretoPlanes{iHA} = [nPlanesToAchieve];
+                            end
+                        end
+                    end
+                    maxPdop(iHA,iSats) = ExSol.maxPdop(ExSol.iOpt);
+                    intPdop(iHA,iSats) = ExSol.intPdop(ExSol.iOpt);
+                    coverage(iHA,iSats) = ExSol.coverage(ExSol.iOpt);
+                    p90(iHA,iSats) = ExSol.p90(ExSol.iOpt);
+                end
+            end
+        else % Genetic Algorithm
+            iHA = 1;
             for iSats = 1:numel(nSats)
-                load([folderList{iScenario} '\LatticeExSol_Lat_'...
-                    num2str(latList(iLat)) '_nSats_' num2str(nSats(iSats)) ...
-                    '_hA_' num2str(hAList(iHA)) '.mat']);
+                load([folderList{iScenario} '\LatticeGaSol_Lat_'...
+                    num2str(latList(iLat)) '_nSats_' num2str(nSats(iSats)) '.mat']);
                 
-                achieveInt = ExSol.intPdop < intTarget;
-                achieveMax = ExSol.maxPdop < maxTarget;
-                achieveCov = ExSol.coverage > covTarget;
-                achievep90 = ExSol.p90 < p90Target;
+                achieveInt = mean(GaSol.intPdop,1) < intTarget;
+                achieveMax = mean(GaSol.maxPdop,1) < maxTarget;
+                achieveCov = mean(GaSol.coverage,1) > covTarget;
+                achievep90 = mean(GaSol.p90,1) < p90Target;
                 if any(achieveInt & achieveMax & achieveCov & achievep90)
                     planeVec = achieveInt & achieveMax & achieveCov & achievep90;
                     [~,iMinPlanes] = min(~(planeVec>0));
-                    nPlanesToAchieve = ExSol.archMat(1,iMinPlanes);
+                    nPlanesToAchieve = GaSol.archMat(1,iMinPlanes);
                     if nPlanesToAchieve < min(paretoPlanes{iHA})
                         if min(paretoPlanes{iHA}) < inf
                             paretoSats{iHA} = [paretoSats{iHA}, nSats(iSats)];
@@ -66,10 +115,10 @@ for iScenario = 1:nScenarios
                         end
                     end
                 end
-                maxPdop(iHA,iSats) = ExSol.maxPdop(ExSol.iOpt);
-                intPdop(iHA,iSats) = ExSol.intPdop(ExSol.iOpt);
-                coverage(iHA,iSats) = ExSol.coverage(ExSol.iOpt);
-                p90(iHA,iSats) = ExSol.p90(ExSol.iOpt);
+                maxPdop(iHA,iSats) = mean(GaSol.maxPdop(:,GaSol.iOpt),1);
+                intPdop(iHA,iSats) = mean(GaSol.intPdop(:,GaSol.iOpt),1);
+                coverage(iHA,iSats) = mean(GaSol.coverage(:,GaSol.iOpt),1);
+                p90(iHA,iSats) = mean(GaSol.p90(:,GaSol.iOpt),1);
             end
         end
         

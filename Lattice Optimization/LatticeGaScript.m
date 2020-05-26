@@ -10,8 +10,9 @@ OptParams.nRepeats = 14;
 OptParams.nDays    = 1;
 OptParams.hAList = [0, 900, 1000];
 OptParams.delLat = 5;
+OptParams.OptType = 'GA';
 
-latList = 60;
+latList = 30:10:60;
 maxSats = 80;
 minSats = 40;
 

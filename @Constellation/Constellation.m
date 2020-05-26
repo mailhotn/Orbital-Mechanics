@@ -15,7 +15,7 @@ classdef Constellation < handle  &  matlab.mixin.CustomDisplay
     methods (Access = protected)
         % Access protected as a Constellation without a type is
         % meaningless. Constructor must be called only by subclasses,
-        % never independantly.
+        % never independently.
         function C = Constellation(nSats, primary)
             switch nargin
                 case 0 % single satellite constellation

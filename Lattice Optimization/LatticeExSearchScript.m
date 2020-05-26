@@ -12,7 +12,7 @@ primary = earth();
 nRepeats = 14;
 nDays    = 1;
 
-latList = 60;
+latList = 30:10:60;
 
 % latEm = 40;
 lonEm = 0;
