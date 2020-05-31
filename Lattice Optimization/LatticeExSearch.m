@@ -44,7 +44,7 @@ if ~exist([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latGs)...
                     pdop = [pdopN.';pdopC.';pdopS.'];
                     % Calculate Performance criteria
                     coverage = 100 - sum(isnan(pdop),2)/length(pdop)*100;
-                    if any(~isnan(pdop))
+                    if any(~isnan(pdop),'all')
                         maxPdop  = max(pdop(~isnan(pdop)),[],2);
                         pdop(pdop > PropParams.maxPdop) = PropParams.maxPdop;
                         pdop(isnan(pdop)) = PropParams.maxPdop;
