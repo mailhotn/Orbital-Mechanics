@@ -6,19 +6,20 @@ PropParams.elevMin  = 5;
 PropParams.relTol = 1e-6;
 PropParams.absTol = 1e-6;
 PropParams.datafolder = 'C:\Users\User\Dropbox\Walker Optimization Data';
+PropParams.delLat = 5;
 primary = earth();
 
 nRepeats = 14;
 nDays    = 1;
 
-latList = 10:10:80;
+latList = 30:10:60;
 
 % latEm = 40;
 lonEm = 0;
-maxSats = 120;
-minSats = 15;
+maxSats = 80;
+minSats = 40;
 
-dIncList = 0:30;
+dIncList = 10; % Option for optimizing inclination, not fully implemented
 % hAList = dIncList;
 hAList = 0;
 save([PropParams.datafolder '\OptParams.mat']);

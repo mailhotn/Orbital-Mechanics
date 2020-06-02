@@ -27,7 +27,7 @@ nScenarios = numel(folderList);
 
 %% Set Performance Goals
 intTarget = 10;
-maxTarget = 10;
+maxTarget = 1e10;
 covTarget = 99;
 p90Target = 3;
 
