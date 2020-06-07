@@ -21,7 +21,7 @@ minSats = 40;
 
 dIncList = 10; % Option for optimizing inclination, not fully implemented
 % hAList = dIncList;
-hAList = 0;
+hAList = 10;
 save([PropParams.datafolder '\OptParams.mat']);
 
 %% Massive For Loop

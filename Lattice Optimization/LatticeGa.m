@@ -16,6 +16,8 @@ if ~exist([OptParams.datafolder '\LatticeGaSol_Lat_' num2str(latEm)...
     % Initialize Constellation Parameter Arrays
     phaseParams = nan(3,length(pList)); % nC1, nC2, nC3
     archParams  = nan(3,length(pList)); % nPlanes, nAops, nSatsPerAop
+    orbits = cell(1,length(pList));
+    inits  = cell(1,length(pList));
     
     for iPlanes = 1:length(pList)
         % Initialize Ga
@@ -83,6 +85,8 @@ if ~exist([OptParams.datafolder '\LatticeGaSol_Lat_' num2str(latEm)...
                 p50Mat(iLat,iPlanes) = prctile(pdopMat(iLat,:),50);
                 phaseParams(:,iPlanes) = [Phase.nC1;Phase.nC2;Phase.nC3];
                 archParams(:,iPlanes)  = [Arch.nPlanes;Arch.nAops;Arch.nSatsPerAop];
+                orbits{iPlanes} = Orbit;
+                inits{iPlanes} = InitCon;
             end
         end
     end
@@ -90,8 +94,8 @@ if ~exist([OptParams.datafolder '\LatticeGaSol_Lat_' num2str(latEm)...
     GaSol.nSats = Arch.nSats;
     GaSol.archMat  = archParams;
     GaSol.phaseMat = phaseParams;
-    GaSol.Orbit = Orbit;
-    GaSol.InitCon = InitCon;
+    GaSol.orbits = orbits;
+    GaSol.inits = inits;
     GaSol.latEm = latEm;
     GaSol.optNPlanes = archParams(1,iOpt);
     GaSol.iOpt = iOpt;

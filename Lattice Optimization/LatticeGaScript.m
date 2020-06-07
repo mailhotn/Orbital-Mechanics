@@ -13,7 +13,7 @@ OptParams.delLat = 5;
 OptParams.OptType = 'GA';
 
 latList = 30:10:60;
-maxSats = 80;
+maxSats = 60;
 minSats = 40;
 
 save([OptParams.datafolder '\OptParams.mat']);
