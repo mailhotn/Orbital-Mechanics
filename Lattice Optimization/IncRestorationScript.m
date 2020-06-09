@@ -101,10 +101,10 @@ error
 
 %% fminbndtest
 
-load([datafolder '\LatticeGaSol_Lat_30_nSats_60.mat'])
+load([datafolder '\LatticeGaSol_Lat_30_nSats_70.mat'])
 nCons = size(GaSol.archMat,2);
 tic
-pList = divisors(Arch.nSats);
+pList = divisors(GaSol.nSats);
 
 % initialize Performance Arrays
 maxMat = inf(3,length(pList));
@@ -137,7 +137,7 @@ for iPlanes = 1:nCons
     for iHA = 1:numel(OptParams.hAList)
         hA = OptParams.hAList(iHA);
         [inc,fval] = fminbnd(@(x) LatticeIncRestFminFitness(x,Arch,Phase,hA,...
-            GaSol.latEm, GaSol.intPdop(:,iPlanes), OptParams),5,30);
+            GaSol.latEm, GaSol.intPdop(:,iPlanes), OptParams),8,20);
         inc = inc + GaSol.latEm;
         if fval<fit
             fit = fval;

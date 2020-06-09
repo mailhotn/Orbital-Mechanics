@@ -1,7 +1,7 @@
 %% Initialize Optimization Parameters
 clear
 OptParams.maxPdop = 1000;
-OptParams.timeVec = 0:10:86164;
+OptParams.timeVec = 0:100:86164;
 OptParams.elevMin = 5;
 OptParams.relTol  = 1e-6;
 OptParams.absTol  = 1e-6;
@@ -13,8 +13,8 @@ OptParams.delLat = 5;
 OptParams.OptType = 'GA';
 
 latList = 30:10:60;
-maxSats = 60;
-minSats = 40;
+maxSats = 80;
+minSats = 50;
 
 save([OptParams.datafolder '\OptParams.mat']);
 %% Run Genetic Algorithm
@@ -45,9 +45,9 @@ for iLat = 1:length(latList)
                 '/' num2str(GaSol.phaseMat(1,GaSol.iOpt)) ...
                 '/' num2str(GaSol.phaseMat(2,GaSol.iOpt)) ...
                 '/' num2str(GaSol.phaseMat(3,GaSol.iOpt)) ...
-                newline 'Inclination: ' num2str(GaSol.Orbit.inc) '°'...
-                newline 'Eccentricity: ' num2str(GaSol.Orbit.ecc)...
-                newline 'Semimajor Axis: ' num2str(GaSol.Orbit.sma) ' km' ...
+                newline 'Inclination: ' num2str(GaSol.orbits{GaSol.iOpt}.inc) '°'...
+                newline 'Eccentricity: ' num2str(GaSol.orbits{GaSol.iOpt}.ecc)...
+                newline 'Semimajor Axis: ' num2str(GaSol.orbits{GaSol.iOpt}.sma) ' km' ...
                 newline 'Earth Repeats: ' num2str(OptParams.nRepeats)])
         catch ME
             % Error!
