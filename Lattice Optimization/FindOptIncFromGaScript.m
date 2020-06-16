@@ -20,5 +20,4 @@ for iLat = 1:numel(latList)
     plot(minSats:maxSats,haList,'o')
     mean(incList-latList(iLat))
     std(incList-latList(iLat))
-end
-    
+end  

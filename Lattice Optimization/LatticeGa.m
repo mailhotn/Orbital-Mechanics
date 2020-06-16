@@ -24,7 +24,7 @@ if ~exist([OptParams.datafolder '\LatticeGaSol_Lat_' num2str(latEm)...
         Arch.nPlanes = pList(iPlanes);
         Arch.nSatsPerAop = OptParams.nDays; % Constraint!  can be different if nDays > 1
         Arch.nAops = Arch.nSats/Arch.nPlanes/Arch.nSatsPerAop;
-        GaOptions = gaoptimset('PopulationSize',50);
+        GaOptions = gaoptimset('PopulationSize',80);
         intCon = [1,3,4,5];
         lBounds = [1,... % hA
             5,... % Inc

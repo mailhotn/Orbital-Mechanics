@@ -3,9 +3,9 @@ datafolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Apog
 load([datafolder '\OptParams.mat']);
 
 lat = 60;
-nSats = 60;
-nPlanes = 6;
-hA = 900;
+nSats = 56;
+nPlanes = 14;
+hA = 1000;
 load([datafolder '\LatticeExSol_Lat_' num2str(lat) '_nSats_' num2str(nSats)...
     '_hA_' num2str(hA) '.mat']);
 
