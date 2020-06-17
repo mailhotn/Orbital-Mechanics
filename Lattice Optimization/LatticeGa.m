@@ -32,7 +32,7 @@ if ~exist([OptParams.datafolder '\LatticeGaSol_Lat_' num2str(latEm)...
             1,... % nC2
             1];   % nC3
         uBounds = [numel(OptParams.hAList),... % hA
-            30,...                      % Inc
+            20,...                      % Inc
             Arch.nPlanes,...            % nC1
             Arch.nAops,...              % nC2
             Arch.nPlanes];              % nC3

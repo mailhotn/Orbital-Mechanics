@@ -17,9 +17,16 @@ latList = 30:10:60;
 % latEm = 40;
 lonEm = 0;
 maxSats = 80;
-minSats = 40;
+minSats = 50;
 
 hAList = [0, 900, 1000];
+if exist([PropParams.datafolder '\OptIncData.mat'],'file')
+    load([PropParams.datafolder '\OptIncData.mat']);
+    delIncList = optdInc;
+    clear optdInc;
+else
+    delIncList = 10*ones(1,length(latList));
+end
 
 save([PropParams.datafolder '\OptParams.mat']);
 
@@ -28,8 +35,8 @@ for iLat = 1:length(latList)
 
     latEm = latList(iLat);
     for iHA = 1:length(hAList)
-        Orbit = struct();
-        inc = min([90,latEm + 10]);
+        Orbit = struct();            
+        inc = min([90,latEm + delIncList(iLat)]);
         [sma, ecc] = CalcRgtSmaApoHeight(inc,hAList(iHA),nRepeats, nDays);
 %         [sma, ecc, inc] = RgtSunSynElements(hAList(iHA), nRepeats, nDays);
         Orbit.sma = sma;
