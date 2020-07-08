@@ -19,7 +19,7 @@ lonEm = 0;
 maxSats = 80;
 minSats = 50;
 
-hAList = [0, 900, 1000];
+hAList = [1000];
 if exist([PropParams.datafolder '\OptIncData.mat'],'file')
     load([PropParams.datafolder '\OptIncData.mat']);
     delIncList = optdInc;
@@ -44,7 +44,7 @@ for iLat = 1:length(latList)
         Orbit.inc = inc;
         Orbit.hA = hAList(iHA);
         
-        InitCon = InitConElliptical(Orbit.ecc,Orbit.inc,Orbit.sma,latEm,lonEm);
+        InitCon = struct();
 
         parfor nSats = minSats:maxSats
             % Optimize
