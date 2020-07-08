@@ -5,6 +5,7 @@ if ~exist([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latGs)...
         '_nSats_' num2str(Arch.nSats) '_hA_' num2str(Orbit.hA) '.mat'],'file')
     pList = divisors(Arch.nSats);
     incList = -1:0.2:5;
+    Orbit0 = Orbit;
     
     % initialize Performance Arrays
     maxVec = inf(1,length(pList));
@@ -23,8 +24,8 @@ if ~exist([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latGs)...
     for iPlanes = 1:length(pList)
         for iInc = 1:length(incList)
             % Modify Inclination & redo initcon
-            inc = Orbit.inc + incList(iInc);
-            [sma, ecc] = CalcRgtSmaApoHeight(inc,Oribt.hA,Arch.nRepeats, Arch.nDays);
+            inc = Orbit0.inc + incList(iInc);
+            [sma, ecc] = CalcRgtSmaApoHeight(inc,Orbit.hA,Arch.nRepeats, Arch.nDays);
             Orbit.sma = sma;
             Orbit.ecc = ecc;
             Orbit.inc = inc;
