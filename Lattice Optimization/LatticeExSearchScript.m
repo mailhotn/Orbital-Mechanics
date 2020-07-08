@@ -1,7 +1,7 @@
 %% Initialize Optimization Parameters
 clear
 PropParams.maxPdop = 1000;
-PropParams.timeVec = 0:10:86164;
+PropParams.timeVec = 0:100:86164;
 PropParams.elevMin = 5;
 PropParams.relTol  = 1e-6;
 PropParams.absTol  = 1e-6;

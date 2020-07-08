@@ -1,6 +1,6 @@
 % Useless before restoring inc data
 clear
-datafolder =     'C:\Users\User\Dropbox\Lattice Optimization Data\GA Standard\Previous Runs\Version 4 - dT 100';
+datafolder =     'C:\Users\User\Dropbox\Lattice Optimization Data\GA Standard\Previous Runs\Version 5 - dT 100, Pop 80';
 load([datafolder '\OptParams']);
 %% Set Performance Goals
 intTarget = 1e10;
@@ -36,13 +36,13 @@ for iLat = 1:numel(latList)
     ylabel('# Constellations')
     optdInc(iLat) = mean(incList)-latList(iLat);
     stdInc(iLat) = std(incList);
+    figure(iLat*10+2)
+    plot(1:sum(hAList==0),incList(hAList==0)-latList(iLat),'o',...
+        1:sum(hAList==900),incList(hAList==900)-latList(iLat),'o',...
+        1:sum(hAList==1000),incList(hAList==1000)-latList(iLat),'o');
 %     figure(iLat*10+2)
-%     plot(1:sum(hAList==0),incList(hAList==0)-latList(iLat),'o',...
-%         1:sum(hAList==900),incList(hAList==900)-latList(iLat),'o',...
-%         1:sum(hAList==1000),incList(hAList==1000)-latList(iLat),'o');
-%     figure(iLat*10+2)
-%     plot(minSats:maxSats,haList,'o')
-%     mean(incList-latList(iLat))
-%     std(incList-latList(iLat))
+%     plot(minSats:maxSats,hAList,'o')
+    mean(incList-latList(iLat))
+    std(incList-latList(iLat))
 end
 save([datafolder '\OptIncData.mat'],'optdInc','stdInc')
