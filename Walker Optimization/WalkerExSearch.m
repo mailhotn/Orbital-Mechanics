@@ -27,7 +27,7 @@ if ~exist([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latGs)...
         for iInc = 1:length(incList)
             % Modify Inclination & redo initcon
             inc = Orbit0.inc + incList(iInc);
-            [sma, ecc] = CalcRgtSmaApoHeight(inc,Orbit.hA,Arch.nRepeats, Arch.nDays);
+            [sma, ecc] = CalcRgtSmaApoHeight(inc,Orbit0.hA,Arch.nRepeats, Arch.nDays);
             Orbit.sma = sma;
             Orbit.ecc = ecc;
             Orbit.inc = inc;
