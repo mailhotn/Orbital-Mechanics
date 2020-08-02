@@ -7,6 +7,7 @@ PropParams.relTol = 1e-6;
 PropParams.absTol = 1e-6;
 PropParams.datafolder = 'C:\Users\User\Dropbox\Walker Optimization Data';
 PropParams.delLat = 5;
+PropParams.minMinDist = 1; %km
 primary = earth();
 
 nRepeats = 14;
@@ -17,7 +18,7 @@ latList = 30:10:60;
 % latEm = 40;
 lonEm = 0;
 maxSats = 80;
-minSats = 40;
+minSats = 50;
 
 dInc = 10; % Option for optimizing inclination, not fully implemented
 % hAList = dIncList;

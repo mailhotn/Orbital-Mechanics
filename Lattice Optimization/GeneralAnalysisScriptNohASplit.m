@@ -1,13 +1,16 @@
 %% Define Scenarios for Analysis
 clear
 folderList = {...
-    'C:\Users\User\Dropbox\Walker Optimization Data\Previous Optimization Runs\Latticified Walker multilat multiInc collision';...
-    'C:\Users\User\Dropbox\Walker Optimization Data\Previous Optimization Runs\Latticified Walker multilat multiInc';...
+%     'C:\Users\User\Dropbox\Walker Optimization Data\Previous Optimization Runs\Latticified Walker multilat multiInc';...
 %     'C:\Users\User\Dropbox\Walker Optimization Data\Previous Optimization Runs\Sun-Synch';...
 %     'C:\Users\User\Dropbox\Lattice Optimization Data';...
-%     'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Apogee Height x3, del inc 10, multilat PDOP, dT 100';...
-%     'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Apogee Height x3, del inc 9-15, multilat PDOP, dT 100';...
+    'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Apogee Height x3, del inc 10, multilat PDOP, dT 100';...
+    'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Apogee Height x3, del inc 9-15, multilat PDOP, dT 100';...
+%     'C:\Users\User\Dropbox\Lattice Optimization Data\GA Standard\Previous Runs\Version 2 - all lats';...
+%     'C:\Users\User\Dropbox\Lattice Optimization Data\GA Standard\Previous Runs\Version 4 - dT 100';...
 %     'C:\Users\User\Dropbox\Lattice Optimization Data\GA Standard\Previous Runs\Version 5 - dT 100, Pop 80';...
+%     'C:\Users\User\Dropbox\Lattice Optimization Data\GA Standard\Previous Runs\Version 1 - Pop size 20';...
+%     'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Apogee Height x3, opt inc 2';...
     };
 markerList = {...
     '*';...
@@ -61,11 +64,11 @@ for iScenario = 1:nScenarios
 %     latList = 50;
 %     hAList = 1000;
     for iLat = 1:numel(latList)
-        paretoSats = mat2cell(inf(numel(hAList),1),ones(1,numel(hAList)));
-        paretoPlanes = mat2cell(inf(numel(hAList),1),ones(1,numel(hAList)));
+        paretoSats = inf;
+        paretoPlanes = inf;
         if ~gaFlag
-            for iHA = 1:numel(hAList)
-                for iSats = 1:numel(nSats)
+            for iSats = 1:numel(nSats)
+                for iHA = 1:numel(hAList)
                     load([folderList{iScenario} '\LatticeExSol_Lat_'...
                         num2str(latList(iLat)) '_nSats_' num2str(nSats(iSats)) ...
                         '_hA_' num2str(hAList(iHA)) '.mat']);
@@ -78,13 +81,13 @@ for iScenario = 1:nScenarios
                         planeVec = achieveInt & achieveMax & achieveCov & achievep90;
                         [~,iMinPlanes] = min(~(planeVec>0));
                         nPlanesToAchieve = ExSol.archMat(1,iMinPlanes);
-                        if nPlanesToAchieve < min(paretoPlanes{iHA})
-                            if min(paretoPlanes{iHA}) < inf
-                                paretoSats{iHA} = [paretoSats{iHA}, nSats(iSats)];
-                                paretoPlanes{iHA} = [paretoPlanes{iHA}, nPlanesToAchieve];
+                        if nPlanesToAchieve < min(paretoPlanes)
+                            if min(paretoPlanes) < inf
+                                paretoSats = [paretoSats, nSats(iSats)];
+                                paretoPlanes = [paretoPlanes, nPlanesToAchieve];
                             else
-                                paretoSats{iHA} = [nSats(iSats)];
-                                paretoPlanes{iHA} = [nPlanesToAchieve];
+                                paretoSats = [nSats(iSats)];
+                                paretoPlanes = [nPlanesToAchieve];
                             end
                         end
                     end
@@ -108,13 +111,13 @@ for iScenario = 1:nScenarios
                     planeVec = achieveInt & achieveMax & achieveCov & achievep90;
                     [~,iMinPlanes] = min(~(planeVec>0));
                     nPlanesToAchieve = GaSol.archMat(1,iMinPlanes);
-                    if nPlanesToAchieve < min(paretoPlanes{iHA})
-                        if min(paretoPlanes{iHA}) < inf
-                            paretoSats{iHA} = [paretoSats{iHA}, nSats(iSats)];
-                            paretoPlanes{iHA} = [paretoPlanes{iHA}, nPlanesToAchieve];
+                    if nPlanesToAchieve < min(paretoPlanes)
+                        if min(paretoPlanes) < inf
+                            paretoSats = [paretoSats, nSats(iSats)];
+                            paretoPlanes = [paretoPlanes, nPlanesToAchieve];
                         else
-                            paretoSats{iHA} = [nSats(iSats)];
-                            paretoPlanes{iHA} = [nPlanesToAchieve];
+                            paretoSats = [nSats(iSats)];
+                            paretoPlanes = [nPlanesToAchieve];
                         end
                     end
                 end
@@ -176,10 +179,8 @@ for iScenario = 1:nScenarios
         
         figure(iLat*10 + 4) % Pareto Frontier
         hold on
-        for iHA = 1:numel(hAList)
-            plot(paretoSats{iHA},paretoPlanes{iHA},['--' markerList{iScenario}]...
+            plot(paretoSats,paretoPlanes,['--' markerList{iScenario}]...
                 ,'linewidth',1.5,'markersize',10)
-        end
         title(['Pareto Frontier \phi_0 = ' num2str(latList(iLat))])
         xlabel('# Sats')
         ylabel('# Planes')
@@ -188,7 +189,7 @@ for iScenario = 1:nScenarios
         if isempty(leg)
             leg = legend(nameList{iScenario});
         else
-            leg.String(nLeg+1:nLeg + numel(hAList)) = nameList(iScenario);
+            leg.String(nLeg+1:nLeg) = nameList(iScenario);
         end
         hold off
         

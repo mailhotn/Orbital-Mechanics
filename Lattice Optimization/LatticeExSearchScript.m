@@ -19,7 +19,7 @@ lonEm = 0;
 maxSats = 80;
 minSats = 50;
 
-hAList = [0,900];
+hAList = [0,900,1000];
 if exist([PropParams.datafolder '\OptIncData.mat'],'file')
     load([PropParams.datafolder '\OptIncData.mat']);
     delIncList = optdInc;

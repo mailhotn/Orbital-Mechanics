@@ -41,34 +41,38 @@ if ~exist([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latGs)...
                 Phase.nC1 = -nC1;
                 % Create Constellation and propagate
                 LC = LatticeConstellation(Arch,Phase,Orbit,InitCon);
-                Prop = Propagator(LC,PropParams.relTol,PropParams.absTol);
-                [propTime, propState] = Prop.PropEciJ2(PropParams.timeVec);
-                % Evaluate PDOP
-                [pdopC, ~] = TdoaPdopVec(propState,propTime,latGs,0,0,PropParams.elevMin);
-                [pdopN, ~] = TdoaPdopVec(propState,propTime,...
-                    latGs+PropParams.delLat,0,0,PropParams.elevMin);
-                [pdopS, ~] = TdoaPdopVec(propState,propTime,...
-                    latGs-PropParams.delLat,0,0,PropParams.elevMin);
-                pdop = [pdopN.';pdopC.';pdopS.'];
-                % Calculate Performance criteria
-                coverage = 100 - sum(isnan(pdop),2)/length(pdop)*100;
-                if any(~isnan(pdop),'all')
-                    maxPdop  = max(pdop(~isnan(pdop)),[],2);
-                    pdop(pdop > PropParams.maxPdop) = PropParams.maxPdop;
-                    pdop(isnan(pdop)) = PropParams.maxPdop;
-                    intPdop  = trapz(propTime,pdop,2)/(propTime(end)-propTime(1));
-                    intPdop = mean(intPdop,1);
-                    if intPdop < intVec(iPlanes)
-                        intVec(iPlanes) = intPdop;
-                        maxVec(iPlanes) = mean(maxPdop,1);
-                        covVec(iPlanes) = mean(coverage,1);
-                        p90Vec(iPlanes) = mean(prctile(pdop,90,2),1);
-                        p75Vec(iPlanes) = mean(prctile(pdop,75,2),1);
-                        p50Vec(iPlanes) = mean(prctile(pdop,50,2),1);
-                        phaseParams(:,iPlanes) = [Phase.nC1;Phase.nC2;Phase.nC3];
-                        archParams(:,iPlanes)  = [Arch.nPlanes;Arch.nAops;Arch.nSatsPerAop];
-                        orbits{iPlanes} = Orbit;
-                        inits{iPlanes} = InitCon;
+                minDist = CalcMinDist(LC); %Collision check
+                if minDist > PropParams.minMinDist
+                    
+                    Prop = Propagator(LC,PropParams.relTol,PropParams.absTol);
+                    [propTime, propState] = Prop.PropEciJ2(PropParams.timeVec);
+                    % Evaluate PDOP
+                    [pdopC, ~] = TdoaPdopVec(propState,propTime,latGs,0,0,PropParams.elevMin);
+                    [pdopN, ~] = TdoaPdopVec(propState,propTime,...
+                        latGs+PropParams.delLat,0,0,PropParams.elevMin);
+                    [pdopS, ~] = TdoaPdopVec(propState,propTime,...
+                        latGs-PropParams.delLat,0,0,PropParams.elevMin);
+                    pdop = [pdopN.';pdopC.';pdopS.'];
+                    % Calculate Performance criteria
+                    coverage = 100 - sum(isnan(pdop),2)/length(pdop)*100;
+                    if any(~isnan(pdop),'all')
+                        maxPdop  = max(pdop(~isnan(pdop)),[],2);
+                        pdop(pdop > PropParams.maxPdop) = PropParams.maxPdop;
+                        pdop(isnan(pdop)) = PropParams.maxPdop;
+                        intPdop  = trapz(propTime,pdop,2)/(propTime(end)-propTime(1));
+                        intPdop = mean(intPdop,1);
+                        if intPdop < intVec(iPlanes)
+                            intVec(iPlanes) = intPdop;
+                            maxVec(iPlanes) = mean(maxPdop,1);
+                            covVec(iPlanes) = mean(coverage,1);
+                            p90Vec(iPlanes) = mean(prctile(pdop,90,2),1);
+                            p75Vec(iPlanes) = mean(prctile(pdop,75,2),1);
+                            p50Vec(iPlanes) = mean(prctile(pdop,50,2),1);
+                            phaseParams(:,iPlanes) = [Phase.nC1;Phase.nC2;Phase.nC3];
+                            archParams(:,iPlanes)  = [Arch.nPlanes;Arch.nAops;Arch.nSatsPerAop];
+                            orbits{iPlanes} = Orbit;
+                            inits{iPlanes} = InitCon;
+                        end
                     end
                 end
             end
