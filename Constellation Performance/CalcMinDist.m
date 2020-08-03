@@ -1,7 +1,7 @@
 function [minDist,minTime,minSats] = CalcMinDist(Con)
 % CalcMinDist calculates the minimum distance between any 2 satellites in a
 % constellation.
-if Con.ecc == 0
+if Con.ecc >= 0
     minDist = inf;
     oe0 = Con.InitialOeMean;
     for iSat = 1:(Con.nSats-1)
