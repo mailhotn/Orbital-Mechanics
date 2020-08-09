@@ -1,9 +1,11 @@
 clear
-targetFolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\LatticeDef v1';
-sourceFolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Apogee Height x3, del inc 9-15, multilat PDOP, dT 100';
-load([sourceFolder '\OptParams.mat'])
+targetFolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\CollCheck (TEST FOLDER)';
+sourceFolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\LatticeDef v1';
+load([sourceFolder '\OptParams.mat'],'PropParams','hAList','latList',...
+    'minSats','maxSats','nRepeats','nDays');
 PropParams.minMinDist = 1; % km
-
+save([targetFolder '\OptParams.mat']);
+%%
 parfor iLat = 1:length(latList)
     latEm = latList(iLat);
     for nSats = minSats:maxSats

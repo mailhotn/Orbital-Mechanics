@@ -11,6 +11,7 @@ OptParams.nDays    = 1;
 OptParams.hAList = [0, 900, 1000];
 OptParams.delLat = 5;
 OptParams.OptType = 'GA';
+OptParams.minMinDist = 1; %km
 
 latList = 30:10:60;
 maxSats = 80;
