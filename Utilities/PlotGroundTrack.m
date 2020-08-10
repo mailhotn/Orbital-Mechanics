@@ -1,7 +1,15 @@
-function PlotGroundTrack( xEci, timeVec, gmst0 )
+function PlotGroundTrack( data, timeVec, gmst0 )
 %plotGroundTrack Plots the ground tracks of a constellation
 %   xEci is a Mx(6*N) matrix of ECI states
 %   timeVec is a Mx1 or 1xM vector of time values
+if nargin == 1
+    Con = data;
+    xEci = Con.InitialStateEci;
+    xEci = reshape(xEci,1,6*Con.nSats);
+    timeVec = 0;
+else 
+    xEci = data;
+end
 if nargin < 3
     gmst0 = 0;
 end

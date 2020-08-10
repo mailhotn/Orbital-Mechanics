@@ -1,16 +1,10 @@
 %% Define Scenarios for Analysis
 clear
+dataFolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Final Results';
 folderList = {...
-%     'C:\Users\User\Dropbox\Walker Optimization Data\Previous Optimization Runs\Latticified Walker multilat multiInc';...
-%     'C:\Users\User\Dropbox\Walker Optimization Data\Previous Optimization Runs\Sun-Synch';...
-%     'C:\Users\User\Dropbox\Lattice Optimization Data';...
-    'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Apogee Height x3, del inc 10, multilat PDOP, dT 100';...
-    'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Apogee Height x3, del inc 9-15, multilat PDOP, dT 100';...
-%     'C:\Users\User\Dropbox\Lattice Optimization Data\GA Standard\Previous Runs\Version 2 - all lats';...
-%     'C:\Users\User\Dropbox\Lattice Optimization Data\GA Standard\Previous Runs\Version 4 - dT 100';...
-%     'C:\Users\User\Dropbox\Lattice Optimization Data\GA Standard\Previous Runs\Version 5 - dT 100, Pop 80';...
-%     'C:\Users\User\Dropbox\Lattice Optimization Data\GA Standard\Previous Runs\Version 1 - Pop size 20';...
-%     'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Apogee Height x3, opt inc 2';...
+    'C:\Users\User\Dropbox\Walker Optimization Data\Previous Optimization Runs\Latticified Walker multilat multiInc collision';...
+    'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\LatticeDef v1';...
+    'C:\Users\User\Dropbox\Lattice Optimization Data\GA Standard\Previous Runs\Version 6 - definitive';...
     };
 markerList = {...
     '*';...
@@ -66,6 +60,7 @@ for iScenario = 1:nScenarios
     for iLat = 1:numel(latList)
         paretoSats = inf;
         paretoPlanes = inf;
+        paretoHAs = [];
         if ~gaFlag
             for iSats = 1:numel(nSats)
                 for iHA = 1:numel(hAList)
@@ -85,9 +80,11 @@ for iScenario = 1:nScenarios
                             if min(paretoPlanes) < inf
                                 paretoSats = [paretoSats, nSats(iSats)];
                                 paretoPlanes = [paretoPlanes, nPlanesToAchieve];
+                                paretoHAs = [paretoHAs, hAList(iHA)];
                             else
                                 paretoSats = [nSats(iSats)];
                                 paretoPlanes = [nPlanesToAchieve];
+                                paretoHAs = hAList(iHA);
                             end
                         end
                     end
@@ -192,6 +189,18 @@ for iScenario = 1:nScenarios
             leg.String(nLeg+1:nLeg) = nameList(iScenario);
         end
         hold off
+        
+        paretoSet = struct();
+        paretoSet.latEm = latList(iLat);
+        paretoSet.nSats = paretoSats;
+        paretoSet.nPlanes = paretoPlanes;
+        paretoSet.hAs = paretoHAs;
+        paretoSet.intTarget = intTarget;
+        paretoSet.maxTarget = maxTarget;
+        paretoSet.p90Target = p90Target;
+        paretoSet.covTarget = covTarget;
+        
+        save([dataFolder '\ParetoList_Lat_' num2str(paretoSet.latEm) '_' nameList{iScenario} '.mat'],'paretoSet');
         
     end
     nLeg = nLeg + numel(hAList);
