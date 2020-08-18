@@ -6,9 +6,9 @@ load([paretoFolder '/ParetoList_Lat_' num2str(latEm) '_LFC Ex_hASplit.mat']);
 hAList = [900, 1000];
 dDay = 5;
 
-
+pdopArray = cell(length(paretoSet.nPlanes{iHA}),length(hAList));
 for iHA = 1:2
-    pdopArray = cell(length(paretoSet.nPlanes{iHA}),2);
+    
     for iCon = 1:length(paretoSet.nPlanes{iHA})
         load([conFolder '\LatticeExSol_Lat_' num2str(latEm) '_nSats_' ...
             num2str(paretoSet.nSats{iHA}(iCon)) '_hA_' num2str(hAList(iHA)) '.mat']);

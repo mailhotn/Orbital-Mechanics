@@ -14,7 +14,7 @@ OptParams.OptType = 'GA';
 OptParams.minMinDist = 1; %km
 
 latList = 30:10:60;
-maxSats = 49;
+maxSats = 80;
 minSats = 40;
 
 save([OptParams.datafolder '\OptParams.mat']);

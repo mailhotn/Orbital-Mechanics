@@ -60,7 +60,12 @@ if ~exist([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latGs)...
                         pdop(pdop > PropParams.maxPdop) = PropParams.maxPdop;
                         pdop(isnan(pdop)) = PropParams.maxPdop;
                         intPdop  = trapz(propTime,pdop,2)/(propTime(end)-propTime(1));
-                        intPdop = mean(intPdop,1);
+                        
+                        % New Objective Function
+                        objective = intPdop(1) + 2*intPdop(2) + intPdop(3) +...
+                            abs(intPdop(1)-intPdop(3));
+                        
+                        intPdop = objective;
                         if intPdop < intVec(iPlanes)
                             intVec(iPlanes) = intPdop;
                             maxVec(iPlanes) = mean(maxPdop,1);
