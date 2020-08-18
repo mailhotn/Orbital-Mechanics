@@ -7,6 +7,7 @@ PropParams.relTol  = 1e-6;
 PropParams.absTol  = 1e-6;
 PropParams.datafolder = 'C:\Users\User\Dropbox\Lattice Optimization Data';
 PropParams.delLat = 5;
+PropParams.minMinDist = 1; %km
 
 nRepeats = 14;
 nDays    = 1;
@@ -15,8 +16,8 @@ latList = 30:10:60;
 
 % latEm = 40;
 lonEm = 0;
-maxSats = 80;
-minSats = 50;
+maxSats = 49;
+minSats = 40;
 
 hAList = [0,900,1000];
 if exist([PropParams.datafolder '\OptIncData.mat'],'file')

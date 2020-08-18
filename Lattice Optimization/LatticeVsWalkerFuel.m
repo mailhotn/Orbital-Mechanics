@@ -51,6 +51,7 @@ end
 delV = delV*nRepeats*365;
 figure(1)
 plot(incList,delV,'linewidth',2);
+grid on
 legend('Circular','h_a = 900 km','h_a = 1000 km')
 xlabel('$\rm{Inclination} \left[^{\circ}\right]$','fontsize',14,'interpreter','latex')
 ylabel('$\frac{\Delta v}{\rm{year}} \rm{\left[\frac{m}{s}\right]}$','fontsize',14,'interpreter','latex')

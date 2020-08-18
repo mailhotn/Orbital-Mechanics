@@ -14,14 +14,14 @@ OptParams.OptType = 'GA';
 OptParams.minMinDist = 1; %km
 
 latList = 30:10:60;
-maxSats = 80;
-minSats = 50;
+maxSats = 49;
+minSats = 40;
 
 save([OptParams.datafolder '\OptParams.mat']);
 %% Run Genetic Algorithm
-for iLat = 1:length(latList)
+parfor iLat = 1:length(latList)
     latEm = latList(iLat);
-    parfor nSats = minSats:maxSats
+    for nSats = minSats:maxSats
         % Optimize
         try
             tic

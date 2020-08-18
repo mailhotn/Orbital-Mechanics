@@ -1,29 +1,20 @@
 %% Define Scenarios for Analysis
 clear
+dataFolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Final Results';
 folderList = {...
     'C:\Users\User\Dropbox\Walker Optimization Data\Previous Optimization Runs\Latticified Walker multilat multiInc collision';...
-    'C:\Users\User\Dropbox\Walker Optimization Data\Previous Optimization Runs\Latticified Walker multilat multiInc';...
-%     'C:\Users\User\Dropbox\Walker Optimization Data\Previous Optimization Runs\Sun-Synch';...
-%     'C:\Users\User\Dropbox\Lattice Optimization Data';...
-%     'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Apogee Height x3, del inc 10, multilat PDOP, dT 100';...
-%     'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\Apogee Height x3, del inc 9-15, multilat PDOP, dT 100';...
-%     'C:\Users\User\Dropbox\Lattice Optimization Data\GA Standard\Previous Runs\Version 5 - dT 100, Pop 80';...
+    'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\LatticeDef v1';...
+    'C:\Users\User\Dropbox\Lattice Optimization Data\GA Standard\Previous Runs\Version 6 - definitive';...
     };
 markerList = {...
     '*';...
-%     '^';...
     'o';...
     'x';...
-%     's';...
     };
 nameList = {...
     'Walker Ex';...
-    'Lattice Ex';...
-%         'Walker Opt';...
-%     'Nominal 2';...
-    'Lattice Ga';...
-    %     'Lattice Optimal 1';...
-    %     'Lattice Optimal 2';...
+    'LFC Ex';...
+    'LFC Ga';...
     };
 nScenarios = numel(folderList);
 
@@ -142,37 +133,37 @@ for iScenario = 1:nScenarios
         end
         hold off
         
-        figure(iLat*10 + 2) % 90th Percentile PDOP
-        hold on
-        semilogy(nSats,p90,markerList{iScenario})
-        title(['90th Percentile of PDOP for \phi_0 = ' num2str(latList(iLat))])
-        xlabel('# Sats')
-        ylabel('$PDOP$','interpreter','latex','fontsize',12)
-        grid on
-        set(gca, 'YScale', 'log')
-        leg = get(gca,'Legend');
-        if isempty(leg)
-            leg = legend(nameList{iScenario});
-        else
-            leg.String(nLeg+1:nLeg + numel(hAList)) = nameList(iScenario);
-        end
-        hold off
+%         figure(iLat*10 + 2) % 90th Percentile PDOP
+%         hold on
+%         semilogy(nSats,p90,markerList{iScenario})
+%         title(['90th Percentile of PDOP for \phi_0 = ' num2str(latList(iLat))])
+%         xlabel('# Sats')
+%         ylabel('$PDOP$','interpreter','latex','fontsize',12)
+%         grid on
+%         set(gca, 'YScale', 'log')
+%         leg = get(gca,'Legend');
+%         if isempty(leg)
+%             leg = legend(nameList{iScenario});
+%         else
+%             leg.String(nLeg+1:nLeg + numel(hAList)) = nameList(iScenario);
+%         end
+%         hold off
         
-        figure(iLat*10 + 3) % Coverage
-        hold on
-        plot(nSats,coverage,markerList{iScenario})
-        title(['Coverage for \phi_0 = ' num2str(latList(iLat))])
-        xlabel('# Sats')
-        ylabel('Coverage %')
-        ylim([0,100])
-        grid on
-        leg = get(gca,'Legend');
-        if isempty(leg)
-            leg = legend(nameList{iScenario});
-        else
-            leg.String(nLeg+1:nLeg + numel(hAList)) = nameList(iScenario);
-        end
-        hold off
+%         figure(iLat*10 + 3) % Coverage
+%         hold on
+%         plot(nSats,coverage,markerList{iScenario})
+%         title(['Coverage for \phi_0 = ' num2str(latList(iLat))])
+%         xlabel('# Sats')
+%         ylabel('Coverage %')
+%         ylim([0,100])
+%         grid on
+%         leg = get(gca,'Legend');
+%         if isempty(leg)
+%             leg = legend(nameList{iScenario});
+%         else
+%             leg.String(nLeg+1:nLeg + numel(hAList)) = nameList(iScenario);
+%         end
+%         hold off
         
         figure(iLat*10 + 4) % Pareto Frontier
         hold on
@@ -191,6 +182,18 @@ for iScenario = 1:nScenarios
             leg.String(nLeg+1:nLeg + numel(hAList)) = nameList(iScenario);
         end
         hold off
+        
+        paretoSet = struct();
+        paretoSet.latEm = latList(iLat);
+        paretoSet.nSats = paretoSats;
+        paretoSet.nPlanes = paretoPlanes;
+        paretoSet.intTarget = intTarget;
+        paretoSet.maxTarget = maxTarget;
+        paretoSet.p90Target = p90Target;
+        paretoSet.covTarget = covTarget;
+        
+        save([dataFolder '\ParetoList_Lat_' num2str(paretoSet.latEm) '_'...
+            nameList{iScenario} '_hASplit.mat'],'paretoSet');
         
     end
     nLeg = nLeg + numel(hAList);
