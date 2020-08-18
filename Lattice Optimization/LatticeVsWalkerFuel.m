@@ -1,28 +1,39 @@
-datafolder = ['C:\Users\User\Dropbox\Lattice Optimization Data']; %#ok<NBRAK>
-load([datafolder '\OptParams.mat']);
-
+% datafolder = ['C:\Users\User\Dropbox\Lattice Optimization Data']; %#ok<NBRAK>
+% load([datafolder '\OptParams.mat']);
+incList = 0:90;
+hAList = [0,900,1000];
+nRepeats = 14;
+nDays = 1;
 %% Drag Parameters
 sDivM = 1;
 cD = 1;
 kD = sDivM*cD;
 %% Fuel Consumption For All ecc & Inc
-delV = nan(length(latList),length(eccList));
-for iLat = 1:length(latList)
-    for iEcc = 1:length(eccList)
-        ecc = eccList(iEcc);
-        latGs = latList(iLat);
-        inc = min([90,latList(iLat)+delInc]);
-        sma = CalcRgtSma(ecc,inc,nRepeats,nDays);
+delV = nan(length(incList),length(hAList));
+thPulse = nan(length(incList),length(hAList));
+eccs = nan(length(incList),length(hAList));
+smas = nan(length(incList),length(hAList));
+for iInc = 1:length(incList)
+    for iHA = 1:length(hAList)
+        
+        hA = hAList(iHA);
+        inc = incList(iInc);
+        
+        [sma, ecc] = CalcRgtSmaApoHeight(inc,hA,nRepeats,nDays);
+        eccs(iInc,iHA) = ecc;
+        smas(iInc,iHA) = sma;
+        
         [rhoP, ~, ~, hScale] = EarthAtmosphere(sma*(1-ecc));
         z = sma*ecc/hScale;
-        delSmaF = -2*pi*kD*rhoP*sma^2*exp(-z)*...
+        % Calculations in meters!!! (rho is kg/m^3)
+        delSmaF = -2*pi*kD*rhoP*sma^2*1000^2*exp(-z)*...
             ((1 + 3/4*ecc^2 + 21/64*ecc^4)*besseli(0,z) + ...
             (2*ecc + 3/4*ecc^3)*besseli(1,z) + ...
             (3/4*ecc^2 + 7/16*ecc^4)*besseli(2,z) + ...
             1/4*ecc^3*besseli(3,z) + ...
             7/64*ecc^4*besseli(4,z));
         
-        delEcc = -2*pi*kD*rhoP*sma*(1-ecc^2)*exp(-z)*...
+        delEcc = -2*pi*kD*rhoP*sma*1000*(1-ecc^2)*exp(-z)*...
             ((1/2*ecc + 3/16*ecc^3)*besseli(0,z) + ...
             (1 + 3/8*ecc^2 + 15/64*ecc^4)*besseli(1,z) + ...
             (1/2*ecc + 1/4*ecc^3)*besseli(2,z) + ...
@@ -31,12 +42,32 @@ for iLat = 1:length(latList)
             3/128*ecc^4*besseli(5,z));
         options = optimset('Display','none');
         
-        [~, delVF] = fminbnd(@(x)FuelCostElliptical(x,sma,ecc,-delSmaF,-delEcc)...
-            ,0,2*pi,options);
-        delV(iLat,iEcc) = delVF;
+        [th, delVF] = fminbnd(@(x)FuelCostElliptical(x,sma,ecc,-delSmaF,-delEcc)...
+            ,0,pi,options);
+        delV(iInc,iHA) = delVF;
+        thPulse(iInc,iHA) = 180/pi*th;
     end
 end
-delV = delV*14*365*1000;
+delV = delV*nRepeats*365;
+figure(1)
+plot(incList,delV,'linewidth',2);
+grid on
+legend('Circular','h_a = 900 km','h_a = 1000 km')
+xlabel('$\rm{Inclination} \left[^{\circ}\right]$','fontsize',14,'interpreter','latex')
+ylabel('$\frac{\Delta v}{\rm{year}} \rm{\left[\frac{m}{s}\right]}$','fontsize',14,'interpreter','latex')
+% figure(2)
+% plot(incList,thPulse)
+%% New Version 08/2020
+% syms a e th mu da de real
+% p = a*(1-e^2);
+% r = p/(1+e*cos(th));
+% v = sqrt(mu/p)*sqrt(1+e^2+2*e*cos(th));
+% dvT = -da*r*v/2/a/(2*a-r);
+% dvN = (-de-2/v*(e+cos(th))*dvT)*a*v/r/sin(th);
+% 
+% dv = simplify(sqrt(dvT^2 + dvN^2));
+% dvdth = diff(dv,th);
+
 %% Function Definition
 function [J] = FuelCostElliptical(x,sma,ecc,delSma,delEcc)
 primary = earth();
@@ -44,10 +75,13 @@ mu = primary.mu;
 th = x;
 p = sma*(1-ecc^2);
 r = p./(1+ecc.*cos(th));
-vTheta = sqrt(mu./p).*(1 + ecc.*cos(th));
-vRadial = sqrt(mu./p).*ecc.*sin(th);
-vMag = sqrt(vTheta.^2 + vRadial.^2);
-dVTan = delSma.*r.*vMag./(2*sma.*(2*sma-r));
-dVRad = sma.*vMag./r.*(delEcc - 2./vMag.*(ecc + cos(th)).*dVTan);
+v = 1000*sqrt(mu./p)*sqrt(1 + ecc^2 + 2*ecc*cos(th));
+sma = 1000*sma;
+r = 1000*r;
+
+dVTan = delSma.*r.*v./(2*sma.*(2*sma-r));
+
+dVRad = delEcc*sma*v/r/sin(th) + 2*sma*(ecc+cos(th))/r/sin(th)*dVTan;
+
 J = sqrt(dVTan.^2 + dVRad.^2);
 end

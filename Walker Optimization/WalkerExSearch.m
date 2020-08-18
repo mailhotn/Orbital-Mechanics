@@ -4,6 +4,8 @@ function [ ExSol ] = WalkerExSearch( Arch, Orbit, InitCon, latGs, PropParams)
 if ~exist([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latGs)...
         '_nSats_' num2str(Arch.nSats) '_hA_' num2str(Orbit.hA) '.mat'],'file')
     pList = divisors(Arch.nSats);
+    incList = -1:0.2:5;
+    Orbit0 = Orbit;
     
     % initialize Performance Arrays
     maxVec = inf(1,length(pList));
@@ -18,54 +20,72 @@ if ~exist([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latGs)...
     archParams  = nan(3,length(pList)); % nPlanes, nAops, nSatsPerAop
     Phase.nC3 = 0;
     Phase.nC2 = 0;
+    orbits = cell(1,length(pList));
+    inits  = cell(1,length(pList));
     
     for iPlanes = 1:length(pList)
-        Arch.nPlanes = pList(iPlanes);
-        Arch.nSatsPerAop = Arch.nSats/Arch.nPlanes;
-        Arch.nAops = 1;
-        for nC1 = 0:Arch.nPlanes-1
-            Phase.nC1 = -nC1;
-            % Create Constellation and propagate
-            LC = LatticeConstellation(Arch,Phase,Orbit,InitCon);
-            Prop = Propagator(LC,PropParams.relTol,PropParams.absTol);
-            [propTime, propState] = Prop.PropEciJ2(PropParams.timeVec);
-            % Evaluate PDOP
-            [pdopC, ~] = TdoaPdopVec(propState,propTime,latGs,0,0,PropParams.elevMin);
-            [pdopN, ~] = TdoaPdopVec(propState,propTime,...
-                latGs+PropParams.delLat,0,0,PropParams.elevMin);
-            [pdopS, ~] = TdoaPdopVec(propState,propTime,...
-                latGs-PropParams.delLat,0,0,PropParams.elevMin);
-            pdop = [pdopN.';pdopC.';pdopS.'];
-            % Calculate Performance criteria
-            coverage = 100 - sum(isnan(pdop),2)/length(pdop)*100;
-            if any(~isnan(pdop),'all')
-                maxPdop  = max(pdop(~isnan(pdop)),[],2);
-                pdop(pdop > PropParams.maxPdop) = PropParams.maxPdop;
-                pdop(isnan(pdop)) = PropParams.maxPdop;
-                intPdop  = trapz(propTime,pdop,2)/(propTime(end)-propTime(1));
-                intPdop = mean(intPdop,1);
-                if intPdop < intVec(iPlanes)
-                    intVec(iPlanes) = intPdop;
-                    maxVec(iPlanes) = mean(maxPdop,1);
-                    covVec(iPlanes) = mean(coverage,1);
-                    p90Vec(iPlanes) = mean(prctile(pdop,90,2),1);
-                    p75Vec(iPlanes) = mean(prctile(pdop,75,2),1);
-                    p50Vec(iPlanes) = mean(prctile(pdop,50,2),1);
-                    phaseParams(:,iPlanes) = [Phase.nC1;Phase.nC2;Phase.nC3];
-                    archParams(:,iPlanes)  = [Arch.nPlanes;Arch.nAops;Arch.nSatsPerAop];
+        for iInc = 1:length(incList)
+            % Modify Inclination & redo initcon
+            inc = Orbit0.inc + incList(iInc);
+            [sma, ecc] = CalcRgtSmaApoHeight(inc,Orbit0.hA,Arch.nRepeats, Arch.nDays);
+            Orbit.sma = sma;
+            Orbit.ecc = ecc;
+            Orbit.inc = inc;
+            
+            InitCon = InitConElliptical(Orbit.ecc,Orbit.inc,Orbit.sma,latGs,0);
+            
+            Arch.nPlanes = pList(iPlanes);
+            Arch.nSatsPerAop = Arch.nSats/Arch.nPlanes;
+            Arch.nAops = 1;
+            for nC1 = 0:Arch.nPlanes-1
+                Phase.nC1 = -nC1;
+                % Create Constellation and propagate
+                LC = LatticeConstellation(Arch,Phase,Orbit,InitCon);
+                minDist = CalcMinDist(LC); %Collision check
+                if minDist > PropParams.minMinDist
+                    
+                    Prop = Propagator(LC,PropParams.relTol,PropParams.absTol);
+                    [propTime, propState] = Prop.PropEciJ2(PropParams.timeVec);
+                    % Evaluate PDOP
+                    [pdopC, ~] = TdoaPdopVec(propState,propTime,latGs,0,0,PropParams.elevMin);
+                    [pdopN, ~] = TdoaPdopVec(propState,propTime,...
+                        latGs+PropParams.delLat,0,0,PropParams.elevMin);
+                    [pdopS, ~] = TdoaPdopVec(propState,propTime,...
+                        latGs-PropParams.delLat,0,0,PropParams.elevMin);
+                    pdop = [pdopN.';pdopC.';pdopS.'];
+                    % Calculate Performance criteria
+                    coverage = 100 - sum(isnan(pdop),2)/length(pdop)*100;
+                    if any(~isnan(pdop),'all')
+                        maxPdop  = max(pdop(~isnan(pdop)),[],2);
+                        pdop(pdop > PropParams.maxPdop) = PropParams.maxPdop;
+                        pdop(isnan(pdop)) = PropParams.maxPdop;
+                        intPdop  = trapz(propTime,pdop,2)/(propTime(end)-propTime(1));
+                        intPdop = mean(intPdop,1);
+                        if intPdop < intVec(iPlanes)
+                            intVec(iPlanes) = intPdop;
+                            maxVec(iPlanes) = mean(maxPdop,1);
+                            covVec(iPlanes) = mean(coverage,1);
+                            p90Vec(iPlanes) = mean(prctile(pdop,90,2),1);
+                            p75Vec(iPlanes) = mean(prctile(pdop,75,2),1);
+                            p50Vec(iPlanes) = mean(prctile(pdop,50,2),1);
+                            phaseParams(:,iPlanes) = [Phase.nC1;Phase.nC2;Phase.nC3];
+                            archParams(:,iPlanes)  = [Arch.nPlanes;Arch.nAops;Arch.nSatsPerAop];
+                            orbits{iPlanes} = Orbit;
+                            inits{iPlanes} = InitCon;
+                        end
+                    end
                 end
             end
         end
     end
-    
     % Find Best Solution
     [fit,iOpt] = min(intVec);
     % Assign Values to Output Struct
     ExSol.nSats = Arch.nSats;
     ExSol.archMat  = archParams;
     ExSol.phaseMat = phaseParams;
-    ExSol.Orbit = Orbit;
-    ExSol.InitCon = InitCon;
+    ExSol.orbits = orbits;
+    ExSol.inits = inits;
     ExSol.latGs = latGs;
     ExSol.optNPlanes = archParams(1,iOpt);
     ExSol.iOpt = iOpt;

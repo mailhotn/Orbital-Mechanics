@@ -7,7 +7,7 @@ PropParams.relTol  = 1e-6;
 PropParams.absTol  = 1e-6;
 PropParams.datafolder = 'C:\Users\User\Dropbox\Lattice Optimization Data';
 PropParams.delLat = 5;
-primary = earth();
+PropParams.minMinDist = 1; %km
 
 nRepeats = 14;
 nDays    = 1;
@@ -16,10 +16,10 @@ latList = 30:10:60;
 
 % latEm = 40;
 lonEm = 0;
-maxSats = 80;
-minSats = 50;
+maxSats = 49;
+minSats = 40;
 
-hAList = [0, 900, 1000];
+hAList = [0,900,1000];
 if exist([PropParams.datafolder '\OptIncData.mat'],'file')
     load([PropParams.datafolder '\OptIncData.mat']);
     delIncList = optdInc;
@@ -44,7 +44,7 @@ for iLat = 1:length(latList)
         Orbit.inc = inc;
         Orbit.hA = hAList(iHA);
         
-        InitCon = InitConElliptical(Orbit.ecc,Orbit.inc,Orbit.sma,latEm,lonEm);
+        InitCon = struct();
 
         parfor nSats = minSats:maxSats
             % Optimize
@@ -55,7 +55,7 @@ for iLat = 1:length(latList)
                 Arch.nSats = nSats;
                 Arch.nRepeats = nRepeats;
                 Arch.nDays = nDays;
-
+                
                 
                 ExSol = LatticeExSearch(Arch,Orbit,InitCon,latEm,PropParams);
 
@@ -73,9 +73,9 @@ for iLat = 1:length(latList)
                     '/' num2str(ExSol.phaseMat(1,ExSol.iOpt)) ...
                     '/' num2str(ExSol.phaseMat(2,ExSol.iOpt)) ...
                     '/' num2str(ExSol.phaseMat(3,ExSol.iOpt)) ...
-                    newline 'Inclination: ' num2str(Orbit.inc) '°'...
-                    newline 'Eccentricity: ' num2str(Orbit.ecc)...
-                    newline 'Semimajor Axis: ' num2str(Orbit.sma) ' km' ...
+                    newline 'Inclination: ' num2str(ExSol.orbits{ExSol.iOpt}.inc) '°'...
+                    newline 'Eccentricity: ' num2str(ExSol.orbits{ExSol.iOpt}.ecc)...
+                    newline 'Semimajor Axis: ' num2str(ExSol.orbits{ExSol.iOpt}.sma) ' km' ...
                     newline 'Earth Repeats: ' num2str(nRepeats)])
             catch ME
                 % Error!

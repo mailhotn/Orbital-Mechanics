@@ -38,7 +38,8 @@ if ~exist([OptParams.datafolder '\LatticeGaSol_Lat_' num2str(latEm)...
             Arch.nPlanes];              % nC3
         % Optimize
         Sol = ga(@(x) LatticeGaFitness(x,Arch,latEm,OptParams),5,[],...
-            [],[],[],lBounds,uBounds,[],intCon,GaOptions);
+            [],[],[],lBounds,uBounds,@(x) LatticeGaCollCon(x,Arch,latEm,OptParams)...
+            ,intCon,GaOptions);
         
         % Re-evaluate (Should prob use exit function instead)
         hA = OptParams.hAList(Sol(1));
