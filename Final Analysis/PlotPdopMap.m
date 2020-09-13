@@ -1,12 +1,17 @@
-function PlotPdopMap(Con,latEm,elevMin,parallel)
+function PlotPdopMap(Con,latEm,lonEm,elevMin,parallel,colorBar)
 if nargin < 3
+    lonEm = 0;
     elevMin = 5;
     parallel = 0;
 elseif nargin < 4
+    elevMin = 5;
     parallel = 0;
+elseif nargin < 5
+    parallel = 0;
+elseif nargin < 6
+    colorBar = false;
 end
 
-lonEm = 0;
 timeVec = 0:100:86400;
 Prop = Propagator(Con);
 [propTime, propState] = Prop.PropEciJ2(timeVec);
@@ -55,6 +60,9 @@ hold on
 
 colormap jet
 shading interp
+if colorBar
+    colorbar
+end
 % c = colorbar;
 % c.Label.String = 'Mean PDOP';
 % c.FontSize = 10;

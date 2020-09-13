@@ -8,7 +8,9 @@ if nargin == 1
     xEci = reshape(xEci,1,6*Con.nSats);
     timeVec = 0;
 else 
-    xEci = data;
+    Con = data;
+    Prop = Propagator(Con);
+    [~, xEci] = Prop.PropEciJ2(timeVec);
 end
 if nargin < 3
     gmst0 = 0;

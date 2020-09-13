@@ -6,7 +6,7 @@ folderList = {...
     'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\LatticeDef v1';...
     'C:\Users\User\Dropbox\Lattice Optimization Data\GA Standard\Previous Runs\Version 6 - definitive';...
     };
-latEm = 60;
+latEm = 30;
 hAList = [0,900,1000];
 
 WalkerExPhase = [];
@@ -25,7 +25,7 @@ WalkerMinDist = [];
 LatticeExMinDist = cell(3,1);
 LatticeGaMinDist = [];
 
-for iScenario = 1:3
+for iScenario = 2
     
     load([dataFolder '/ParetoList_Lat_' num2str(latEm) '_' nameList{iScenario} '_hASplit.mat']);
     if iScenario == 2
@@ -33,7 +33,7 @@ for iScenario = 1:3
     else
         hAList = 0;
     end
-    for iHA = 1:length(hAList)
+    for iHA = 3:length(hAList)
         for iCon = 1:length(paretoSet.nPlanes{iHA})
             switch iScenario
                 case 1 % Walker
@@ -132,24 +132,59 @@ for iScenario = 1:3
                     LatticeGaMinDist = [LatticeGaMinDist, minDist];
             end
             
-            %         figure(iScenario*100 + iCon*10 + 1)
+                    figure(iScenario*100 + iCon*10 + 1)
             %         subplot(2,1,1)
             %         PlotGroundTrack(LC);
             %         title([nameList{iScenario} ' ' num2str(Arch.nSats) '/' ...
             %             num2str(Arch.nPlanes) ' ' num2str(Orbit.hA)])
             %
             %         subplot(2,1,2)
-            %         PlotPdopMap(LC,latEm,5,true);
+                    PlotPdopMap(LC,latEm,0,5,true,true);
         end
     end
 end
 
-%% Plot min Dists
-figure(1)
-semilogy(1,WalkerMinDist,'bo',...
-    2,LatticeExMinDist{2},'bo',...
-    3,LatticeExMinDist{3},'bo',...
-    4,LatticeGaMinDist,'bo')
-grid on
+%% Generate example of too regional coverage
+clear
+close all
+dataFolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\LatticeDef v1';
+load([dataFolder '\LatticeExSol_Lat_30_nSats_60_hA_900.mat']);
 
+Arch.nSats = 60;
+Arch.nPlanes = 60;
+Arch.nAops = 1;
+Arch.nSatsPerAop = 1;
+
+Orbit = ExSol.orbits{end};
+
+Phase.nC1 = ExSol.phaseMat(1,end);
+Phase.nC2 = ExSol.phaseMat(2,end);
+Phase.nC3 = ExSol.phaseMat(3,end);
+
+InitCon = ExSol.inits{end};
+
+LC = LatticeConstellation(Arch,Phase,Orbit,InitCon);
+time = 0:10:86164;
+Prop = Propagator(LC);
+[~, xEci] = Prop.PropEciJ2(time);
+
+primary = earth();
+gmst = primary.we*time;
+nSats = size(xEci,2)/6;
+tracks = nan(2*nSats,length(gmst));
+for iTime = 1:length(gmst)
+    xEcef = eci2ecef(reshape(xEci(iTime,:).',6,nSats),gmst(iTime));
+    rEcef = xEcef(1:3,:)./sqrt(dot(xEcef(1:3,:),xEcef(1:3,:),1));
+    lla   = ecef2lla(rEcef.'*primary.Re,0,primary.Re).';
+    tracks(:,iTime) = reshape(lla(1:2,:),2*nSats,1);
+end
+
+figure(1)
+PlotPdopMap(LC,30,0,5,true);
+hold on
+for iSat = 1:nSats
+        plot(wrapTo180(tracks(2*iSat,:)),tracks(2*iSat-1,:),'.w');
+end
+hold off
+    
 

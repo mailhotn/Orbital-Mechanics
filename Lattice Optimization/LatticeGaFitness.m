@@ -43,6 +43,7 @@ intPdopNom = trapz(propTime,pdop)/(propTime(end)-propTime(1));
 intPdopNorth = trapz(propTime,pdopN)/(propTime(end)-propTime(1));
 intPdopSouth = trapz(propTime,pdopS)/(propTime(end)-propTime(1));
 
-fitness = (intPdopNom + intPdopNorth + intPdopSouth)/3;
+fitness = (2*intPdopNom + intPdopNorth + intPdopSouth)/4 + ...
+    abs(intPdopNorth - intPdopSouth);
 
 
