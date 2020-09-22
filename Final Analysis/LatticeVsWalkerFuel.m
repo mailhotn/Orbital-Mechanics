@@ -1,4 +1,4 @@
-% datafolder = ['C:\Users\User\Dropbox\Lattice Optimization Data']; %#ok<NBRAK>
+dataFolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Final Results';
 % load([datafolder '\OptParams.mat']);
 incList = 0:90;
 hAList = [0,900,1000];
@@ -50,11 +50,19 @@ for iInc = 1:length(incList)
 end
 delV = delV*nRepeats*365;
 figure(1)
-plot(incList,delV,'linewidth',2);
+plot(incList.',delV(:,1),'-',...
+    incList.',delV(:,2),'-.',...
+    incList.',delV(:,3),'--','linewidth',2)
 grid on
-legend('Circular','h_a = 900 km','h_a = 1000 km')
-xlabel('$\rm{Inclination} \left[^{\circ}\right]$','fontsize',14,'interpreter','latex')
-ylabel('$\frac{\Delta v}{\rm{year}} \rm{\left[\frac{m}{s}\right]}$','fontsize',14,'interpreter','latex')
+legend('Circular, h_a = h_c','Elliptical, h_a = 900 km','Elliptical, h_a = 1000 km')
+xlabel('$\rm{Orbital \: inclination}$','fontsize',14,'interpreter','latex')
+xticks(0:10:90)
+xticklabels({'0°','10°','20°','30°','40°','50°','60°','70°','80°','90°'})
+ylabel('$\mathrm{Annual} \: \Delta v \mathrm{\left[\frac{m}{s}\right]}$','fontsize',14,'interpreter','latex')
+xlim([0,90])
+ylim([0,25])
+
+print([dataFolder '\Annual fuel usage'],'-depsc','-painters');
 % figure(2)
 % plot(incList,thPulse)
 %% New Version 08/2020

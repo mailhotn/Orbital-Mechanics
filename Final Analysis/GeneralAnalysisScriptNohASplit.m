@@ -7,14 +7,14 @@ folderList = {...
     'C:\Users\User\Dropbox\Lattice Optimization Data\GA Standard\Previous Runs\Version 6 - definitive';...
     };
 markerList = {...
-    '*';...
     'o';...
+    'v';...
     'x';...
     };
 nameList = {...
-    'Walker Ex';...
-    'LFC Ex';...
-    'LFC Ga';...
+    'Walker exhaustive search';...
+    'LFC exhaustive search';...
+    'LFC genetic algorithm';...
     };
 nScenarios = numel(folderList);
 
@@ -129,18 +129,22 @@ for iScenario = 1:nScenarios
         figure(iLat*10 + 1) % Int PDOP
         hold on
         semilogy(nSats,min(intPdop,[],1),markerList{iScenario})
+        if iScenario == 3
+            semilogy([minSats,maxSats],[intTarget,intTarget],'b','linewidth',1.5)
+        end
 %         title(['Integral of PDOP for \phi_0 = ' num2str(latList(iLat))])
-        xlabel('$N_s$','interpreter','latex','fontsize',12)
+        xlabel('$N_s$','interpreter','latex','fontsize',14)
 %         ylabel('$\frac{1}{T}\int^{T}_{0}{PDOPdt}$','interpreter','latex','fontsize',12)
-        ylabel('$\mathcal{J}$','interpreter','latex','fontsize',12)
+        ylabel('$\mathcal{J}$','interpreter','latex','fontsize',14)
         grid on
         set(gca, 'YScale', 'log')
-        leg = get(gca,'Legend');
-        if isempty(leg)
-            leg = legend(nameList{iScenario});
-        else
-            leg.String(nLeg+1) = nameList(iScenario);
-        end
+        legend(nameList)
+%         leg = get(gca,'Legend');
+%         if isempty(leg)
+%             leg = legend(nameList{iScenario});
+%         else
+%             leg.String(nLeg) = nameList(iScenario);
+%         end
         hold off
         
 %         figure(iLat*10 + 2) % 90th Percentile PDOP
@@ -177,18 +181,21 @@ for iScenario = 1:nScenarios
         
         figure(iLat*10 + 4) % Pareto Frontier
         hold on
-            plot(paretoSats,paretoPlanes,['--' markerList{iScenario}]...
+            plot(paretoSats,paretoPlanes,markerList{iScenario}...
                 ,'linewidth',1.5,'markersize',10)
 %         title(['Pareto Frontier \phi_0 = ' num2str(latList(iLat))])
-        xlabel('$N_s$','interpreter','latex','fontsize',12)
-        ylabel('$N_o$','interpreter','latex','fontsize',12)
+        xlabel('$N_s$','interpreter','latex','fontsize',14)
+        ylabel('$N_o$','interpreter','latex','fontsize',14)
+        xlim([45,80])
+        ylim([0,65])
         grid on
-        leg = get(gca,'Legend');
-        if isempty(leg)
-            leg = legend(nameList{iScenario});
-        else
-            leg.String(nLeg+1) = nameList(iScenario);
-        end
+        legend(nameList)
+%         leg = get(gca,'Legend');
+%         if isempty(leg)
+%             leg = legend(nameList{iScenario});
+%         else
+%             leg.String(nLeg+1) = nameList(iScenario);
+%         end
         hold off
         
         paretoSet = struct();
