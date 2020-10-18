@@ -1,4 +1,4 @@
-function PlotPdopMap(Con,latEm,lonEm,elevMin,parallel,colorBar)
+function PlotPdopMap(Con,latEm,lonEm,elevMin,parallel,colorBar,prct)
 if nargin < 3
     lonEm = 0;
     elevMin = 5;
@@ -33,8 +33,10 @@ if parallel
                 ,0,elevMin);
             pdop(pdop>1000) = 1000;
             pdop(isnan(pdop)) = 1000;
+%             p95 = prctile(pdop,95);
+%             pdop(pdop > p95) = nan;
 %             PDOP2(iLat) = trapz(propTime(~isnan(pdop)),pdop(~isnan(pdop)))/propTime(end);
-            PDOP2(iLat) = prctile(pdop,95);
+            PDOP2(iLat) = prctile(pdop,prct);
         end
         PDOP(:,iLon) = PDOP2;
     end
@@ -47,12 +49,13 @@ else
             pdop(pdop>1000) = 1000;
             pdop(isnan(pdop)) = 1000;
 %             PDOP2(iLat) = trapz(propTime,pdop)/propTime(end);
-            PDOP2(iLat) = prctile(pdop,95);
+            PDOP2(iLat) = prctile(pdop,prct);
         end
         PDOP(:,iLon) = PDOP2;
     end
 end
 PDOP(end,end) = 0;
+PDOP(1,end) = 20;
 %% Actually Plot
 gcf
 
@@ -64,7 +67,7 @@ colormap jet
 shading interp
 if colorBar
     c = colorbar;
-    c.Label.String = '$p_{95}\left(PDOP\right)$';
+    c.Label.String = "$p_{" + prct + "}\left(PDOP\right)$";
     c.Label.Interpreter = 'latex';
     c.Label.FontSize = 14;
 end

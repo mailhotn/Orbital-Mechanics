@@ -9,6 +9,8 @@ folderList = {...
 latList = 30:10:60;
 % latEm = 30;
 
+prct = 95;
+
 WalkerExPhase = [];
 LatticeExPhase = [];
 LatticeGaPhase = [];
@@ -94,20 +96,20 @@ for iLat = 1:length(latList)
             %             num2str(Arch.nPlanes) ' ' num2str(Orbit.hA)])
             %
             %         subplot(2,1,2)
-            PlotPdopMap(LC,latEm,0,5,true,true);
+            PlotPdopMap(LC,latEm,0,5,true,true,prct);
             
             switch iScenario
                 case 1
                     WalkerMinDist = [WalkerMinDist, minDist];
-                    name = ['Lat' num2str(latEm) 'Wa ' num2str(LC.nSats)...
+                    name = [num2str(prct) 'Lat' num2str(latEm) 'Wa ' num2str(LC.nSats)...
                         '-' num2str(LC.nPlanes)];
                 case 2
                     LatticeExMinDist{iHA} = [LatticeExMinDist{iHA}, minDist];
-                    name = ['Lat' num2str(latEm) 'Ex900 ' num2str(LC.nSats)...
+                    name = [num2str(prct) 'Lat' num2str(latEm) 'Ex900 ' num2str(LC.nSats)...
                         '-' num2str(LC.nPlanes)];
                 case 3
                     LatticeGaMinDist = [LatticeGaMinDist, minDist];
-                    name = ['Lat' num2str(latEm) 'Ga ' num2str(LC.nSats)...
+                    name = [num2str(prct) 'Lat' num2str(latEm) 'Ga ' num2str(LC.nSats)...
                         '-' num2str(LC.nPlanes)];
             end
             

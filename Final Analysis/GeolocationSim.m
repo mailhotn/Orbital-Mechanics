@@ -1,6 +1,9 @@
 %% Define Constellation & RoI Position
+clear
 latRoi = 30;
 lonRoi = 35;
+delLatRoi = 10;
+delLonRoi = 10;
 elevMin = 5; % minimum elevation for visibility [deg]
 load('C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\LatticeDef v1\LatticeExSol_Lat_30_nSats_70_hA_900.mat');
 
@@ -24,40 +27,66 @@ InitCon.M1 = 180;
 
 LC = LatticeConstellation(Arch,Phase,Orbit,InitCon);
 
-figure(1)
-PlotGroundTrack(LC);
-% figure(2)
-% PlotPdopMap(LC,latRoi,lonRoi,5,true);
+% figure(1)
+% PlotGroundTrack(LC);
+figure(2)
+PlotPdopMap(LC,latRoi,lonRoi,5,true,true,95);
+hold on
+plot([lonRoi - 40,lonRoi + 40],[latRoi + delLatRoi, latRoi + delLatRoi],'-w',...
+    [lonRoi - 40,lonRoi + 40],[latRoi - delLatRoi, latRoi - delLatRoi],'-w','linewidth',2);
+hold off
 %% Orbital Simulation
 time = 0:600:86400; % sec
 Prop = Propagator(LC,1e-8,1e-8);
 [~, state] = Prop.PropEciJ2(time);
 
 %% Estimation
-nSims = 1000;
-rUnConErrMat = nan(nSims,length(time));
-rLinConErrMat = nan(nSims,length(time));
-r2ndConErrMat = nan(nSims,length(time));
+nPoints = 1000;
+nExps = 100;
 
-rUnConErrStdMat = nan(nSims,length(time));
-rLinConErrStdMat = nan(nSims,length(time));
-r2ndConErrStdMat = nan(nSims,length(time));
+latList = nan(nPoints,1);
+lonList = nan(nPoints,1);
 
-pdopMat = nan(nSims,length(time));
-unCpdopMat = nan(nSims,length(time));
+rUnConAbsErr = nan(nPoints,length(time));
+rLinConAbsErr = nan(nPoints,length(time));
+r2ndConAbsErr = nan(nPoints,length(time));
+
+rUnConRmsErr = nan(nPoints,length(time));
+rLinConRmsErr = nan(nPoints,length(time));
+r2ndConRmsErr = nan(nPoints,length(time));
+
+pdopMat = nan(nPoints,length(time));
+unCpdopMat = nan(nPoints,length(time));
 varTime = (10/3e5)^2; % sec
 
-for iSim = 1:nSims
-    latEm = latRoi + (rand-0.5)*20;
-    lonEm = lonRoi + (rand-0.5)*20;
+for iSim = 1:nPoints
+    latEm = latRoi + (rand-0.5)*2*delLatRoi;
+    lonEm = lonRoi + (rand-0.5)*2*delLonRoi;
+    latList(iSim) = latEm;
+    lonList(iSim) = lonEm;
+    
     [pdopMat(iSim,:), ~, unCpdopMat(iSim,:)] = CumTdoaPdopVec(state,time,latEm,lonEm,0,5);
     rEm = lla2ecef([latEm,lonEm,0]).'/1000;
     % [pdop,nSis] = TdoaPdopVec(state,time,latEm,lonEm,0,elevMin);
-    rUnCon = nan(3,length(time));
-    rUnCon(:,1) = lla2ecef([latRoi,lonRoi,0]).'/1000; % Initial guess 30°N, 30°E
-    rLinCon = rUnCon;
-    rNLinCon = rUnCon;
-    zMeas = cell(1);
+    rUnCon = cell(nExps,1);
+    
+    dirInit = 2*pi*rand;
+    latInit = latEm + sin(dirInit)*5;
+    lonInit = lonEm + cos(dirInit)*5;
+    rInit = lla2ecef([latInit,lonInit,0]).'/1000;
+        
+    for iExp = 1:nExps
+        
+        rUnCon{iExp} = nan(3,length(time));
+        rUnCon{iExp}(:,1) = rInit; % Initial guess 30°N, 30°E
+        rLinCon = rUnCon;
+        rNLinCon = rUnCon;
+        % Initial Abs Error
+        rUnConAbsErr(iSim,1) = norm(rEm - rInit);
+        rLinConAbsErr(iSim,1) = norm(rEm - rInit);
+        r2ndConAbsErr(iSim,1) = norm(rEm - rInit);
+    end
+    zMeas = cell(nExps,length(time));
     % Create Measurements
     for iTime = 1:length(time)
         % Derive measurement matrix from satellite positions
@@ -69,11 +98,16 @@ for iSim = 1:nSims
         % Create Measurement & Linearized matrix
         z = tdoaMeas(rSats,rEm);
         noiseCov = varTime*(eye(nMeas) + ones(nMeas));
-        zMeas{iTime} = z + mvnrnd(zeros(nMeas,1),noiseCov).'; % add noise
+        for iExp = 1:nExps
+            zMeas{iExp,iTime} = z + mvnrnd(zeros(nMeas,1),noiseCov).'; % add noise
+        end
     end
     
     %% Unconstrained
-    pEst = 1000*eye(3);
+    pEst = cell(nExps,1);
+    for iExp = 1:nExps
+        pEst{iExp} = 1000*eye(3);
+    end
     stdVec = nan(1,length(iTime));
     for iTime = 2:length(time)
         % Derive measurement matrix from satellite positions
@@ -83,21 +117,42 @@ for iSim = 1:nSims
         rSats = stateInSight(1:3,:);
         nMeas = size(rSats,2)-1;
         noiseCov = varTime*(eye(nMeas) + ones(nMeas));
-        % Create Linearized measurement matrix
-        [zEst,hMeas] = tdoaMeasMat(rSats,rUnCon(:,iTime-1));
-        % EKF
-        kGain = (pEst*hMeas.')/(hMeas*pEst*hMeas.' + noiseCov);
-        rUnCon(:,iTime) = rUnCon(:,iTime-1) + ...
-            kGain*(zMeas{iTime} - zEst);
-        pEst = (eye(3) - kGain*hMeas)*pEst*(eye(3) - kGain*hMeas).' + ...
-            kGain*noiseCov*kGain.';
-        stdVec(iTime) = sqrt(trace(pEst));
+        
+        rSamples = nan(3,nExps);
+        for iExp = 1:nExps
+            % Create Linearized measurement matrix
+            [zEst,hMeas] = tdoaMeasMat(rSats,rUnCon{iExp}(:,iTime-1));
+            % EKF
+            kGain = (pEst{iExp}*hMeas.')/(hMeas*pEst{iExp}*hMeas.' + noiseCov);
+            rUnCon{iExp}(:,iTime) = rUnCon{iExp}(:,iTime-1) + ...
+                kGain*(zMeas{iExp,iTime} - zEst);
+            pEst{iExp} = (eye(3) - kGain*hMeas)*pEst{iExp}*(eye(3) - kGain*hMeas).' + ...
+                kGain*noiseCov*kGain.';
+            
+            % collect error samples
+            rSamples(:,iExp) = rEm - rUnCon{iExp}(:,iTime);
+            
+        end
+        % calculate estimate of estimation error covariance matrix
+        rMeanExp = mean(rSamples,2);
+        samplePEst = zeros(3);
+        for iExp = 1:nExps
+%             samplePEst = samplePEst + ...
+%                 (rSamples(:,iExp) - rMeanExp)*(rSamples(:,iExp) - rMeanExp).';
+            samplePEst = samplePEst + pEst{iExp};
+        end
+        samplePEst = samplePEst/(nExps-1);
+        
+        % average errors across experiments
+        rUnConAbsErr(iSim,iTime) = mean(vecnorm(rSamples));
+        rUnConRmsErr(iSim,iTime) = sqrt(trace(samplePEst));
     end
-    rUnConErrStdMat(iSim,:) = stdVec;
-    rUnConErrMat(iSim,:) = vecnorm(rEm - rUnCon);
     
     %% Linearized Constraint
-    pEst = 1000*eye(3);
+    pEst = cell(nExps,1);
+    for iExp = 1:nExps
+        pEst{iExp} = 1000*eye(3);
+    end
     for iTime = 2:length(time)
         % Derive measurement matrix from satellite positions
         gmst = time(iTime)*LC.primary.we;
@@ -106,24 +161,41 @@ for iSim = 1:nSims
         rSats = stateInSight(1:3,:);
         nMeas = size(rSats,2)-1;
         noiseCov = varTime*(eye(nMeas) + ones(nMeas));
-        % Create Measurement & Linearized matrix
-        [zEst,hMeas] = tdoaMeasMat(rSats,rLinCon(:,iTime-1));
-        % EKF
-        kGain = (pEst*hMeas.')/(hMeas*pEst*hMeas.' + noiseCov);
-        rLinCon(:,iTime) = rLinCon(:,iTime-1) + ...
-            kGain*(zMeas{iTime} - zEst);
-        pEst = (eye(3) - kGain*hMeas)*pEst*(eye(3) - kGain*hMeas).' + ...
-            kGain*noiseCov*kGain.';
-        % Apply Constraint
-        [rLinCon(:,iTime), pEst2] = LinConKF(rLinCon(:,iTime),rLinCon(:,iTime-1),pEst,pEst);
-        
-        stdVec(iTime) = sqrt(trace(pEst2));
+        for iExp = 1:nExps
+            % Create Measurement & Linearized matrix
+            [zEst,hMeas] = tdoaMeasMat(rSats,rLinCon{iExp}(:,iTime-1));
+            % EKF
+            kGain = (pEst{iExp}*hMeas.')/(hMeas*pEst{iExp}*hMeas.' + noiseCov);
+            rLinCon{iExp}(:,iTime) = rLinCon{iExp}(:,iTime-1) + ...
+                kGain*(zMeas{iExp,iTime} - zEst);
+            pEst{iExp} = (eye(3) - kGain*hMeas)*pEst{iExp}*(eye(3) - kGain*hMeas).' + ...
+                kGain*noiseCov*kGain.';
+            % Apply Constraint
+            [rLinCon{iExp}(:,iTime), pEst2] = LinConKF(rLinCon{iExp}(:,iTime)...
+                ,rLinCon{iExp}(:,iTime-1),pEst{iExp},pEst{iExp});
+            
+            
+            rSamples(:,iExp) = rEm - rLinCon{iExp}(:,iTime);
+            
+        end
+        rMeanExp = mean(rSamples,2);
+        samplePEst = zeros(3);
+        for iExp = 1:nExps
+            samplePEst = samplePEst + ...
+                (rSamples(:,iExp) - rMeanExp)*(rSamples(:,iExp) - rMeanExp).';
+        end
+        samplePEst = samplePEst/(nExps-1);
+        % average errors across experiments
+        rLinConAbsErr(iSim,iTime) = mean(vecnorm(rSamples));
+        rLinConRmsErr(iSim,iTime) = sqrt(trace(samplePEst));
     end
-    rLinConErrStdMat(iSim,:) = stdVec;
-    rLinConErrMat(iSim,:) = vecnorm(rEm - rLinCon);
+
     
     %% 2nd Order Non-linear Constraint
-    pEst = 1000*eye(3);
+    pEst = cell(nExps,1);
+    for iExp = 1:nExps
+        pEst{iExp} = 1000*eye(3);
+    end
     for iTime = 2:length(time)
         % Derive measurement matrix from satellite positions
         gmst = time(iTime)*LC.primary.we;
@@ -132,53 +204,92 @@ for iSim = 1:nSims
         rSats = stateInSight(1:3,:);
         nMeas = size(rSats,2)-1;
         noiseCov = varTime*(eye(nMeas) + ones(nMeas));
-        % Create Measurement & Linearized matrix
-        [zEst,hMeas] = tdoaMeasMat(rSats,rNLinCon(:,iTime-1));
-        % EKF
-        kGain = (pEst*hMeas.')/(hMeas*pEst*hMeas.' + noiseCov);
-        rNLinCon(:,iTime) = rNLinCon(:,iTime-1) + ...
-            kGain*(zMeas{iTime} - zEst);
-        pEst = (eye(3) - kGain*hMeas)*pEst*(eye(3) - kGain*hMeas).' + ...
-            kGain*noiseCov*kGain.';
-        rNLinCon(:,iTime) = NonLinConKF(rNLinCon(:,iTime),inv(pEst));
-        
-        stdVec(iTime) = sqrt(trace(pEst));
+        for iExp = 1:nExps
+            % Create Measurement & Linearized matrix
+            [zEst,hMeas] = tdoaMeasMat(rSats,rNLinCon{iExp}(:,iTime-1));
+            % EKF
+            kGain = (pEst{iExp}*hMeas.')/(hMeas*pEst{iExp}*hMeas.' + noiseCov);
+            rNLinCon{iExp}(:,iTime) = rNLinCon{iExp}(:,iTime-1) + ...
+                kGain*(zMeas{iExp,iTime} - zEst);
+            pEst{iExp} = (eye(3) - kGain*hMeas)*pEst{iExp}*(eye(3) - kGain*hMeas).' + ...
+                kGain*noiseCov*kGain.';
+            % Apply constraint
+            rNLinCon{iExp}(:,iTime) = NonLinConKF(rNLinCon{iExp}(:,iTime),inv(pEst{iExp}));
+           
+            
+            rSamples(:,iExp) = rEm - rNLinCon{iExp}(:,iTime);
+            
+        end
+        rMeanExp = mean(rSamples,2);
+        samplePEst = zeros(3);
+        for iExp = 1:nExps
+            samplePEst = samplePEst + ...
+                (rSamples(:,iExp) - rMeanExp)*(rSamples(:,iExp) - rMeanExp).';
+        end
+        samplePEst = samplePEst/(nExps-1);
+        % average errors across experiments
+        r2ndConAbsErr(iSim,iTime) = mean(vecnorm(rSamples));
+        r2ndConRmsErr(iSim,iTime) = sqrt(trace(samplePEst));
     end
-    r2ndConErrStdMat(iSim,:) = stdVec;
-    r2ndConErrMat(iSim,:) = vecnorm(rEm - rNLinCon);
 end
 %% Plot Stuff
 % AbsError Plot
 figure(1)
-semilogy(time/3600,mean(rUnConErrMat,1),...
-    time/3600,mean(rLinConErrMat,1),...
-    time/3600,mean(r2ndConErrMat,1),...
-    time/3600,mean(pdopMat,1)*sqrt(varTime)*3e5,...
-    time/3600,mean(unCpdopMat,1)*sqrt(varTime)*3e5,...
+semilogy(time/3600,mean(rUnConAbsErr,1),'-',...
+    time/3600,mean(r2ndConAbsErr,1),'-.',...
     'linewidth',1.5)
 xlim([0,24])
 xticks(0:2:24)
-xlabel('$\rm{Time \left[hr\right]}$','interpreter','latex','fontsize',12)
-ylabel('$\left|r-\hat{r}\right| \left[\rm{km}\right]$','interpreter','latex','fontsize',12)
-legend('EKF','Linearized Constraint','Nonlinear Constraint',...
-    'PDOP\cdot\sigma_t\cdot c','PDOP\cdot\sigma_t\cdot c - Unconstrained')
+xlabel('$\rm{Time \left[hr\right]}$','interpreter','latex','fontsize',14)
+ylabel('$\| r-\hat{r}\| \left[\rm{km}\right]$','interpreter','latex','fontsize',14)
+legend('EKF','CEKF')
 grid on
 
-% STD Error Plot
+% RMS Error Plot
 figure(2)
-semilogy(time/3600,mean(rUnConErrStdMat,1),...
-    time/3600,mean(rLinConErrStdMat,1),...
-    time/3600,mean(r2ndConErrStdMat,1),...
-    time/3600,mean(pdopMat,1)*sqrt(varTime)*3e5,...
-    time/3600,mean(unCpdopMat,1)*sqrt(varTime)*3e5,'--',...
-    'linewidth',1.5)
+semilogy(time/3600,mean(rUnConRmsErr,1),'-',...
+    time/3600,mean(r2ndConRmsErr,1),'-.',...
+    time/3600,mean(unCpdopMat,1)*sqrt(varTime)*3e5,':',...
+    time/3600,mean(pdopMat,1)*sqrt(varTime)*3e5,':',...
+    'linewidth',2)
 xlim([0,24])
 xticks(0:2:24)
-xlabel('$\rm{Time \left[hr\right]}$','interpreter','latex','fontsize',12)
-ylabel('$\rm{RMSE}\left(r-\hat{r}\right) \left[\rm{km}\right]$','interpreter','latex','fontsize',12)
-legend('EKF','Linearized Constraint','Nonlinear Constraint',...
-    'PDOP\cdot\sigma_t\cdot c','PDOP\cdot\sigma_t\cdot c - Unconstrained')
+xlabel('$\rm{Time \left[hr\right]}$','interpreter','latex','fontsize',14)
+ylabel('$\textrm{RMSE}\left(\hat{r}\right) \left[\rm{km}\right]$','interpreter','latex','fontsize',14)
+legend('EKF','CEKF',...
+    'Efficient RMSE - unconstrained','Efficient RMSE - constrained')
 grid on
+
+% Final Error Plot
+figure(3)
+semilogy(1:min([nPoints,100]),rUnConAbsErr(1:min([nPoints,100]),end),'o',...
+    1:min([nPoints,100]),rLinConAbsErr(1:min([nPoints,100]),end),'s',...
+    1:min([nPoints,100]),r2ndConAbsErr(1:min([nPoints,100]),end),'^')
+xlabel('$\textrm{Point \#}$','interpreter','latex','fontsize',14)
+ylabel('$\textrm{Final } \| r-\hat{r}\| \left[\rm{km}\right]$','interpreter','latex','fontsize',14)
+legend('EKF','CEKF with linearized constraint','CEKF with nonlinear constraint')
+ylim([0.7,100])
+xlim([1,100])
+xticks([1,10:10:100])
+grid on
+
+% Final Error Latitude Plot
+figure(4)
+semilogy(latList,rUnConAbsErr(:,end),'o',...
+    latList,rLinConAbsErr(:,end),'s',...
+    latList,r2ndConAbsErr(:,end),'^')
+xlabel('$\textrm{Latitude}$','interpreter','latex','fontsize',14)
+ylabel('$\textrm{Final } \| r-\breve{r}\| \left[\rm{km}\right]$','interpreter','latex','fontsize',14)
+
+
+% Final Error Longitude Plot
+figure(5)
+semilogy(lonList,rUnConAbsErr(:,end),'o',...
+    lonList,rLinConAbsErr(:,end),'s',...
+    lonList,r2ndConAbsErr(:,end),'^')
+xlabel('$\textrm{Longitude}$','interpreter','latex','fontsize',14)
+ylabel('$\textrm{Final } \| r-\breve{r}\| \left[\rm{km}\right]$','interpreter','latex','fontsize',14)
+
 
 % % Estimate Map
 % unConCo = ecef2lla(rUnCon.'*1000);

@@ -10,6 +10,8 @@ latList = 30:10:60;
 % latEm = 40;
 hAList = [0,900,1000];
 
+prct = 95;
+
 WalkerExPhase = [];
 LatticeExPhase = cell(3,1);
 LatticeGaPhase = [];
@@ -35,7 +37,7 @@ for iLat = 1:length(latList)
         else
             hAList = 0;
         end
-        for iHA = 2:2;%length(hAList)
+        for iHA = 1:length(hAList)
             for iCon = 1:length(paretoSet.nPlanes{iHA})
                 switch iScenario
                     case 1 % Walker
@@ -134,20 +136,20 @@ for iLat = 1:length(latList)
                 %             num2str(Arch.nPlanes) ' ' num2str(Orbit.hA)])
                 %
                 %         subplot(2,1,2)
-                PlotPdopMap(LC,latEm,0,5,true,true);
+                PlotPdopMap(LC,latEm,0,5,true,true,prct);
                 
                 switch iScenario
                     case 1
                         WalkerMinDist = [WalkerMinDist, minDist];
-                        name = ['Lat' num2str(latEm) 'Wa ' num2str(LC.nSats)...
+                        name = [num2str(prct) 'Lat' num2str(latEm) 'Wa ' num2str(LC.nSats)...
                             '-' num2str(LC.nPlanes)];
                     case 2
                         LatticeExMinDist{iHA} = [LatticeExMinDist{iHA}, minDist];
-                        name = ['Lat' num2str(latEm) 'Ex900 ' num2str(LC.nSats)...
+                        name = [num2str(prct) 'Lat' num2str(latEm) 'Ex900 ' num2str(LC.nSats)...
                             '-' num2str(LC.nPlanes)];
                     case 3
                         LatticeGaMinDist = [LatticeGaMinDist, minDist];
-                        name = ['Lat' num2str(latEm) 'Ga ' num2str(LC.nSats)...
+                        name = [num2str(prct) 'Lat' num2str(latEm) 'Ga ' num2str(LC.nSats)...
                             '-' num2str(LC.nPlanes)];
                 end
                 
@@ -156,5 +158,18 @@ for iLat = 1:length(latList)
         end
     end
 end
+%% Plot min min Dist dist
+% figure(1)
+% semilogy(1,WalkerMinDist,'bo',...
+%     2,[LatticeExMinDist{2},LatticeExMinDist{3}],'bo',...
+%     3,LatticeGaMinDist,'bo')
+% grid on
+% xlim([0.5,3.5])
+% xticks(1:3)
+% xticklabels({'Walker exhaustive search','LFC exhaustive search','LFC genetic algorithm'})
+% xtickangle(20)
+% ylabel('$\rho_{min} \left[\textrm{km}\right]$','interpreter','latex','fontsize',14)
+% 
+% print([dataFolder '\Coverage Maps\min min dist dist'],'-depsc','-painters');
 
 
