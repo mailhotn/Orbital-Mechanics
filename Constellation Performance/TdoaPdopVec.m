@@ -4,10 +4,10 @@ function [ pdop , nSatsInSight] = TdoaPdopVec(X, T, latGs, lonGs, gmst0, elevMin
 %% Input Arguments
 % * X      - Mx(6N) matrix of ECI states for N satellites at M time steps
 % * T      - Mx1 vector of time steps
-% * lat_gs - Ground Station latitude (deg)
-% * lon_gs - Ground Station longitude (deg)
-% * GMST0  - Initial GMST (deg)
-% * e_min  - Minimum elevation for line of sight check
+% * latGs - Ground Station latitude (deg)
+% * lonGs - Ground Station longitude (deg)
+% * gmst0  - Initial GMST (deg)
+% * elevMin  - Minimum elevation for line of sight check
 %
 %%   ~~~~~~~~~~~~~ Algorithm ~~~~~~~~~~~~~
 % 1. for loop over all time-steps, at each step:

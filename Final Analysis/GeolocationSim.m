@@ -29,12 +29,12 @@ LC = LatticeConstellation(Arch,Phase,Orbit,InitCon);
 
 % figure(1)
 % PlotGroundTrack(LC);
-figure(2)
-PlotPdopMap(LC,latRoi,lonRoi,5,true,true,95);
-hold on
-plot([lonRoi - 40,lonRoi + 40],[latRoi + delLatRoi, latRoi + delLatRoi],'-w',...
-    [lonRoi - 40,lonRoi + 40],[latRoi - delLatRoi, latRoi - delLatRoi],'-w','linewidth',2);
-hold off
+% figure(2)
+% PlotPdopMap(LC,latRoi,lonRoi,5,true,true,95);
+% hold on
+% plot([lonRoi - 40,lonRoi + 40],[latRoi + delLatRoi, latRoi + delLatRoi],'-w',...
+%     [lonRoi - 40,lonRoi + 40],[latRoi - delLatRoi, latRoi - delLatRoi],'-w','linewidth',2);
+% hold off
 %% Orbital Simulation
 time = 0:600:86400; % sec
 Prop = Propagator(LC,1e-8,1e-8);
@@ -57,7 +57,7 @@ r2ndConRmsErr = nan(nPoints,length(time));
 
 pdopMat = nan(nPoints,length(time));
 unCpdopMat = nan(nPoints,length(time));
-varTime = (10/3e5)^2; % sec
+varTime = (2e-8)^2; % sec
 
 for iSim = 1:nPoints
     latEm = latRoi + (rand-0.5)*2*delLatRoi;
@@ -236,18 +236,20 @@ end
 % AbsError Plot
 figure(1)
 semilogy(time/3600,mean(rUnConAbsErr,1),'-',...
+    time/3600,mean(rLinConAbsErr,1),'--',...
     time/3600,mean(r2ndConAbsErr,1),'-.',...
     'linewidth',1.5)
 xlim([0,24])
 xticks(0:2:24)
 xlabel('$\rm{Time \left[hr\right]}$','interpreter','latex','fontsize',14)
 ylabel('$\| r-\hat{r}\| \left[\rm{km}\right]$','interpreter','latex','fontsize',14)
-legend('EKF','CEKF')
+legend('EKF','CEKF with linearized constraint','CEKF with nonlinear constraint')
 grid on
 
 % RMS Error Plot
 figure(2)
 semilogy(time/3600,mean(rUnConRmsErr,1),'-',...
+    time/3600,mean(rLinConRmsErr,1),'--',...
     time/3600,mean(r2ndConRmsErr,1),'-.',...
     time/3600,mean(unCpdopMat,1)*sqrt(varTime)*3e5,':',...
     time/3600,mean(pdopMat,1)*sqrt(varTime)*3e5,':',...
@@ -256,7 +258,7 @@ xlim([0,24])
 xticks(0:2:24)
 xlabel('$\rm{Time \left[hr\right]}$','interpreter','latex','fontsize',14)
 ylabel('$\textrm{RMSE}\left(\hat{r}\right) \left[\rm{km}\right]$','interpreter','latex','fontsize',14)
-legend('EKF','CEKF',...
+legend('EKF','CEKF with linearized constraint','CEKF with nonlinear constraint',...
     'Efficient RMSE - unconstrained','Efficient RMSE - constrained')
 grid on
 
@@ -267,8 +269,8 @@ semilogy(1:min([nPoints,100]),rUnConAbsErr(1:min([nPoints,100]),end),'o',...
     1:min([nPoints,100]),r2ndConAbsErr(1:min([nPoints,100]),end),'^')
 xlabel('$\textrm{Point \#}$','interpreter','latex','fontsize',14)
 ylabel('$\textrm{Final } \| r-\hat{r}\| \left[\rm{km}\right]$','interpreter','latex','fontsize',14)
-legend('EKF','CEKF with linearized constraint','CEKF with nonlinear constraint')
-ylim([0.7,100])
+legend('EKF','CEKF with linearized constraint','CEKF with nonlinear constraint','location','best')
+ylim([0.01,100])
 xlim([1,100])
 xticks([1,10:10:100])
 grid on

@@ -40,13 +40,16 @@ for iTime = 1:M
     X_ECEF = eci2ecef(X_ECI,GMST(iTime));
     X_IS = SatsInSight(X_ECEF,GS,elevMin,norm(GS));
     nSatsInSight(iTime) = size(X_IS,2);
-    [measMat, conMat, Qinv] = CalcTdoaPdopMats(GS,X_IS);
-    
-    infoMat = infoMat + measMat.'*Qinv*measMat;
-    gMat = conMat.'*infoMat*conMat;
-    ccrlb = (conMat/gMat)*conMat.';
-    pdop(iTime) = sqrt(trace(ccrlb));
-    
+    if size(X_IS,2) >=2
+        [measMat, conMat, Qinv] = CalcTdoaPdopMats(GS,X_IS);
+        
+        infoMat = infoMat + measMat.'*Qinv*measMat;
+        gMat = conMat.'*infoMat*conMat;
+        ccrlb = (conMat/gMat)*conMat.';
+        pdop(iTime) = sqrt(trace(ccrlb));
+    else
+        pdop(iTime) = nan;
+    end
     if cond(infoMat) < 1e10
         unCpdop(iTime) = sqrt(trace(eye(3)/infoMat));
     end
