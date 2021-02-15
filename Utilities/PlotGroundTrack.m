@@ -42,9 +42,9 @@ axis equal
 xlim([-180,180])
 ylim([-90,90])
 yticks(-90:30:90)
-yticklabels({'90°S','60°S','30°S','0°','30°N','60°N','90°N'})
+yticklabels({'90ï¿½S','60ï¿½S','30ï¿½S','0ï¿½','30ï¿½N','60ï¿½N','90ï¿½N'})
 xticks(-180:60:180)
-xticklabels({'180°W','120°W','60°W','0°','60°E','120°E','180°E'})
+xticklabels({'180ï¿½W','120ï¿½W','60ï¿½W','0ï¿½','60ï¿½E','120ï¿½E','180ï¿½E'})
 % xlabel('Longitude')
 % ylabel('Latitude')
 grid on

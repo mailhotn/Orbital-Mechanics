@@ -17,7 +17,7 @@ latList = 30:10:60;
 
 % latEm = 40;
 lonEm = 0;
-maxSats = 80;
+maxSats = 49;
 minSats = 40;
 
 dInc = 10; % Option for optimizing inclination, not fully implemented
