@@ -1,3 +1,7 @@
+%% NOTE
+% This script has been greatly altered and should be used ONLY to generate
+% LFC pareto fronts split by apogee altitude
+
 %% Define Scenarios for Analysis
 clear
 dataFolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Final Results';
@@ -7,14 +11,14 @@ folderList = {...
     'C:\Users\User\Dropbox\Lattice Optimization Data\GA Standard\Previous Runs\Version 6 - definitive';...
     };
 markerList = {...
-    '*';...
     'o';...
+    'v';...
     'x';...
     };
 nameList = {...
-    'Walker Ex';...
-    'LFC Ex';...
-    'LFC Ga';...
+    'Circular, h_a = h_c';...
+    'Elliptical, h_a = 900 km';...
+    'Elliptical, h_a = 1000 km';...
     };
 nScenarios = numel(folderList);
 
@@ -27,7 +31,7 @@ p90Target = 1e10;
 %% Analyze Scenarios
 close all
 nLeg = 0;
-for iScenario = 1:nScenarios
+for iScenario = 2 %1:nScenarios
     load([folderList{iScenario} '\OptParams.mat']);
     if exist('OptParams','var')
         % adjust for different data structure
@@ -116,22 +120,22 @@ for iScenario = 1:nScenarios
             end
         end
         
-        % Plot Results for Latitude
-        figure(iLat*10 + 1) % Int PDOP
-        hold on
-        semilogy(nSats,intPdop,markerList{iScenario})
-        title(['Integral of PDOP for \phi_0 = ' num2str(latList(iLat))])
-        xlabel('# Sats')
-        ylabel('$\frac{1}{T}\int^{T}_{0}{PDOPdt}$','interpreter','latex','fontsize',12)
-        grid on
-        set(gca, 'YScale', 'log')
-        leg = get(gca,'Legend');
-        if isempty(leg)
-            leg = legend(nameList{iScenario});
-        else
-            leg.String(nLeg+1:nLeg + numel(hAList)) = nameList(iScenario);
-        end
-        hold off
+%         % Plot Results for Latitude
+%         figure(iLat*10 + 1) % Int PDOP
+%         hold on
+%         semilogy(nSats,intPdop,markerList{iScenario})
+%         title(['Integral of PDOP for \phi_0 = ' num2str(latList(iLat))])
+%         xlabel('# Sats')
+%         ylabel('$\frac{1}{T}\int^{T}_{0}{PDOPdt}$','interpreter','latex','fontsize',12)
+%         grid on
+%         set(gca, 'YScale', 'log')
+%         leg = get(gca,'Legend');
+%         if isempty(leg)
+%             leg = legend(nameList{iScenario});
+%         else
+%             leg.String(nLeg+1:nLeg + numel(hAList)) = nameList(iScenario);
+%         end
+%         hold off
         
 %         figure(iLat*10 + 2) % 90th Percentile PDOP
 %         hold on
@@ -168,19 +172,22 @@ for iScenario = 1:nScenarios
         figure(iLat*10 + 4) % Pareto Frontier
         hold on
         for iHA = 1:numel(hAList)
-            plot(paretoSats{iHA},paretoPlanes{iHA},['--' markerList{iScenario}]...
+            plot(paretoSats{iHA},paretoPlanes{iHA},markerList{iHA}...
                 ,'linewidth',1.5,'markersize',10)
         end
-        title(['Pareto Frontier \phi_0 = ' num2str(latList(iLat))])
-        xlabel('# Sats')
-        ylabel('# Planes')
+%         title(['Pareto Frontier \phi_0 = ' num2str(latList(iLat))])
+        xlabel('$N_s$','interpreter','latex','fontsize',14)
+        ylabel('$N_o$','interpreter','latex','fontsize',14)
+        xlim([50,80])
+        ylim([0,65])
         grid on
-        leg = get(gca,'Legend');
-        if isempty(leg)
-            leg = legend(nameList{iScenario});
-        else
-            leg.String(nLeg+1:nLeg + numel(hAList)) = nameList(iScenario);
-        end
+        legend(nameList)
+%         leg = get(gca,'Legend');
+%         if isempty(leg)
+%             leg = legend(nameList{iHA});
+%         else
+%             leg.String(nLeg) = nameList(iHA);
+%         end
         hold off
         
         paretoSet = struct();

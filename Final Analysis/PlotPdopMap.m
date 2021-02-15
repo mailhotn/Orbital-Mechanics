@@ -1,12 +1,17 @@
-function PlotPdopMap(Con,latEm,elevMin,parallel)
+function PlotPdopMap(Con,latEm,lonEm,elevMin,parallel,colorBar,prct)
 if nargin < 3
+    lonEm = 0;
     elevMin = 5;
     parallel = 0;
 elseif nargin < 4
+    elevMin = 5;
     parallel = 0;
+elseif nargin < 5
+    parallel = 0;
+elseif nargin < 6
+    colorBar = false;
 end
 
-lonEm = 0;
 timeVec = 0:100:86400;
 Prop = Propagator(Con);
 [propTime, propState] = Prop.PropEciJ2(timeVec);
@@ -15,20 +20,23 @@ Prop = Propagator(Con);
 %% Plot PDOP Map
 dLon = 30;
 dLat = 20;
-lats = max([5,latEm-dLat]):1:min([latEm+dLat,85]);
-lons = [-dLon:1:dLon] + lonEm;
+lats = max([5,latEm-dLat]):1:min([latEm+dLat,85])+1;
+lons = [-dLon:1:dLon+1] + lonEm;
 [LON,LAT] = meshgrid(lons,lats);
 PDOP = nan(size(LON));
+
 if parallel
     parfor iLon = 1:length(lons)
         PDOP2 = zeros(length(lats),1);
         for iLat = 1:length(lats)
             pdop = TdoaPdopVec(propState,propTime,LAT(iLat,iLon),LON(iLat,iLon)...
                 ,0,elevMin);
-            pdop(pdop>100) = 100;
-            pdop(isnan(pdop)) = 100;
+            pdop(pdop>1000) = 1000;
+            pdop(isnan(pdop)) = 1000;
+%             p95 = prctile(pdop,95);
+%             pdop(pdop > p95) = nan;
 %             PDOP2(iLat) = trapz(propTime(~isnan(pdop)),pdop(~isnan(pdop)))/propTime(end);
-            PDOP2(iLat) = prctile(pdop,95);
+            PDOP2(iLat) = prctile(pdop,prct);
         end
         PDOP(:,iLon) = PDOP2;
     end
@@ -38,14 +46,16 @@ else
         for iLat = 1:length(lats)
             pdop = TdoaPdopVec(propState,propTime,LAT(iLat,iLon),LON(iLat,iLon)...
                 ,0,elevMin);
-            pdop(pdop>100) = 100;
-            pdop(isnan(pdop)) = 100;
+            pdop(pdop>1000) = 1000;
+            pdop(isnan(pdop)) = 1000;
 %             PDOP2(iLat) = trapz(propTime,pdop)/propTime(end);
-            PDOP2(iLat) = prctile(pdop,95);
+            PDOP2(iLat) = prctile(pdop,prct);
         end
         PDOP(:,iLon) = PDOP2;
     end
 end
+PDOP(end,end) = 0;
+PDOP(1,end) = 20;
 %% Actually Plot
 gcf
 
@@ -55,6 +65,12 @@ hold on
 
 colormap jet
 shading interp
+if colorBar
+    c = colorbar;
+    c.Label.String = "$p_{" + prct + "}\left(PDOP\right)$";
+    c.Label.Interpreter = 'latex';
+    c.Label.FontSize = 14;
+end
 % c = colorbar;
 % c.Label.String = 'Mean PDOP';
 % c.FontSize = 10;
