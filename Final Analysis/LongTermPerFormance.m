@@ -1,6 +1,6 @@
 clear
-paretoFolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Final Results';
-conFolder = 'C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\LatticeDef v1';
+paretoFolder = 'C:\Users\User\Google Drive\Master''s Degree\Lattice Optimization Data\Final Results';
+conFolder = 'C:\Users\User\Google Drive\Master''s Degree\Lattice Optimization Data\Previous Runs\LatticeDef v1';
 latList = 30:10:60;
 % latEm = 50;
 elevMin = 5;
@@ -13,7 +13,7 @@ for iLat = 1:length(latList)
     latEm = latList(iLat);
     load([paretoFolder '/ParetoList_Lat_' num2str(latEm) '_LFC Ex_hASplit.mat']);
     aopTime = 0;
-    for iHA = 1:1
+    for iHA = 1:2
         for iCon = 1:length(paretoSet.nPlanes{iHA+1})
             load([conFolder '\LatticeExSol_Lat_' num2str(latEm) '_nSats_' ...
                 num2str(paretoSet.nSats{iHA+1}(iCon)) '_hA_' num2str(hAList(iHA)) '.mat']);
@@ -40,7 +40,7 @@ for iLat = 1:length(latList)
     leg1000 = cell(1);
     %% Run Stuff
     
-    for iHA = 1:1
+    for iHA = 1:2
         
         for iCon = 1:length(paretoSet.nPlanes{iHA+1})
             load([conFolder '\LatticeExSol_Lat_' num2str(latEm) '_nSats_' ...
@@ -83,8 +83,8 @@ for iLat = 1:length(latList)
                 %             pdopN = TdoaPdopVec(propState,propTime,latEm+5,0,0,elevMin);
                 %             pdopS = TdoaPdopVec(propState,propTime,latEm-5,0,0,elevMin);
                 %             pdop = [pdopN.';pdopC.';pdopS.'];
-                pdop(pdop>100) = 100;
-                pdop(isnan(pdop)) = 100;
+                pdop(pdop>1000) = 1000;
+                pdop(isnan(pdop)) = 1000;
                 %             pdopDay(iDay) = trapz(propTime,pdop)/propTime(end);
                 pdopDay(iDay) = prctile(pdop,95);
             end
@@ -105,7 +105,7 @@ for iLat = 1:length(latList)
     figure(1)
     semilogy(dayVec,pdop900,'--o')
     xlim([0,dayVec(end)])
-    ylim([1,100])
+    ylim([1,1000])
     xlabel('$Day$','interpreter','latex','fontsize',14)
     ylabel('$p_{95}\left(PDOP\right)$','interpreter','latex','fontsize',14)
     legend(leg900,'location','best')
@@ -114,12 +114,15 @@ for iLat = 1:length(latList)
     print([paretoFolder '\Coverage Maps\Long Term hA900 Lat' num2str(latEm)],...
         '-depsc','-painters');
     
-    % figure(2)
-    % semilogy(dayVec,pdop1000,'-o')
-    % xlim([0,dayVec(end)])
-    % ylim([1,100])
-    % xlabel('$Day$','interpreter','latex','fontsize',14)
-    % ylabel('$p_{95}\left(PDOP\right)$','interpreter','latex','fontsize',14)
-    % legend(leg1000,'location','best')
-    % grid on
+    figure(2)
+    semilogy(dayVec,pdop1000,'-o')
+    xlim([0,dayVec(end)])
+    ylim([1,1000])
+    xlabel('$Day$','interpreter','latex','fontsize',14)
+    ylabel('$p_{95}\left(PDOP\right)$','interpreter','latex','fontsize',14)
+    legend(leg1000,'location','best')
+    grid on
+    
+    print([paretoFolder '\Coverage Maps\Long Term hA1000 Lat' num2str(latEm)],...
+        '-depsc','-painters');
 end

@@ -5,7 +5,7 @@ lonRoi = 35;
 delLatRoi = 10;
 delLonRoi = 10;
 elevMin = 5; % minimum elevation for visibility [deg]
-load('C:\Users\User\Dropbox\Lattice Optimization Data\Previous Runs\LatticeDef v1\LatticeExSol_Lat_30_nSats_70_hA_900.mat');
+load('C:\Users\User\Google Drive\Master''s Degree\Lattice Optimization Data\Previous Runs\LatticeDef v1\LatticeExSol_Lat_30_nSats_70_hA_900.mat');
 
 Arch.nSats = 70;
 Arch.nPlanes = 7;
@@ -78,7 +78,7 @@ for iSim = 1:nPoints
     for iExp = 1:nExps
         
         rUnCon{iExp} = nan(3,length(time));
-        rUnCon{iExp}(:,1) = rInit; % Initial guess 30°N, 30°E
+        rUnCon{iExp}(:,1) = rInit; % Initial guess 30ï¿½N, 30ï¿½E
         rLinCon = rUnCon;
         rNLinCon = rUnCon;
         % Initial Abs Error
@@ -310,9 +310,9 @@ ylabel('$\textrm{Final } \| r-\breve{r}\| \left[\rm{km}\right]$','interpreter','
 % xlim([17,37])
 % ylim([27,37])
 % yticks(25:5:45)
-% yticklabels({'25°N','30°N','35°N','40°N','45°N'})
+% yticklabels({'25ï¿½N','30ï¿½N','35ï¿½N','40ï¿½N','45ï¿½N'})
 % xticks(15:5:35)
-% xticklabels({'15°E','20°E','25°E','30°E','35°E'})
+% xticklabels({'15ï¿½E','20ï¿½E','25ï¿½E','30ï¿½E','35ï¿½E'})
 % legend('EKF','Linearized Constraint','Nonlinear Constraint')
 % grid on
 % hold off

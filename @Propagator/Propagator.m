@@ -194,22 +194,22 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             r = p./(1+e.*cos(th));
             MJ2 = -3*P.Con.mu./r.^4.*P.Con.J2.*P.Con.Re.^2;
             n = sqrt(P.Con.mu./a.^3);
-            aop = th + w;
+            aol = th + w;
             % Forces
-            f_r = MJ2/2.*(1-3*sin(inc).^2.*sin(aop).^2);
-            f_th = MJ2.*sin(inc).^2.*sin(aop).*cos(aop);
-            f_h = MJ2.*sin(inc).*cos(inc).*sin(aop);
+            f_r = MJ2/2.*(1-3*sin(inc).^2.*sin(aol).^2);
+            f_th = MJ2.*sin(inc).^2.*sin(aol).*cos(aol);
+            f_h = MJ2.*sin(inc).*cos(inc).*sin(aol);
             F = reshape([f_r;f_th;f_h],3*P.Con.nSats,1);
             % GVE Sparsified Matrix
             B11 = vec2sparse(2*a.^2./h.*e.*sin(th),[6,3],[1,1]);
             B12 = vec2sparse(2*a.^2./h.*(1 + e.*cos(th)),[6,3],[1,2]);
             B21 = vec2sparse(p./h.*sin(th),[6,3],[2,1]);
             B22 = vec2sparse(r./h.*(e + 2*cos(th) + e.*cos(th).^2),[6,3],[2,2]);
-            B33 = vec2sparse(r./h.*cos(aop),[6,3],[3,3]);
-            B43 = vec2sparse(r.*sin(aop)./(h.*sin(inc)),[6,3],[4,3]);
+            B33 = vec2sparse(r./h.*cos(aol),[6,3],[3,3]);
+            B43 = vec2sparse(r.*sin(aol)./(h.*sin(inc)),[6,3],[4,3]);
             B51 = vec2sparse(-p./(h.*e).*cos(th),[6,3],[5,1]);
             B52 = vec2sparse(r./(h.*e).*(2+e.*cos(th)).*sin(th),[6,3],[5,2]);
-            B53 = vec2sparse(-r./h.*sin(aop).*cos(inc)./sin(inc),[6,3],[5,3]);
+            B53 = vec2sparse(-r./h.*sin(aol).*cos(inc)./sin(inc),[6,3],[5,3]);
             B61 = vec2sparse((p.*cos(th)-2*r.*e)./(n.*a.^2.*e),[6,3],[6,1]);
             B62 = vec2sparse(-(p+r).*sin(th)./(n.*a.^2.*e),[6,3],[6,2]);
             

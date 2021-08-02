@@ -2,7 +2,7 @@
 %
 c = 3e5;
 timeVar = (1e-6)^2;
-datafolder = 'C:\Users\User\Dropbox\Lattice Optimization Data';
+datafolder = 'C:\Users\User\Google Drive\Master''s Degree\Lattice Optimization Data';
 latGs = 50;
 lonGs = 0;
 nSats = 80;
