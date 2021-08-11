@@ -3,7 +3,7 @@ M = 0:0.001:2*pi;
 tol = 1e-14;
 %% Calculate N-R, Battin
 
-fFour = fFourier(M,e,tol);
+fF = fFourier(M,e,tol);
 
 tic
 fTrue = pi/180*me2ta(180/pi*M,e,tol);
@@ -11,29 +11,39 @@ c2fTrue = cos(fTrue).^2;
 c3fTrue = cos(fTrue).^3;
 c4fTrue = cos(fTrue).^4;
 c5fTrue = cos(fTrue).^5;
+c1s1T = cos(fT).*sin(fT);
+c2s1T = cos(fT).^2.*sin(fT);
 toc
 
 tic
-[c2fFourier, BkVec2] = Cos2f(M,e,tol);
+[c2F, BkVec2] = Cos2f(M,e,tol);
 toc
 tic
-[c3fFourier, BkVec3] = Cos3f(M,e,tol);
+[c3F, BkVec3] = Cos3f(M,e,tol);
 toc
 tic
-[c4fFourier, BkVec4] = Cos4f(M,e,tol);
+[c4F, BkVec4] = Cos4f(M,e,tol);
 toc
 tic
 [c5fFourier, BkVec4] = Cos5f(M,e,tol);
 toc
 
+tic
+[c1s1F,BkVec11] = CosfSinf(M,e,tol);
+toc
+tic
+[c2s1F,BkVec21] = Cos2fSinf(M,e,tol);
+toc
 
 errorc2f = norm(c2fTrue-c2fFourier)/length(c2fTrue)
 errorc3f = norm(c3fTrue-c3fFourier)/length(c3fTrue)
 errorc4f = norm(c4fTrue-c4fFourier)/length(c4fTrue)
 errorc5f = norm(c5fTrue-c5fFourier)/length(c5fTrue)
+errorc1s1F = norm(c1s1T-c1s1F)/length(c1s1T)
+errorc2s1F = norm(c2s1T-c2s1F)/length(c2s1T)
 %% Plot Stuff
 figure(1) % M & E
-plot(M,fTrue,M,fFour,'--','linewidth',2)
+plot(M,fT,M,fF,'--','linewidth',2)
 xticks(0:pi/2:2*pi)
 xticklabels({'0','\pi/2','\pi','3\pi/2','2\pi'})
 yticks(0:pi/2:2*pi)
@@ -41,7 +51,7 @@ yticklabels({'0','\pi/2','\pi','3\pi/2','2\pi'})
 axis([0 2*pi 0 2*pi])
 
 figure(2)
-plot(M,c2fTrue,M,c2fFourier,'--','linewidth',2)
+plot(M,c2T,M,c2F,'--','linewidth',2)
 xticks(0:pi/2:2*pi)
 xticklabels({'0','\pi/2','\pi','3\pi/2','2\pi'})
 xlabel('M')
@@ -49,7 +59,7 @@ axis([0 2*pi -1 1])
 legend('N-R','Fourier','location','best')
 
 figure(3)
-plot(M,c3fTrue,M,c3fFourier,'--','linewidth',2)
+plot(M,c3T,M,c3F,'--','linewidth',2)
 xticks(0:pi/2:2*pi)
 xticklabels({'0','\pi/2','\pi','3\pi/2','2\pi'})
 xlabel('M')
@@ -57,7 +67,7 @@ axis([0 2*pi -1 1])
 legend('N-R','Fourier','location','best')
 
 figure(4)
-plot(M,c4fTrue,M,c4fFourier,'--','linewidth',2)
+plot(M,c4T,M,c4F,'--','linewidth',2)
 xticks(0:pi/2:2*pi)
 xticklabels({'0','\pi/2','\pi','3\pi/2','2\pi'})
 xlabel('M')
@@ -71,11 +81,26 @@ xticklabels({'0','\pi/2','\pi','3\pi/2','2\pi'})
 xlabel('M')
 axis([0 2*pi -1 1])
 legend('N-R','Fourier','location','best')
+figure(6)
+plot(M,c1s1T,M,c1s1F,'--','linewidth',2)
+xticks(0:pi/2:2*pi)
+xticklabels({'0','\pi/2','\pi','3\pi/2','2\pi'})
+xlabel('M')
+axis([0 2*pi -1 1])
+legend('N-R','Fourier','location','best')
 
+figure(7)
+plot(M,c2s1T,M,c2s1F,'--','linewidth',2)
+xticks(0:pi/2:2*pi)
+xticklabels({'0','\pi/2','\pi','3\pi/2','2\pi'})
+xlabel('M')
+axis([0 2*pi -1 1])
+legend('N-R','Fourier','location','best')
 %%
 function [c2f,BkVec] = Cos2f(M,e,stop)
 if nargin < 3 % default tolerance
     tol = 1e-14;
+    tol = nTol;
     kMax = Inf;
 elseif stop < 1 % stop is tolerance
     tol = stop;
@@ -99,7 +124,7 @@ while abs(Bk) > tol && k < kMax% Iterate until Bk is small enough
     n = 1;
     Bk = 1/2/sqrt(1-e^2)*besselj(0,-k*e)*(b^abs(k+2)-4*e*b^abs(k+1)+...
         (4*e^2+2)*b^abs(k)-4*e*b^abs(k-1)+b^abs(k-2));
-    while abs(dBk) > nTol || n < k% Iterate until Bk converges
+    while abs(dBk) > nTol || n <= k + 2% Iterate until Bk converges
         dBk = 1/2/sqrt(1-e^2)*(besselj(n,-k*e)*(b^abs(n+k+2)-4*e*b^abs(n+k+1)+...
             (4*e^2+2)*b^abs(n+k)-4*e*b^abs(n+k-1)+b^abs(n+k-2)) + ...
             besselj(-n,-k*e)*(b^abs(-n+k+2)-4*e*b^abs(-n+k+1)+...
@@ -120,6 +145,7 @@ end
 function [c3f,BkVec] = Cos3f(M,e,stop)
 if nargin < 3 % default tolerance
     tol = 1e-14;
+    nTol = tol;
     kMax = Inf;
 elseif stop < 1 % stop is tolerance
     tol = stop;
@@ -148,7 +174,7 @@ while abs(Bk) > tol && k < kMax % Iterate until Bk is small enough
     Bk = 1/4/(1-e^2)*besselj(n,-k*e)*Am*...
         (abs(m+n+k-2).*b.^abs(m+n+k-3) + e/sqrt(1-e^2)*b.^abs(m+n+k-2));
     n = 1;
-    while abs(dBk) > nTol || n < k% Iterate until Bk converges
+    while abs(dBk) > nTol || n <= k + 3% Iterate until Bk converges
         dBk = 1/4/(1-e^2)*besselj(n,-k*e)*Am*...
         (abs(m+n+k-2).*b.^abs(m+n+k-3) + e/sqrt(1-e^2)*b.^abs(m+n+k-2))+...
         1/4/(1-e^2)*besselj(-n,-k*e)*Am*...
@@ -202,7 +228,7 @@ while abs(Bk) > tol && k < kMax % Iterate until Bk is small enough
         3/2*e^2/(1-e^2)*b.^abs(m+n+k-2));
     
     n = 1;
-    while abs(dBk) > nTol || n < k % Iterate until Bk converges
+    while abs(dBk) > nTol || n <= k + 4% Iterate until Bk converges
         dBk = 1/8/(1-e^2)^(3/2)*besselj(n,-k*e)*Am*...
         (abs(m+n+k-3).*abs(m+n+k-2)/2.*b.^abs(m+n+k-4) + ...
         3/2*e/sqrt(1-e^2)*abs(m+n+k-2).*b.^abs(m+n+k-3) + ...
@@ -288,6 +314,107 @@ end
 c5f(:) = B0;
 for k = 1:length(BkVec)
     c5f = c5f + BkVec(k)*cos(k*M);
+end
+end
+
+function [c1s1f,BkVec] = CosfSinf(M,e,stop)
+if nargin < 3 % default tolerance
+    tol = 1e-14;
+    nTol = tol;
+    kMax = Inf;
+elseif stop < 1 % stop is tolerance
+    tol = stop;
+    nTol = stop;
+    kMax = Inf;
+else            % stop is maximum iterations
+    tol = 0;
+    kMax = stop;
+    nTol = 1e-14;
+end
+b = (1-sqrt(1-e^2))/e;
+c1s1f = nan(1,length(M));
+B0 = 0; % constant term
+Am = [-1,2*e,0,-2*e,1];
+m = [0:4].';
+
+BkVec = [];
+
+Bk = inf;
+k = 1;
+while abs(Bk) > tol && k < kMax % Iterate until Bk is small enough
+    dBk = inf;
+    n = 0;
+    
+    Bk = -1/2*besselj(n,-k*e)*Am*...
+        (b.^abs(m+n+k-2));
+    n = 1;
+    while abs(dBk) > nTol || n <= k+2% Iterate until Bk converges
+        dBk = -1/2*besselj(n,-k*e)*Am*...
+        (b.^abs(m+n+k-2))+...
+        -1/2*besselj(-n,-k*e)*Am*...
+        (b.^abs(m-n+k-2));
+        
+        Bk = Bk + dBk;
+        n = n+1;
+    end
+    BkVec = [BkVec; Bk];
+    k = k+1;
+end
+c1s1f(:) = B0;
+for k = 1:length(BkVec)
+    c1s1f = c1s1f + BkVec(k)*sin(k*M);
+end
+end
+
+function [c2s1f,BkVec] = Cos2fSinf(M,e,stop)
+if nargin < 3 % default tolerance
+    tol = 1e-14;
+    nTol = tol;
+    kMax = Inf;
+elseif stop < 1 % stop is tolerance
+    tol = stop;
+    nTol = stop;
+    kMax = Inf;
+else            % stop is maximum iterations
+    tol = 0;
+    kMax = stop;
+    nTol = 1e-14;
+end
+b = (1-sqrt(1-e^2))/e;
+c2s1f = nan(1,length(M));
+B0 = 0; % constant term
+Am = [-1,4*e,-4*e^2-1,0,4*e^2+1,-4*e,1];
+m = [0:6].';
+
+BkVec = [];
+
+Bk = inf;
+k = 1;
+while abs(Bk) > tol && k < kMax % Iterate until Bk is small enough
+    dBk = inf;
+    n = 0;
+    
+    Bk = -1/2/sqrt(1-e^2)*besselj(n,-k*e)*Am*...
+        (abs(m+n+k-2)/2.*b.^abs(m+n+k-3) + ...
+        e/2/sqrt(1-e^2)*b.^abs(m+n+k-2));
+    n = 1;
+    while abs(dBk) > nTol || n <= k+2% Iterate until Bk converges
+        dBk = -1/2/sqrt(1-e^2)*besselj(n,-k*e)*Am*...
+        (abs(m+n+k-2)/2.*b.^abs(m+n+k-3) + ...
+        e/2/sqrt(1-e^2)*b.^abs(m+n+k-2))+...
+        -1/2/sqrt(1-e^2)*besselj(-n,-k*e)*Am*...
+        (abs(m-n+k-2)/2.*b.^abs(m-n+k-3) + ...
+        e/2/sqrt(1-e^2)*b.^abs(m-n+k-2));
+        
+        Bk = Bk + dBk;
+        n = n+1;
+    end
+    BkVec = [BkVec; Bk];
+    k = k+1;
+end
+c2s1f(:) = B0;
+for k = 1:length(BkVec)
+    c2s1f = c2s1f + BkVec(k)*sin(k*M);
 end
 end
 
