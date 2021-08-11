@@ -1,4 +1,4 @@
-e = 0.1;
+e = 0.3;
 M = 0:0.001:2*pi;
 tol = 1e-14;
 %% Calculate N-R, Battin
@@ -10,6 +10,7 @@ fTrue = pi/180*me2ta(180/pi*M,e,tol);
 c2fTrue = cos(fTrue).^2;
 c3fTrue = cos(fTrue).^3;
 c4fTrue = cos(fTrue).^4;
+c5fTrue = cos(fTrue).^5;
 toc
 
 tic
@@ -21,11 +22,15 @@ toc
 tic
 [c4fFourier, BkVec4] = Cos4f(M,e,tol);
 toc
+tic
+[c5fFourier, BkVec4] = Cos5f(M,e,tol);
+toc
 
 
 errorc2f = norm(c2fTrue-c2fFourier)/length(c2fTrue)
 errorc3f = norm(c3fTrue-c3fFourier)/length(c3fTrue)
 errorc4f = norm(c4fTrue-c4fFourier)/length(c4fTrue)
+errorc5f = norm(c5fTrue-c5fFourier)/length(c5fTrue)
 %% Plot Stuff
 figure(1) % M & E
 plot(M,fTrue,M,fFour,'--','linewidth',2)
@@ -59,7 +64,13 @@ xlabel('M')
 axis([0 2*pi -1 1])
 legend('N-R','Fourier','location','best')
 
-
+figure(5)
+plot(M,c5fTrue,M,c5fFourier,'--','linewidth',2)
+xticks(0:pi/2:2*pi)
+xticklabels({'0','\pi/2','\pi','3\pi/2','2\pi'})
+xlabel('M')
+axis([0 2*pi -1 1])
+legend('N-R','Fourier','location','best')
 
 %%
 function [c2f,BkVec] = Cos2f(M,e,stop)
@@ -211,6 +222,72 @@ end
 c4f(:) = B0;
 for k = 1:length(BkVec)
     c4f = c4f + BkVec(k)*cos(k*M);
+end
+end
+
+function [c5f,BkVec] = Cos5f(M,e,stop)
+if nargin < 3 % default tolerance
+    tol = 1e-14;
+    kMax = Inf;
+elseif stop < 1 % stop is tolerance
+    tol = stop;
+    nTol = stop;
+    kMax = Inf;
+else            % stop is maximum iterations
+    tol = 0;
+    kMax = stop;
+    nTol = 1e-14;
+end
+b = (1-sqrt(1-e^2))/e;
+c5f = nan(1,length(M));
+B0 = -2*b^4*(2*b^11 -5*e*b^10 -12*b^9 +35*e*b^8 +28*b^7 ...
+    +(8*e^5+40*e^3-90*e)*b^6 -(160*e^4+240*e^2+48)*b^5 ...
+    +(72*e^5+760*e^3+510*e)*b^4 -(480*e^4+1120*e^2+110)*b^3 ...
+    +(72*e^5+760*e^3+335*e)*b^2 -(160*e^4+240*e^2+20)*b +8*e^5 +40*e^3 +15*e)...
+    /e^4/(1-b^2)^7;% constant term
+    
+Am = [1,-10*e,40*e^2+5,-(80*e^3+40*e),(80*e^4+120*e^2+10),...
+    -(32*e^5+160*e^3+60*e),(80*e^4+120*e^2+10),-(80*e^3+40*e),40*e^2+5,...
+    -10*e,1];
+m = [0:10].';
+
+BkVec = [];
+
+Bk = inf;
+k = 1;
+while abs(Bk) > tol && k < kMax % Iterate until Bk is small enough
+    dBk = inf;
+    n = 0;
+    
+    Bk = 1/16/(1-e^2)^(2)*besselj(n,-k*e)*Am*...
+        (abs(m+n+k-4).*abs(m+n+k-3).*abs(m+n+k-2)/6.*b.^abs(m+n+k-5) + ...
+        e/sqrt(1-e^2)*abs(m+n+k-3).*abs(m+n+k-2).*b.^abs(m+n+k-4) + ...
+        5/2*e^2/(1-e^2)*abs(m+n+k-2).*b.^abs(m+n+k-3) + ...
+        5/2*e^3/(1-e^2)^(3/2)*b.^abs(m+n+k-2));
+    
+    n = 1;
+    while abs(dBk) > nTol || n < k % Iterate until Bk converges
+        dBk = 1/16/(1-e^2)^(2)*besselj(n,-k*e)*Am*...
+        (abs(m+n+k-4).*abs(m+n+k-3).*abs(m+n+k-2)/6.*b.^abs(m+n+k-5) + ...
+        e/sqrt(1-e^2)*abs(m+n+k-3).*abs(m+n+k-2).*b.^abs(m+n+k-4) + ...
+        5/2*e^2/(1-e^2)*abs(m+n+k-2).*b.^abs(m+n+k-3) + ...
+        5/2*e^3/(1-e^2)^(3/2)*b.^abs(m+n+k-2))...
+        ...
+        +1/16/(1-e^2)^(2)*besselj(-n,-k*e)*Am*...
+        (abs(m-n+k-4).*abs(m-n+k-3).*abs(m-n+k-2)/6.*b.^abs(m-n+k-5) + ...
+        e/sqrt(1-e^2)*abs(m-n+k-3).*abs(m-n+k-2).*b.^abs(m-n+k-4) + ...
+        5/2*e^2/(1-e^2)*abs(m-n+k-2).*b.^abs(m-n+k-3) + ...
+        5/2*e^3/(1-e^2)^(3/2)*b.^abs(m-n+k-2));
+        
+        Bk = Bk + dBk;
+        n = n+1;
+    end
+    BkVec = [BkVec; Bk];
+    k = k+1;
+end
+c5f(:) = B0;
+for k = 1:length(BkVec)
+    c5f = c5f + BkVec(k)*cos(k*M);
 end
 end
 
