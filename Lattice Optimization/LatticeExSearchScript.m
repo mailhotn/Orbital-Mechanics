@@ -5,7 +5,7 @@ PropParams.timeVec = 0:100:86164;
 PropParams.elevMin = 5;
 PropParams.relTol  = 1e-6;
 PropParams.absTol  = 1e-6;
-PropParams.datafolder = 'C:\Users\User\Dropbox\Lattice Optimization Data';
+PropParams.datafolder = 'C:\Users\User\Google Drive\Master''s Degree\Lattice Optimization Data';
 PropParams.delLat = 5;
 PropParams.minMinDist = 1; %km
 
@@ -19,7 +19,7 @@ lonEm = 0;
 maxSats = 80;
 minSats = 40;
 
-hAList = [0,900,1000];
+hAList = [900,1000];
 if exist([PropParams.datafolder '\OptIncData.mat'],'file')
     load([PropParams.datafolder '\OptIncData.mat']);
     delIncList = optdInc;

@@ -1,4 +1,4 @@
-e = 0.3;
+e = 0.5;
 M = 0:0.001:2*pi;
 tol = 1e-14;
 %% Calculate N-R, Battin
@@ -290,6 +290,7 @@ function [c5f,BkVec] = Cos5f(M,e,stop)
 if nargin < 3 % default tolerance
     tol = 1e-14;
     kMax = Inf;
+    nTol = 1e-14;
 elseif stop < 1 % stop is tolerance
     tol = stop;
     nTol = stop;
