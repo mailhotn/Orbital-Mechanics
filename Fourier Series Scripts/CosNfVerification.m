@@ -1,4 +1,5 @@
-e = 0.5;
+clear
+e = 0.9;
 M = 0:0.001:2*pi;
 tol = 1e-14;
 %% Calculate N-R, Battin
@@ -220,7 +221,7 @@ while abs(Bk) > tol && k < kMax % Iterate until Bk is small enough
         Bk = Bk + dBk;
         n = n+1;
     end
-    BkVec = [BkVec; Bk];
+    BkVec = [BkVec; Bk]; %#ok<AGROW>
     k = k+1;
 end
 for k = 0:length(BkVec)-1
@@ -248,7 +249,7 @@ B0 = b^3*(3*b^8-8*e*b^7-12*b^6+40*e*b^5+(8*e^4+24*e^2+18)*b^4-(96*e^3+152*e)*b^3
     (32*e^4+240*e^2+36)*b^2-(96*e^3+72*e)*b+8*e^4+24*e^2+3)/(e^3*(1-b^2)^5);% constant term
     
 Am = [1,-8*e,24*e^2+4,-(32*e^3+24*e),(16*e^4+48*e^2+6),-(32*e^3+24*e),24*e^2+4,-8*e,1];
-m = [0:8].';
+m = [0:8].'; %#ok<NBRAK>
 
 BkVec = [B0];
 

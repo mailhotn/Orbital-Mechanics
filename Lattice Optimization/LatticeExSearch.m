@@ -37,6 +37,7 @@ if ~exist([PropParams.datafolder '\LatticeExSol_Lat_' num2str(latGs)...
             Arch.nAops = Arch.nSats/Arch.nPlanes/Arch.nSatsPerAop;
 %             nC3List = divisors(Arch.nPlanes); % Constraint! nC3 does not have to be a divisor of nPlanes
             nC3List = 1:Arch.nPlanes;
+            nC3List = [1, nC3List(gcd(nC3List,Arch.nPlanes)~=1)];
             for iNC3 = 1:length(nC3List)
                 Phase.nC3 = nC3List(iNC3);
                 for nC2 = 1:Arch.nAops

@@ -1,7 +1,8 @@
+clear 
 tol = 1e-14;
 primary = earth();
 %% Orbital Elements
-oe = [8000, 0.3, 30*pi/180, 0, 80*pi/180, 0];
+oe = [10000, 0.3, 30*pi/180, 0, 80*pi/180, 0];
 a = oe(1);
 e = oe(2);
 i = oe(3);
