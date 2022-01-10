@@ -28,7 +28,7 @@ classdef SingleSat < Constellation
             end
             %%%% Object Initialization %%%%
             % Call superclass constructor before accessing object
-            Sat = Sat@Constellation(1,1,primary);
+            Sat = Sat@Constellation(1,primary);
             
             %%%% Post Initialization %%%%
             % property assignment
@@ -40,19 +40,19 @@ classdef SingleSat < Constellation
             Sat.me   = OE(6);
         end
         
-        function OE_m = getInitMeanElements(Sat)
-            OE_m = [Sat.sma,Sat.e,Sat.inc,Sat.raan,Sat.aop,Sat.me].';
+        function oeM = InitialOeMean(Sat)
+            oeOsc = Sat.InitialOeOsc;
+            oeM = osc2me(oeOsc,Sat.J2,Sat.Re);
         end
         
-        function OE = getInitElements(Sat)
-            OE_m = Sat.getInitMeanElements;
-            OE = me2osc(OE_m,Sat.J2,Sat.Re);
+        function oeOsc = InitialOeOsc(Sat)            
+            oeOsc = [Sat.sma,Sat.e,Sat.inc,Sat.raan,Sat.aop,Sat.me].';
         end
         
-        function X = getInitECI(Sat)
-            OE = Sat.getInitElements;
-            OE(6) = me2ta(OE(6),OE(2));
-            [R, V] = oe2eci(OE,Sat.mu);
+        function X = InitialStateEci(Sat)
+            oeOsc = Sat.InitialOeOsc;
+            oeOsc(6) = me2ta(oeOsc(6),oeOsc(2));
+            [R, V] = oe2eci(oeOsc,Sat.primary);
             X = [R; V];
         end
     end
