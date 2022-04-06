@@ -1,5 +1,5 @@
 clear
-e = 0.9;
+e = 0.3;
 M = 0:0.001:2*pi;
 tol = 1e-14;
 %% Calculate N-R, Battin

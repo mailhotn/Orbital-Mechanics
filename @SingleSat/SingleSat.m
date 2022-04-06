@@ -3,7 +3,7 @@ classdef SingleSat < Constellation
     % orbital elements. This is useful for using the constellation
     % propagator framework when working with a single satellite.
     properties
-        sma  % semi-major axis [km
+        sma  % semi-major axis [km]
         e    % eccentricity
         inc  % inclination [deg]
         raan % right ascension of ascending node [deg]

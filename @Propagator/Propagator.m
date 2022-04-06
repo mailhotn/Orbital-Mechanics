@@ -77,7 +77,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             dM = 180/pi*repmat([0,0,0,0,0,1].',P.Con.nSats,1).*...
                 (3/4*P.Con.J2.*(P.Con.Re./p).^2.*n.*eta.*(3*cosd(i).^2-1) + n);
             dX = dO + dw + dM;
-            % Propagate
+            % "Propagate"
             X = zeros(order,length(T));
             X(:,1) = IC;
             X(:,2:end) = X(:,1) + dX*T(2:end);
