@@ -1,5 +1,6 @@
 clear
-tol = 1e-14;
+% tol = 1e-14;
+tol = 20;
 primary = earth();
 %% Orbital Elements
 oe = [10000, 0.3, 20*pi/180, 0, 70*pi/180, 0];
@@ -8,8 +9,8 @@ e = oe(2);
 i = oe(3);
 raan = oe(4);
 aop = oe(5);
-M = 0:0.001:2*pi;
-f = pi/180*me2ta(180/pi*M,e,tol);
+M = 0:0.01:2*pi;
+f = pi/180*me2ta(180/pi*M,e,1e-14);
 %% Calculate Potentials
 
 % [J2F,J2freq] = J2PotFourier(oe,M,tol);
@@ -83,13 +84,13 @@ dJ2deT = -3*primary.mu*primary.J2*primary.Re^2/2/a^3/(1-e^2)^3*(1+e*cos(f)).^2.*
     (3*sin(aop+f).^2*sin(i)^2-1).*(2*e*(1+e*cos(f))/(1-e^2) + cos(f)));
 
 % other stuff
-[dJ2diF, dJ2diFreq] = dJ2diFour(oe,M,tol);
-[dJ2doF, dJ2doFreq] = dJ2doFour(oe,M,tol);
-[dJ2dlF, dJ2dlFreq] = dJ2dlFour(oe,M,tol);
-[dJ2daF, dJ2daFreq] = dJ2daFour(oe,M,tol);
+[dJ2diF, dJ2diFreq] = dJ2diFour(oe,M,tol,primary);
+[dJ2doF, dJ2doFreq] = dJ2doFour(oe,M,tol,primary);
+[dJ2dlF, dJ2dlFreq] = dJ2dlFour(oe,M,tol,primary);
+[dJ2daF, dJ2daFreq] = dJ2daFour(oe,M,tol,primary);
 
 % Eccentricity
-[dJ2deF, dJ2deFreq] = dJ2deFour(oe,M,tol);
+[dJ2deF, dJ2deFreq] = dJ2deFour(oe,M,tol,primary);
  
 % Additional verification for da/dt, cuz I don't trust lambda
 fRJ2 = -3*primary.mu*primary.J2*primary.Re^2/2/a^4/(1-e^2)^4*(1+e*cos(f)).^4.*...
@@ -116,9 +117,29 @@ dlErr = norm(dJ2dlT-dJ2dlF)/length(f)
 deErr = norm(dJ2deT-dJ2deF)/length(f)
 daErr = norm(dJ2daT-dJ2daF)/length(f)
 
+dJ2daf = 0*M;
+dJ2def = 0*M;
+dJ2dif = 0*M;
+dJ2dof = 0*M;
+dJ2dlf = 0*M;
+% Check function
+for iM = 1:length(M)
+    [~, dJ2f] = LpeJ2Fourier([],[oe(1:5),M(iM)],tol);
+    dJ2daf(iM) = dJ2f(1);
+    dJ2def(iM) = dJ2f(2);
+    dJ2dif(iM) = dJ2f(3);
+    dJ2dof(iM) = dJ2f(4);
+    dJ2dlf(iM) = dJ2f(5);
+end
+
+diErrf = norm(dJ2dif-dJ2diF)/length(f)
+doErrf = norm(dJ2dof-dJ2doF)/length(f)
+dlErrf = norm(dJ2dlf-dJ2dlF)/length(f)
+deErrf = norm(dJ2def-dJ2deF)/length(f)
+daErrf = norm(dJ2daf-dJ2daF)/length(f)
 %% Plot stuff
 figure(1)
-plot(M,dJ2daT,M,dJ2daF,'--','linewidth',2)
+plot(M,dJ2daf,M,dJ2daF,'--','linewidth',2)
 xlabel('M')
 xlim([0,2*pi])
 xticks([0,pi/2,pi,3*pi/2,2*pi])
@@ -129,7 +150,7 @@ figure(2)
 plot(vecnorm(dJ2daFreq))
 
 figure(3)
-plot(dldtForce-dldtPot)
+plot(dJ2daf-dJ2daF)
 
 %%
 function [J2time, J2freq] = J2PotFourier(oe,M,stop,primary)
