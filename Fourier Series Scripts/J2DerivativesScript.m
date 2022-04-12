@@ -124,7 +124,7 @@ dJ2dof = 0*M;
 dJ2dlf = 0*M;
 % Check function
 for iM = 1:length(M)
-    [~, dJ2f] = LpeJ2Fourier([],[oe(1:5),M(iM)],tol);
+    [~, dJ2f] = LpeJ2Fourier([],[oe(1:5),M(iM)],8);
     dJ2daf(iM) = dJ2f(1);
     dJ2def(iM) = dJ2f(2);
     dJ2dif(iM) = dJ2f(3);
