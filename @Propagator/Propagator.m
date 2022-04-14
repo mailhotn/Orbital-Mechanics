@@ -86,6 +86,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         end
         
         function [Time, X] = PropOeOsc(P,T)
+            % Use this I think
             opts = odeset('reltol',P.relTol,'abstol',P.absTol);
             OE = P.Con.InitialOeOsc;
             OE(3:end,:) = OE(3:end,:)*pi/180;
@@ -96,6 +97,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         end
         
         function [Time, X] = PropOeOsc2(P,T)
+            % probably worse?
             opts = odeset('reltol',P.relTol,'abstol',P.absTol);
             OE = P.Con.InitialOeOsc;
             OE(3:end,:) = OE(3:end,:)*pi/180;
@@ -114,7 +116,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         end
         
         function [Time, X] = PropOeFourier(P,T,kMax)
-            % Propagate for time T using Fourier series of LPE 
+            % Propagate for time T using Fourier series of LPE
             % Currently only works for one satellite
             opts = odeset('reltol',P.relTol,'abstol',P.absTol);
             IC = reshape(P.Con.InitialOeOsc,[6*P.Con.nSats,1]);
@@ -124,6 +126,31 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             X = X.';
             X(3:end,:) = wrapTo360(X(3:end,:));
         end
+        
+        function [Time, X] = PropOeFourier2(P,T,kMax)
+            % Propagate for time T using Fourier LPE
+            % Assume constant coefficients, assume M is not affected by J2
+            IC = reshape(P.Con.InitialOeOsc,[6*P.Con.nSats,1]);
+            a = IC(1);
+            n = sqrt(P.Con.primary.mu/a^3);
+            IC(3:end) = IC(3:end)*pi/180;
+            [~,lpeSpec] = P.DynOeFourier([],IC,kMax);
+            M = n*T;
+            k = 1:kMax;
+            X = nan(6*P.Con.nSats,length(T));
+            for iTime = 1:length(T)
+                trigMat = repmat([sin(k*M(iTime))./k/n;-cos(k*M(iTime))./k/n],6,1);
+                trigsum1 = sum(lpeSpec(:,2:end).*trigMat,2);
+                trigsum2 = [sum(trigsum1(1:2)); sum(trigsum1(3:4));...
+                    sum(trigsum1(5:6)); sum(trigsum1(7:8)); sum(trigsum1(9:10));...
+                    sum(trigsum1(11:12))];
+                X(:,iTime) = IC + lpeSpec(1:2:11,1)*T(iTime) + trigsum2;
+                X(6,iTime) = X(6,iTime) + M(iTime);
+            end
+            X(3:end,:) = wrapTo360(X(3:end,:)*180/pi);
+            Time = T;
+        end
+        
     end
     
     methods(Access = protected) % Equations of Motion
@@ -299,7 +326,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 circshift(-P.Con.mu*R2./r.^3 + f_J2 + f_J3,3);
         end
         
-        function dX = DynOeFourier(P,t,X,kMax) %#ok<INUSL>
+        function [dX,lpeSpec] = DynOeFourier(P,t,X,kMax) %#ok<INUSL>
             
             % handle elements vector
             a = X(1);
@@ -598,6 +625,14 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             dX(4) = 1/n/a^2/eta/sin(i)*dJ2di;
             dX(5) = eta/n/a^2/e*dJ2de - cos(i)/n/a^2/eta/sin(i)*dJ2di;
             dX(6) = n -2/n/a*dJ2da -eta^2/n/a^2/e*dJ2de;
+            
+            lpeSpec = nan(12,kMax+1);
+            lpeSpec(1:2,:) = 2/n/a*dJ2dlFreq;
+            lpeSpec(3:4,:) = eta^2/n/a^2/e*dJ2dlFreq - eta/n/a^2/e*dJ2doFreq;
+            lpeSpec(5:6,:) = cos(i)/n/a^2/eta/sin(i)*dJ2doFreq;
+            lpeSpec(7:8,:) = 1/n/a^2/eta/sin(i)*dJ2diFreq;
+            lpeSpec(9:10,:) = eta/n/a^2/e*dJ2deFreq - cos(i)/n/a^2/eta/sin(i)*dJ2diFreq;
+            lpeSpec(11:12,:) = -2/n/a*dJ2daFreq -eta^2/n/a^2/e*dJ2deFreq;
         end
         
     end

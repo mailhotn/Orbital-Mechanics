@@ -25,12 +25,12 @@ end
 if rows ~= 3
     V = V.'; % Make sure V is a wide matrix
 end
-r = sqrt(dot(R,R,1));
+r = vecnorm(R,2);
 vr = dot(R,V,1)./r;
 H = cross(R,V);
 h = sqrt(dot(H,H,1));
 E = (cross(V,H)-mu*R./r)/mu;
-e = sqrt(dot(E,E,1));
+e = vecnorm(E,2);
 i = acosd(H(3,:)./h);
 N = cross(repmat([0 0 1].',1,size(H,2)),H);
 n = sqrt(dot(N,N,1));

@@ -80,4 +80,4 @@ tic
 oe_time = toc;
 diff = sum(sqrt(dot(X_ECI-X_OE,X_ECI-X_OE,1)));
 disp([newline 'ECI Time: ' num2str(eci_time) newline ' OE Time: ' num2str(oe_time) newline ' Error: ' num2str(diff)])
-plot(T,X_ECI(:,6)+X_ECI(:,5),T,X_OE(:,6)+X_OE(:,5))
+plot(T,X_ECI(:,1),T,X_OE(:,1))

@@ -31,7 +31,7 @@ TA = pi/180*TA;
 g2 = J2/2*(Re./a0).^2;
 
 % Check inclination singularity
-epsilon = 0.05;
+epsilon = 0.005;
 den = 1-5*cos(i0).^2;
 den = den.*(abs(den) >= epsilon) + epsilon*sign(den).*(abs(den) < epsilon);
 
