@@ -28,21 +28,21 @@ end
 r = vecnorm(R,2);
 vr = dot(R,V,1)./r;
 H = cross(R,V);
-h = sqrt(dot(H,H,1));
+h = vecnorm(H,2);
 E = (cross(V,H)-mu*R./r)/mu;
 e = vecnorm(E,2);
 i = acosd(H(3,:)./h);
 N = cross(repmat([0 0 1].',1,size(H,2)),H);
-n = sqrt(dot(N,N,1));
+n = vecnorm(N,2);
 
 O = (N(2,:)>=0).*acosd(N(1,:)./n) + ...
     (N(2,:)<0).*(360 - acosd(N(1,:)./n));
 
-w = (E(3,:)>=0).*acosd(dot(N,E,1)./(n.*e)) + ...
-    (E(3,:)<0).*(360 - acosd(dot(N,E,1)./(n.*e)));
+w = (E(3,:)>=0).*acosd(dot(N./n,E./e,1)) + ...
+    (E(3,:)<0).*(360 - acosd(dot(N./n,E./e,1)));
 
-th = (vr>=0).*acosd(dot(E,R,1)./(e.*r)) + ...
-    (vr<0).*(360 - acosd(dot(E,R,1)./(e.*r)));
+th = (vr>=0).*acosd(dot(E./e,R./r,1)) + ...
+    (vr<0).*(360 - acosd(dot(E./e,R./r,1)));
 
 a = h.^2./(mu*(1-e.^2));
 OE = [a; e; i; O; w; th];

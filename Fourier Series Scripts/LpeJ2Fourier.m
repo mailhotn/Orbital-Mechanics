@@ -109,7 +109,7 @@ dJ2dlFreq = R*[[dR0dl;0],zeros(2,kMax)];
 
 k = 1;
 
-while k < kMax
+while k <= kMax
     n = 0;
     
     g2 = b.^abs(m2+n+k-2);

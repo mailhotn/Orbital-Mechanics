@@ -135,16 +135,23 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             n = sqrt(P.Con.primary.mu/a^3);
             IC(3:end) = IC(3:end)*pi/180;
             [~,lpeSpec] = P.DynOeFourier([],IC,kMax);
-            M = n*T;
+            M = n*T+IC(6);
             k = 1:kMax;
             X = nan(6*P.Con.nSats,length(T));
+            % Initial time
+            trigMat = repmat([sin(k*M(1))./k/n;-cos(k*M(1))./k/n],6,1);
+            trigsum1 = sum(lpeSpec(:,2:end).*trigMat,2);
+            InitVal = [sum(trigsum1(1:2)); sum(trigsum1(3:4));...
+                sum(trigsum1(5:6)); sum(trigsum1(7:8)); sum(trigsum1(9:10));...
+                sum(trigsum1(11:12))];
+            
             for iTime = 1:length(T)
                 trigMat = repmat([sin(k*M(iTime))./k/n;-cos(k*M(iTime))./k/n],6,1);
                 trigsum1 = sum(lpeSpec(:,2:end).*trigMat,2);
                 trigsum2 = [sum(trigsum1(1:2)); sum(trigsum1(3:4));...
                     sum(trigsum1(5:6)); sum(trigsum1(7:8)); sum(trigsum1(9:10));...
                     sum(trigsum1(11:12))];
-                X(:,iTime) = IC + lpeSpec(1:2:11,1)*T(iTime) + trigsum2;
+                X(:,iTime) = IC + lpeSpec(1:2:11,1)*T(iTime) + trigsum2 - InitVal;
                 X(6,iTime) = X(6,iTime) + M(iTime);
             end
             X(3:end,:) = wrapTo360(X(3:end,:)*180/pi);
@@ -433,7 +440,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             
             k = 1;
             
-            while k < kMax
+            while k <= kMax
                 n = 0;
                 
                 g2 = b.^abs(m2+n+k-2);
