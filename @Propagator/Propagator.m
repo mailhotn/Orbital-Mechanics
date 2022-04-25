@@ -130,14 +130,30 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         function [Time, X] = PropOeFourier2(P,T,kMax)
             % Propagate for time T using Fourier LPE
             % Assume constant coefficients, assume M is not affected by J2
+            
+            % Handle Initial conditions
             IC = reshape(P.Con.InitialOeOsc,[6*P.Con.nSats,1]);
-            a = IC(1);
-            n = sqrt(P.Con.primary.mu/a^3);
             IC(3:end) = IC(3:end)*pi/180;
+            a = IC(1);
+            
+            % Get mean a - nonsingular, somewhat weird
+            e = IC(2);
+            i = IC(3);
+            aop = IC(5);
+            eta = sqrt(1-e^2);
+            f = me2ta(IC(6),e);
+            a_r = (1+e.*cos(f))./eta.^2;
+            g2 = -P.Con.primary.J2/2*(P.Con.primary.Re/a)^2;
+            a = a + a*g2*((3*cos(i)^2-1).*(a_r^3 - 1/eta^3) ...
+                + 3*(1-cos(i)^2)*a_r^3*cos(2*aop + 2*f));
+            
+            % Continue with the rest
+            n = sqrt(P.Con.primary.mu/a^3);
             [~,lpeSpec] = P.DynOeFourier([],IC,kMax);
             M = n*T+IC(6);
             k = 1:kMax;
             X = nan(6*P.Con.nSats,length(T));
+            
             % Initial time
             trigMat = repmat([sin(k*M(1))./k/n;-cos(k*M(1))./k/n],6,1);
             trigsum1 = sum(lpeSpec(:,2:end).*trigMat,2);
@@ -145,14 +161,31 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 sum(trigsum1(5:6)); sum(trigsum1(7:8)); sum(trigsum1(9:10));...
                 sum(trigsum1(11:12))];
             
+            % Fix M - Works far worse than fixing n
+            M2 = M;
             for iTime = 1:length(T)
-                trigMat = repmat([sin(k*M(iTime))./k/n;-cos(k*M(iTime))./k/n],6,1);
+                trigMat = [sin(k*M(iTime))./k/n;-cos(k*M(iTime))./k/n];
+                trigsum1 = sum(lpeSpec(11:12,2:end).*trigMat,2);
+                trigsum2 = sum(trigsum1);
+                M2(iTime) = IC(6) + lpeSpec(11,1)*T(iTime) + trigsum2 - InitVal(6) + M(iTime);
+            end
+            % Fix M again
+            M3 = M2;
+%             for iTime = 1:length(T)
+%                 trigMat = [sin(k*M2(iTime))./k/n;-cos(k*M2(iTime))./k/n];
+%                 trigsum1 = sum(lpeSpec(11:12,2:end).*trigMat,2);
+%                 trigsum2 = sum(trigsum1);
+%                 M3(iTime) = IC(6) + lpeSpec(11,1)*T(iTime) + trigsum2 - InitVal(6) + M2(iTime);
+%             end
+            %
+            for iTime = 1:length(T)
+                trigMat = repmat([sin(k*M3(iTime))./k/n;-cos(k*M3(iTime))./k/n],6,1);
                 trigsum1 = sum(lpeSpec(:,2:end).*trigMat,2);
                 trigsum2 = [sum(trigsum1(1:2)); sum(trigsum1(3:4));...
                     sum(trigsum1(5:6)); sum(trigsum1(7:8)); sum(trigsum1(9:10));...
                     sum(trigsum1(11:12))];
                 X(:,iTime) = IC + lpeSpec(1:2:11,1)*T(iTime) + trigsum2 - InitVal;
-                X(6,iTime) = X(6,iTime) + M(iTime);
+                X(6,iTime) = X(6,iTime) + M3(iTime);
             end
             X(3:end,:) = wrapTo360(X(3:end,:)*180/pi);
             Time = T;
@@ -633,7 +666,16 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             dX(5) = eta/n/a^2/e*dJ2de - cos(i)/n/a^2/eta/sin(i)*dJ2di;
             dX(6) = n -2/n/a*dJ2da -eta^2/n/a^2/e*dJ2de;
             
+            % Fix a,n - Not clear if helpful
+%             f = me2ta(M,e);
+%             a_r = (1+e.*cos(f))./eta.^2;
+%             g2 = -P.Con.primary.J2/2*(P.Con.primary.Re/a)^2;
+%             a = a + a*g2*((3*cos(i)^2-1).*(a_r^3 - 1/eta^3) ...
+%                 + 3*(1-cos(i)^2)*a_r^3*cos(2*aop + 2*f));
+%             n = sqrt(P.Con.primary.mu/a^3);
+            
             lpeSpec = nan(12,kMax+1);
+            
             lpeSpec(1:2,:) = 2/n/a*dJ2dlFreq;
             lpeSpec(3:4,:) = eta^2/n/a^2/e*dJ2dlFreq - eta/n/a^2/e*dJ2doFreq;
             lpeSpec(5:6,:) = cos(i)/n/a^2/eta/sin(i)*dJ2doFreq;

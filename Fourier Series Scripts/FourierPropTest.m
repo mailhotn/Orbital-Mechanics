@@ -1,5 +1,5 @@
 clear
-oe = [10000, 0.3, 63.4, 30, 70, 0];
+oe = [10000, 0.2, 63.0, 30, 70, 0];
 
 Sat = SingleSat(oe,earth());
 Prop = Propagator(Sat);
@@ -61,38 +61,52 @@ plot(t,oeC(6,:),t,oeB(6,:),'.'...
 legend('ECI','Brouwer','F2','F5','F10','F15')
 
 %% Plot errors
-errB = oeC-oeB;
-errF10 = oeC-oeF10;
-errF15 = oeC-oeF15;
+errB = abs(oeC-oeB);
+errF10 = abs(oeC-oeF10);
+errF15 = abs(oeC-oeF15);
+errB = [errB(1,:)/oe(1);errB(2,:)/oe(2);errB(3:end,:)*pi/180];
+errF10 = [errF10(1,:)/oe(1);errF10(2,:)/oe(2);errF10(3:end,:)*pi/180];
+errF15 = [errF15(1,:)/oe(1);errF15(2,:)/oe(2);errF15(3:end,:)*pi/180];
 
-
-figure(11)
+figure(11) % semimajor axis
 plot(t,errB(1,:),t,errF10(1,:),t,errF15(1,:))
 legend('Brouwer','F10','F15')
-xlabel('time')
-ylabel('a error')
-figure(12)
+xlabel('$Time \left[s\right]$','interpreter','latex','fontsize',12)
+ylabel('$\frac{\left|a_c-a_x\right|}{a\left(0\right)}$','fontsize',15,'interpreter','latex')
+grid on
+xlim([0,86400])
+figure(12) % eccentricity
 plot(t,errB(2,:),t,errF10(2,:),t,errF15(2,:))
 legend('Brouwer','F10','F15')
-xlabel('time')
-ylabel('e error')
-figure(13)
+xlabel('$Time \left[s\right]$','interpreter','latex','fontsize',12)
+ylabel('$\frac{\left|e_c-e_x\right|}{e\left(0\right)}$','fontsize',15,'interpreter','latex')
+grid on
+xlim([0,86400])
+figure(13) % inclination
 plot(t,errB(3,:),t,errF10(3,:),t,errF15(3,:))
 legend('Brouwer','F10','F15')
-xlabel('time')
-ylabel('i error')
-figure(14)
+xlabel('$Time \left[s\right]$','interpreter','latex','fontsize',12)
+ylabel('$\left|i_c-i_x\right| \left[{rad}\right]$','fontsize',12,'interpreter','latex')
+grid on
+xlim([0,86400])
+figure(14) % raan
 plot(t,errB(4,:),t,errF10(4,:),t,errF15(4,:))
 legend('Brouwer','F10','F15')
-xlabel('time')
-ylabel('raan error')
-figure(15)
+xlabel('$Time \left[s\right]$','interpreter','latex','fontsize',12)
+ylabel('$\left|\Omega_c-\Omega_x\right| \left[{rad}\right]$','fontsize',12,'interpreter','latex')
+grid on
+xlim([0,86400])
+figure(15) % aop
 plot(t,errB(5,:),t,errF10(5,:),t,errF15(5,:))
 legend('Brouwer','F10','F15')
-xlabel('time')
-ylabel('aop error')
-figure(16)
+xlabel('$Time \left[s\right]$','interpreter','latex','fontsize',12)
+ylabel('$\left|\omega_c-\omega_x\right| \left[{rad}\right]$','fontsize',12,'interpreter','latex')
+grid on
+xlim([0,86400])
+figure(16) % mean anomaly
 plot(t(2:end),errB(6,2:end),t(2:end),errF10(6,2:end),t(2:end),errF15(6,2:end))
 legend('Brouwer','F10','F15')
-xlabel('time')
-ylabel('mean anomaly error')
+xlabel('$Time \left[s\right]$','interpreter','latex','fontsize',12)
+ylabel('$\left|M_c-M_x\right| \left[{rad}\right]$','fontsize',12,'interpreter','latex')
+grid on
+xlim([0,86400])
