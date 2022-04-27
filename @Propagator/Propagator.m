@@ -141,7 +141,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             i = IC(3);
             aop = IC(5);
             eta = sqrt(1-e^2);
-            f = me2ta(IC(6),e);
+            f = pi/180*me2ta(IC(6)*180/pi,e);
             a_r = (1+e.*cos(f))./eta.^2;
             g2 = -P.Con.primary.J2/2*(P.Con.primary.Re/a)^2;
             a = a + a*g2*((3*cos(i)^2-1).*(a_r^3 - 1/eta^3) ...
@@ -160,26 +160,26 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             InitVal = [sum(trigsum1(1:2)); sum(trigsum1(3:4));...
                 sum(trigsum1(5:6)); sum(trigsum1(7:8)); sum(trigsum1(9:10));...
                 sum(trigsum1(11:12))];
-            
-            % Fix M
             M2 = M;
+            % Fix M
+            
             for iTime = 1:length(T)
                 trigMat = [sin(k*M(iTime))./k/n;-cos(k*M(iTime))./k/n];
                 trigsum1 = sum(lpeSpec(11:12,2:end).*trigMat,2);
                 trigsum2 = sum(trigsum1);
                 M2(iTime) = IC(6) + lpeSpec(11,1)*T(iTime) + trigsum2 - InitVal(6) + M(iTime);
             end
-            M3 = M2;
+            
             %
             for iTime = 1:length(T)
-                trigMat = repmat([sin(k*M3(iTime))./k/n;-cos(k*M3(iTime))./k/n],6,1);
+                trigMat = repmat([sin(k*M2(iTime))./k/n;-cos(k*M2(iTime))./k/n],6,1);
                 trigsum1 = sum(lpeSpec(:,2:end).*trigMat,2);
                 trigsum2 = [sum(trigsum1(1:2)); sum(trigsum1(3:4));...
                     sum(trigsum1(5:6)); sum(trigsum1(7:8)); sum(trigsum1(9:10));...
                     sum(trigsum1(11:12))];
                 X(:,iTime) = IC + lpeSpec(1:2:11,1)*T(iTime) + trigsum2 - InitVal;
-%                 X(6,iTime) = X(6,iTime) + M3(iTime); % without M Fix
-                X(6,iTime) = M3(iTime); % M fix
+%                 X(6,iTime) = X(6,iTime) + M2(iTime); % without M Fix
+                X(6,iTime) = M2(iTime); % M fix
             end
             X(3:end,:) = wrapTo360(X(3:end,:)*180/pi);
             Time = T;
