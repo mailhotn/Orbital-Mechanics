@@ -161,7 +161,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 sum(trigsum1(5:6)); sum(trigsum1(7:8)); sum(trigsum1(9:10));...
                 sum(trigsum1(11:12))];
             
-            % Fix M - Works far worse than fixing n
+            % Fix M
             M2 = M;
             for iTime = 1:length(T)
                 trigMat = [sin(k*M(iTime))./k/n;-cos(k*M(iTime))./k/n];
@@ -169,14 +169,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 trigsum2 = sum(trigsum1);
                 M2(iTime) = IC(6) + lpeSpec(11,1)*T(iTime) + trigsum2 - InitVal(6) + M(iTime);
             end
-            % Fix M again
             M3 = M2;
-%             for iTime = 1:length(T)
-%                 trigMat = [sin(k*M2(iTime))./k/n;-cos(k*M2(iTime))./k/n];
-%                 trigsum1 = sum(lpeSpec(11:12,2:end).*trigMat,2);
-%                 trigsum2 = sum(trigsum1);
-%                 M3(iTime) = IC(6) + lpeSpec(11,1)*T(iTime) + trigsum2 - InitVal(6) + M2(iTime);
-%             end
             %
             for iTime = 1:length(T)
                 trigMat = repmat([sin(k*M3(iTime))./k/n;-cos(k*M3(iTime))./k/n],6,1);
@@ -185,7 +178,8 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                     sum(trigsum1(5:6)); sum(trigsum1(7:8)); sum(trigsum1(9:10));...
                     sum(trigsum1(11:12))];
                 X(:,iTime) = IC + lpeSpec(1:2:11,1)*T(iTime) + trigsum2 - InitVal;
-                X(6,iTime) = X(6,iTime) + M3(iTime);
+%                 X(6,iTime) = X(6,iTime) + M3(iTime); % without M Fix
+                X(6,iTime) = M3(iTime); % M fix
             end
             X(3:end,:) = wrapTo360(X(3:end,:)*180/pi);
             Time = T;
