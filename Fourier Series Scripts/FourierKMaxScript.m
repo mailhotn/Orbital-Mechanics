@@ -1,6 +1,6 @@
 clear
-nSats = 100; % different orbits
-kMaxMax = 15;
+nSats = 1000; % different orbits
+kMaxMax = 7;
 nOrb = 5; % # orbits for test
 
 aErrMat = nan(nSats,kMaxMax+1);
@@ -14,8 +14,8 @@ for iSat = 1:nSats
     % random orbit
     r = rand(6,1);
     oe = [7500+r(1)*3000;
-        0.1+0.1*r(2);
-        63.4+0.2*(2*r(3)-1);
+        0.01+0.1*r(2);
+        63.4+0.5*(2*r(3)-1);
         r(4)*360;
         r(5)*360;
         r(6)*360].';
@@ -68,6 +68,8 @@ raanStd = std(raanErrMat);
 aopStd = std(aopErrMat);
 MStd = std(MErrMat);
 
+
+
 aErrM = mean(aErrMat);
 eErrM = mean(eErrMat);
 iErrM = mean(iErrMat);
@@ -77,43 +79,79 @@ MErrM = mean(MErrMat);
 
 figure(1)
 clf
-errorbar(k,aErrM(2:end),aStd(2:end),'o')
+errorbar(k,aErrM(2:end),aErrM(2:end)-prctile(aErrMat(2:end),20),prctile(aErrMat(2:end),80)-aErrM(2:end),'o','linewidth',2)
 hold on
-plot(k,aErrM(1)*ones(1,length(k)),'--')
+plot(0:(kMaxMax+1),aErrM(1)*ones(1,length(k)+2),'--','linewidth',2)
+xticks(1:kMaxMax)
+xlim([0,kMaxMax+1])
+grid on
+ylabel('$\textrm{Average error}$','interpreter','latex','fontsize',18)
+xlabel('$k_{Max}$','interpreter','latex','fontsize',18)
+legend('Fourier','Brouwer','fontsize',12)
 hold off
 
 figure(2)
 clf
-errorbar(k,eErrM(2:end),eStd(2:end),'o')
+errorbar(k,eErrM(2:end),eErrM(2:end)-prctile(eErrMat(2:end),20),prctile(eErrMat(2:end),80)-eErrM(2:end),'o','linewidth',2)
 hold on
-plot(k,eErrM(1)*ones(1,length(k)),'--')
+plot(0:(kMaxMax+1),eErrM(1)*ones(1,length(k)+2),'--','linewidth',2)
+xticks(1:kMaxMax)
+xlim([0,kMaxMax+1])
+grid on
+ylabel('$\textrm{Average error}$','interpreter','latex','fontsize',18)
+xlabel('$k_{Max}$','interpreter','latex','fontsize',18)
+legend('Fourier','Brouwer','fontsize',12)
 hold off
 
 figure(3)
 clf
-errorbar(k,iErrM(2:end),iStd(2:end),'o')
+errorbar(k,iErrM(2:end),iErrM(2:end)-prctile(iErrMat(2:end),20),prctile(iErrMat(2:end),80)-iErrM(2:end),'o','linewidth',2)
 hold on
-plot(k,iErrM(1)*ones(1,length(k)),'--')
+plot(0:(kMaxMax+1),iErrM(1)*ones(1,length(k)+2),'--','linewidth',2)
+xticks(1:kMaxMax)
+xlim([0,kMaxMax+1])
+grid on
+ylabel('$\textrm{Average error}$','interpreter','latex','fontsize',18)
+xlabel('$k_{Max}$','interpreter','latex','fontsize',18)
+legend('Fourier','Brouwer','fontsize',12)
 hold off
 
 figure(4)
 clf
-errorbar(k,raanErrM(2:end),raanStd(2:end),'o')
+errorbar(k,raanErrM(2:end),raanErrM(2:end)-prctile(raanErrMat(2:end),20),prctile(raanErrMat(2:end),80)-raanErrM(2:end),'o','linewidth',2)
 hold on
-plot(k,raanErrM(1)*ones(1,length(k)),'--')
+plot(0:(kMaxMax+1),raanErrM(1)*ones(1,length(k)+2),'--','linewidth',2)
+xticks(1:kMaxMax)
+xlim([0,kMaxMax+1])
+grid on
+ylabel('$\textrm{Average error}$','interpreter','latex','fontsize',18)
+xlabel('$k_{Max}$','interpreter','latex','fontsize',18)
+legend('Fourier','Brouwer','fontsize',12)
 hold off
 
 figure(5)
 clf
-errorbar(k,aopErrM(2:end),aopStd(2:end),'o')
+errorbar(k,aopErrM(2:end),aopErrM(2:end)-prctile(aopErrMat(2:end),20),prctile(aopErrMat(2:end),80)-aopErrM(2:end),'o','linewidth',2)
 hold on
-plot(k,aopErrM(1)*ones(1,length(k)),'--')
+plot(0:(kMaxMax+1),aopErrM(1)*ones(1,length(k)+2),'--','linewidth',2)
+xticks(1:kMaxMax)
+xlim([0,kMaxMax+1])
+grid on
+ylabel('$\textrm{Average error}$','interpreter','latex','fontsize',18)
+xlabel('$k_{Max}$','interpreter','latex','fontsize',18)
+legend('Fourier','Brouwer','fontsize',12)
 hold off
 
 figure(6)
 clf
-errorbar(k,MErrM(2:end),MStd(2:end),'o')
+errorbar(k,MErrM(2:end),MErrM(2:end)-prctile(MErrMat(2:end),20),prctile(MErrMat(2:end),80)-MErrM(2:end),'o','linewidth',2)
 hold on
-plot(k,MErrM(1)*ones(1,length(k)),'--')
+plot(0:(kMaxMax+1),MErrM(1)*ones(1,length(k)+2),'--','linewidth',2)
+xticks(1:kMaxMax)
+xlim([0,kMaxMax+1])
+grid on
+ylabel('$\textrm{Average error}$','interpreter','latex','fontsize',18)
+xlabel('$k_{Max}$','interpreter','latex','fontsize',18)
+legend('Fourier','Brouwer','fontsize',12)
 hold off
 
