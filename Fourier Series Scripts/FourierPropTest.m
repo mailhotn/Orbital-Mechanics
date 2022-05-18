@@ -1,13 +1,13 @@
 clear
-oe = [10000, 0.1, 63.0, 30, 70, 0];
+oe = [10000, 0.1, 63.25, 30, 70, 50];
 
 Sat = SingleSat(oe,earth());
 Prop = Propagator(Sat);
 T = 2*pi*sqrt(oe(1)^3/Sat.primary.mu);
-nOrb = 10;
+nOrb = 2;
 t = 0:60:nOrb*T;
-kLow = 6;
-kHigh = 10;
+kLow = 4;
+kHigh = 5;
 %% Conventional ECI
 [~,Xeci] = Prop.PropEciJ2(t);
 oeC = eci2oe(Xeci(:,1:3),Xeci(:,4:6));
@@ -75,58 +75,57 @@ intErrB = trapz(t.',errB,2)/t(end)
 intErr10 = trapz(t.',errFLow,2)/t(end)
 intErr15 = trapz(t.',errFHigh,2)/t(end)
 
-labelLow = ['F' num2str(kLow)];
-labelHigh = ['F' num2str(kHigh)];
+labelHigh = ['Fourier'];
 
 % 
-figure(11) % semimajor axis
-plot(t,errB(1,:),t,errFLow(1,:),t,errFHigh(1,:))
-legend('Brouwer',labelLow,labelHigh)
-ylabel('$\frac{\left|a_c-a_x\right|}{a\left(0\right)}$','fontsize',15,'interpreter','latex')
-xlabel('$Orbit$','interpreter','latex','fontsize',12)
-grid on
-xlim([0,nOrb])
-xticks(1:nOrb)
+% figure(11) % semimajor axis
+% plot(t,errB(1,:),t,errFHigh(1,:),'--','linewidth',2)
+% legend('Brouwer',labelHigh,'fontsize',18)
+% ylabel('$\frac{\left|a_c-a_x\right|}{a\left(0\right)}$','fontsize',18,'interpreter','latex')
+% xlabel('$Orbit$','interpreter','latex','fontsize',18)
+% grid on
+% xlim([0,nOrb])
+% xticks(1:nOrb)
 figure(12) % eccentricity
-plot(t,errB(2,:),t,errFLow(2,:),t,errFHigh(2,:))
-legend('Brouwer',labelLow,labelHigh)
-ylabel('$\frac{\left|e_c-e_x\right|}{e\left(0\right)}$','fontsize',15,'interpreter','latex')
-xlabel('$Orbit$','interpreter','latex','fontsize',12)
+plot(t,errFHigh(2,:),t,errB(2,:),'--','linewidth',2)
+legend(labelHigh,'Brouwer','fontsize',12)
+ylabel('$\frac{\left|e_c-e_x\right|}{e\left(0\right)}$','fontsize',18,'interpreter','latex')
+xlabel('$Orbit$','interpreter','latex','fontsize',18)
 grid on
 xlim([0,nOrb])
 xticks(1:nOrb)
-figure(13) % inclination
-plot(t,errB(3,:),t,errFLow(3,:),t,errFHigh(3,:))
-legend('Brouwer',labelLow,labelHigh)
-ylabel('$\left|i_c-i_x\right| \left[{rad}\right]$','fontsize',12,'interpreter','latex')
-xlabel('$Orbit$','interpreter','latex','fontsize',12)
-grid on
-xlim([0,nOrb])
-xticks(1:nOrb)
-figure(14) % raan
-plot(t,errB(4,:),t,errFLow(4,:),t,errFHigh(4,:))
-legend('Brouwer',labelLow,labelHigh)
-ylabel('$\left|\Omega_c-\Omega_x\right| \left[{rad}\right]$','fontsize',12,'interpreter','latex')
-xlabel('$Orbit$','interpreter','latex','fontsize',12)
-grid on
-xlim([0,nOrb])
-xticks(1:nOrb)
-figure(15) % aop
-plot(t,errB(5,:),t,errFLow(5,:),t,errFHigh(5,:))
-legend('Brouwer',labelLow,labelHigh)
-ylabel('$\left|\omega_c-\omega_x\right| \left[{rad}\right]$','fontsize',12,'interpreter','latex')
-xlabel('$Orbit$','interpreter','latex','fontsize',12)
-grid on
-xlim([0,nOrb])
-xticks(1:nOrb)
-figure(16) % mean anomaly
-plot(t(2:end),errB(6,2:end),t(2:end),errFLow(6,2:end),t(2:end),errFHigh(6,2:end))
-legend('Brouwer',labelLow,labelHigh)
-ylabel('$\left|M_c-M_x\right| \left[{rad}\right]$','fontsize',12,'interpreter','latex')
-xlabel('$Orbit$','interpreter','latex','fontsize',12)
-grid on
-xlim([0,nOrb])
-if (max(errFLow(6,:))>0.2) || (max(errB(6,:))>0.2)
-    ylim([0,0.2])
-end
-xticks(1:nOrb)
+% figure(13) % inclination
+% plot(t,errB(3,:),t,errFHigh(3,:),'--','linewidth',2)
+% legend('Brouwer',labelHigh)
+% ylabel('$\left|i_c-i_x\right| \left[{rad}\right]$','fontsize',18,'interpreter','latex')
+% xlabel('$Orbit$','interpreter','latex','fontsize',18)
+% grid on
+% xlim([0,nOrb])
+% xticks(1:nOrb)
+% figure(14) % raan
+% plot(t,errB(4,:),t,errFHigh(4,:),'--','linewidth',2)
+% legend('Brouwer',labelHigh)
+% ylabel('$\left|\Omega_c-\Omega_x\right| \left[{rad}\right]$','fontsize',18,'interpreter','latex')
+% xlabel('$Orbit$','interpreter','latex','fontsize',18)
+% grid on
+% xlim([0,nOrb])
+% xticks(1:nOrb)
+% figure(15) % aop
+% plot(t,errB(5,:),t,errFHigh(5,:),'--','linewidth',2)
+% legend('Brouwer',labelHigh)
+% ylabel('$\left|\omega_c-\omega_x\right| \left[{rad}\right]$','fontsize',18,'interpreter','latex')
+% xlabel('$Orbit$','interpreter','latex','fontsize',18)
+% grid on
+% xlim([0,nOrb])
+% xticks(1:nOrb)
+% figure(16) % mean anomaly
+% plot(t(2:end),errB(6,2:end),t(2:end),errFHigh(6,2:end),'--','linewidth',2)
+% legend('Brouwer',labelHigh)
+% ylabel('$\left|M_c-M_x\right| \left[{rad}\right]$','fontsize',18,'interpreter','latex')
+% xlabel('$Orbit$','interpreter','latex','fontsize',18)
+% grid on
+% xlim([0,nOrb])
+% if (max(errFLow(6,:))>0.2) || (max(errB(6,:))>0.2)
+%     ylim([0,0.2])
+% end
+% xticks(1:nOrb)

@@ -167,7 +167,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 trigMat = [sin(k*M(iTime))./k/n;-cos(k*M(iTime))./k/n];
                 trigsum1 = sum(lpeSpec(11:12,2:end).*trigMat,2);
                 trigsum2 = sum(trigsum1);
-                M2(iTime) = IC(6) + lpeSpec(11,1)*T(iTime) + trigsum2 - InitVal(6) + M(iTime);
+                M2(iTime) = lpeSpec(11,1)*T(iTime) + trigsum2 - InitVal(6) + M(iTime);
             end
             
             %
