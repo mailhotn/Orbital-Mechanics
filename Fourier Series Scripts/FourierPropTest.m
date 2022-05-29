@@ -91,7 +91,7 @@ labelHigh = ['Fourier'];
 % 
 figure(11) % semimajor axis
 plot(t,errFHigh(1,:),t,errB(1,:),'linewidth',2)
-legend(labelHigh,'Brouwer','fontsize',12)
+legend(labelHigh,'Brouwer','fontsize',12,'location','best')
 ylabel('$\frac{\left|a_c-a_x\right|}{a\left(0\right)}$','fontsize',18,'interpreter','latex')
 xlabel('$Orbit$','interpreter','latex','fontsize',18)
 grid on
@@ -99,7 +99,7 @@ xlim([0,nOrb])
 xticks(1:nOrb)
 figure(12) % eccentricity
 plot(t,errFHigh(2,:),t,errB(2,:),'linewidth',2)
-legend(labelHigh,'Brouwer','fontsize',12)
+legend(labelHigh,'Brouwer','fontsize',12,'location','best')
 ylabel('$\frac{\left|e_c-e_x\right|}{e\left(0\right)}$','fontsize',18,'interpreter','latex')
 xlabel('$Orbit$','interpreter','latex','fontsize',18)
 grid on
@@ -107,7 +107,7 @@ xlim([0,nOrb])
 xticks(1:nOrb)
 figure(13) % inclination
 plot(t,errFHigh(3,:),t,errB(3,:),'linewidth',2)
-legend(labelHigh,'Brouwer','fontsize',12)
+legend(labelHigh,'Brouwer','fontsize',12,'location','best')
 ylabel('$\left|i_c-i_x\right| \left[{rad}\right]$','fontsize',18,'interpreter','latex')
 xlabel('$Orbit$','interpreter','latex','fontsize',18)
 grid on
@@ -115,7 +115,7 @@ xlim([0,nOrb])
 xticks(1:nOrb)
 figure(14) % raan
 plot(t,errFHigh(4,:),t,errB(4,:),'linewidth',2)
-legend(labelHigh,'Brouwer','fontsize',12)
+legend(labelHigh,'Brouwer','fontsize',12,'location','best')
 ylabel('$\left|\Omega_c-\Omega_x\right| \left[{rad}\right]$','fontsize',18,'interpreter','latex')
 xlabel('$Orbit$','interpreter','latex','fontsize',18)
 grid on
@@ -123,7 +123,7 @@ xlim([0,nOrb])
 xticks(1:nOrb)
 figure(15) % aop
 plot(t,errFHigh(5,:),t,errB(5,:),'linewidth',2)
-legend(labelHigh,'Brouwer','fontsize',12)
+legend(labelHigh,'Brouwer','fontsize',12,'location','best')
 ylabel('$\left|\omega_c-\omega_x\right| \left[{rad}\right]$','fontsize',18,'interpreter','latex')
 xlabel('$Orbit$','interpreter','latex','fontsize',18)
 grid on
@@ -131,7 +131,7 @@ xlim([0,nOrb])
 xticks(1:nOrb)
 figure(16) % mean anomaly
 plot(t,errFHigh(6,:),t,errB(6,:),'linewidth',2)
-legend(labelHigh,'Brouwer','fontsize',12)
+legend(labelHigh,'Brouwer','fontsize',12,'location','best')
 ylabel('$\left|M_c-M_x\right| \left[{rad}\right]$','fontsize',18,'interpreter','latex')
 xlabel('$Orbit$','interpreter','latex','fontsize',18)
 grid on
