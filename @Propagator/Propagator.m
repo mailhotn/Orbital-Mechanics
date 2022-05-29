@@ -150,6 +150,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             % Continue with the rest
             n = sqrt(P.Con.primary.mu/a^3);
             [~,lpeSpec] = P.DynOeFourier([],IC,kMax);
+%             n = n + lpeSpec(11,1); % <-------------------  Work on this
             M = n*T+IC(6);
             k = 1:kMax;
             X = nan(6*P.Con.nSats,length(T));

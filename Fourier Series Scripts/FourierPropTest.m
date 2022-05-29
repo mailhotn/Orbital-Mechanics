@@ -75,7 +75,7 @@ t = t/T;
 %     ,t,oeF2(6,:),'--',t,oeF5(6,:),'--',t,oeFLow(6,:),'--',t,oeFHigh(6,:),'--','linewidth',1.5)
 % legend('ECI','Brouwer','F2','F5','F10','F15')
 
-%% Plot errors
+% Plot errors
 errB = abs(oeC-oeB);
 errFLow = abs(oeC-oeFLow);
 errFHigh = abs(oeC-oeFHigh);
