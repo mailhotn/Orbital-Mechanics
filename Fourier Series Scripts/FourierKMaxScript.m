@@ -59,14 +59,14 @@ for iSat = 1:nSats
     end
 end
 
-%% Plot
+%% Plot - Errorbar stuff
 k = 1:kMaxMax;
-aStd = std(aErrMat);
-eStd = std(eErrMat);
-iStd = std(iErrMat);
-raanStd = std(raanErrMat);
-aopStd = std(aopErrMat);
-MStd = std(MErrMat);
+% aStd = std(aErrMat);
+% eStd = std(eErrMat);
+% iStd = std(iErrMat);
+% raanStd = std(raanErrMat);
+% aopStd = std(aopErrMat);
+% MStd = std(MErrMat);
 
 
 
@@ -155,3 +155,89 @@ xlabel('$k_{Max}$','interpreter','latex','fontsize',18)
 legend('Fourier','Brouwer','fontsize',12)
 hold off
 
+%% Plot Relative
+
+aErrRel = aErrMat(:,2:end)-aErrMat(:,1);
+eErrRel = eErrMat(:,2:end)-eErrMat(:,1);
+iErrRel = iErrMat(:,2:end)-iErrMat(:,1);
+raanErrRel = raanErrMat(:,2:end)-raanErrMat(:,1);
+aopErrRel = aopErrMat(:,2:end)-aopErrMat(:,1);
+MErrRel = MErrMat(:,2:end)-MErrMat(:,1);
+
+f = figure(11);
+clf
+f.Position(3:4) = [500,250];
+errorbar(k,mean(aErrRel),mean(aErrRel)-prctile(aErrRel,10),prctile(aErrRel,90)-mean(aErrRel),'o','linewidth',2)
+hold on
+plot(0:(kMaxMax+1),zeros(1,length(k)+2),'--k','linewidth',1)
+xticks(1:kMaxMax)
+xlim([0,kMaxMax+1])
+grid on
+ylabel('$\frac{\overline{\delta a_F-\delta a_B}}{a\left(0\right)}$','interpreter','latex','fontsize',18)
+xlabel('$k_{Max}$','interpreter','latex','fontsize',18)
+hold off
+
+f = figure(12);
+clf
+f.Position(3:4) = [500,250];
+errorbar(k,mean(eErrRel),mean(eErrRel)-prctile(eErrRel,10),prctile(eErrRel,90)-mean(eErrRel),'o','linewidth',2)
+hold on
+plot(0:(kMaxMax+1),zeros(1,length(k)+2),'--k','linewidth',1)
+xticks(1:kMaxMax)
+xlim([0,kMaxMax+1])
+grid on
+ylabel('$\frac{\overline{\delta e_F-\delta e_B}}{e\left(0\right)}$','interpreter','latex','fontsize',18)
+xlabel('$k_{Max}$','interpreter','latex','fontsize',18)
+hold off
+
+f = figure(13);
+clf
+f.Position(3:4) = [500,250];
+errorbar(k,mean(iErrRel),mean(iErrRel)-prctile(iErrRel,10),prctile(iErrRel,90)-mean(iErrRel),'o','linewidth',2)
+hold on
+plot(0:(kMaxMax+1),zeros(1,length(k)+2),'--k','linewidth',1)
+xticks(1:kMaxMax)
+xlim([0,kMaxMax+1])
+grid on
+ylabel('$\overline{\delta i_F-\delta i_B} \left[rad\right]$','interpreter','latex','fontsize',18)
+xlabel('$k_{Max}$','interpreter','latex','fontsize',18)
+hold off
+
+f = figure(14);
+clf
+f.Position(3:4) = [500,250];
+errorbar(k,mean(raanErrRel),mean(raanErrRel)-prctile(raanErrRel,10),prctile(raanErrRel,90)-mean(raanErrRel),'o','linewidth',2)
+hold on
+plot(0:(kMaxMax+1),zeros(1,length(k)+2),'--k','linewidth',1)
+xticks(1:kMaxMax)
+xlim([0,kMaxMax+1])
+grid on
+ylabel('$\overline{\delta \Omega_F-\delta \Omega_B} \left[rad\right]$','interpreter','latex','fontsize',18)
+xlabel('$k_{Max}$','interpreter','latex','fontsize',18)
+hold off
+
+f = figure(15);
+clf
+f.Position(3:4) = [500,250];
+errorbar(k,mean(aopErrRel),mean(aopErrRel)-prctile(aopErrRel,10),prctile(aopErrRel,90)-mean(aopErrRel),'o','linewidth',2)
+hold on
+plot(0:(kMaxMax+1),zeros(1,length(k)+2),'--k','linewidth',1)
+xticks(1:kMaxMax)
+xlim([0,kMaxMax+1])
+grid on
+ylabel('$\overline{\delta \omega_F-\delta \omega_B} \left[rad\right]$','interpreter','latex','fontsize',18)
+xlabel('$k_{Max}$','interpreter','latex','fontsize',18)
+hold off
+
+f = figure(16);
+clf
+f.Position(3:4) = [500,250];
+errorbar(k,mean(MErrRel),mean(MErrRel)-prctile(MErrRel,10),prctile(MErrRel,90)-mean(MErrRel),'o','linewidth',2)
+hold on
+plot(0:(kMaxMax+1),zeros(1,length(k)+2),'--k','linewidth',1)
+xticks(1:kMaxMax)
+xlim([0,kMaxMax+1])
+grid on
+ylabel('$\overline{\delta M_F-\delta M_B} \left[rad\right]$','interpreter','latex','fontsize',18)
+xlabel('$k_{Max}$','interpreter','latex','fontsize',18)
+hold off
