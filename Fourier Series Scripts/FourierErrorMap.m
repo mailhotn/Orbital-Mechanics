@@ -4,16 +4,16 @@ kMax = 4;
 nOrb = 1;
 dT = 100; % sec
 % Region Params
-nInc = 10;
-nEcc = 10;
-nMonte = 10;
-incRange = linspace(1,90,nInc);
-eccRange = linspace(0.01,0.3,nEcc);
+nInc = 180;
+nEcc = 100;
+nMonte = 1000;
+incRange = linspace(0.4,90,nInc);
+eccRange = linspace(0.001,0.3,nEcc);
 maxSma = 15000;
 
 % Error Tensors
-errTenF = nan(nInc,nEcc,6);
-errTenB = nan(nInc,nEcc,6);
+errTenF = nan(nEcc,nInc,6);
+errTenB = nan(nEcc,nInc,6);
 
 %% Loops
 for iEcc = 1:nEcc
@@ -24,7 +24,6 @@ for iEcc = 1:nEcc
         % Average Error Vectors
         errVecB = zeros(6,1);
         errVecF = zeros(6,1);
-        
         parfor iTry = 1:nMonte
             % Get OE
             rNum = rand(4,1);
@@ -63,13 +62,14 @@ for iEcc = 1:nEcc
         errVecB = errVecB/nMonte;
         errVecF = errVecF/nMonte;
         % Assign errors
-        errTenB(iInc,iEcc,:) = errVecB;
-        errTenF(iInc,iEcc,:) = errVecF;
+        errTenB(iEcc,iInc,:) = errVecB;
+        errTenF(iEcc,iInc,:) = errVecF;
     end
 end
 
 %% Plot
 [incMesh, eccMesh] = meshgrid(incRange,eccRange);
+levelVec = 0.01*[-1:0.01:0,0:0.01,1];
 
 figure(1)
 contourf(incMesh,eccMesh,errTenF(:,:,1)-errTenB(:,:,1))
