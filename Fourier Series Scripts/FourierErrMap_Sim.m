@@ -6,11 +6,11 @@ kMax = 4;
 nOrb = 1;
 dT = 100; % sec
 % Region Params
-nInc = 180;
-nEcc = 110;
+nInc = 50;
+nEcc = 20;
 nMonte = 1000;
-incRange = linspace(0.4,90,nInc);
-eccRange = linspace(0.001,0.55,nEcc);
+incRange = linspace(60,70,nInc);
+eccRange = linspace(0.5,0.7,nEcc);
 maxSma = 15000;
 
 %% Initialize Error Tensors
@@ -44,21 +44,21 @@ for iEcc = 1:nEcc
             % Prop Numerical
             [~,oeC] = Prop.PropOeOsc(t);
             oeC = oeC.';
-            % Prop Brouwer
             try
+                % Prop Brouwer
                 [~,OeM] = Prop.PropOeMeanFast(t);
                 oeB = me2osc(OeM.');
+                errB = abs(oeC-oeB);
+                errB = [errB(1,:)/oe(1);errB(2,:)/oe(2);errB(3:end,:)*pi/180];
+                errVecB = errVecB + trapz(t.',errB,2)/t(end);
             catch ME
-                % Do nothing - error remains infinite
+                % Error remains infinite
+                errVecB = errVecB + inf(6,1);
             end
             % Prop Fourier
             [~,oeF] = Prop.PropOeFourier2(t,kMax);
             
-            % Errors
-            errB = abs(oeC-oeB);
-            errB = [errB(1,:)/oe(1);errB(2,:)/oe(2);errB(3:end,:)*pi/180];
-            errVecB = errVecB + trapz(t.',errB,2)/t(end);
-            
+            % Fourier Error          
             errF = abs(oeC-oeF);
             errF = [errF(1,:)/oe(1);errF(2,:)/oe(2);errF(3:end,:)*pi/180];
             errVecF = errVecF + trapz(t.',errF,2)/t(end);
@@ -87,4 +87,4 @@ MapData.errTenF = errTenF;
 MapData.errTenB = errTenB;
 
 c = clock;
-save([datafolder '\ErrMaps_' num2str(c(3)) '-' num2str(c(2)) '-' num2str(c(1)) '_' num2str(c(4)) '-' num2str(c(5)), '.mat'],'MapData');
+save([dataFolder '\ErrMaps_' num2str(c(3)) '-' num2str(c(2)) '-' num2str(c(1)) '_' num2str(c(4)) '-' num2str(c(5)), '.mat'],'MapData');
