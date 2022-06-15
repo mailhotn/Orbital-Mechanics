@@ -1,3 +1,4 @@
+clear
 %% Define Parameters
 dataFolder = 'C:\Users\User\Dropbox\Fourier Data\Error Mapping';
 primary = earth();
