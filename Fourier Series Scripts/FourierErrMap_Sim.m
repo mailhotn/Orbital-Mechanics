@@ -6,12 +6,12 @@ kMax = 4;
 nOrb = 1;
 dT = 100; % sec
 % Region Params
-nInc = 50;
-nEcc = 20;
+nInc = 720;
+nEcc = 200;
 nMonte = 1000;
-incRange = linspace(60,70,nInc);
-eccRange = linspace(0.5,0.7,nEcc);
-maxSma = 15000;
+incRange = linspace(0.1,179.9,nInc);
+eccRange = linspace(0.001,0.7,nEcc);
+maxSma = 25000;
 
 %% Initialize Error Tensors
 errTenF = inf(nEcc,nInc,6);
