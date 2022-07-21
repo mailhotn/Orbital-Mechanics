@@ -1,20 +1,28 @@
 clear
+%% Scale
 primary = earth();
 mu = primary.mu;
 Re = primary.Re;
 J2 = primary.J2;
+
+% mu = 1;
+
+%% Initial Conditions
 sma = 10000;
 ecc = 0.2;
 inc = 40;
 ran = 30;
 aop = 30;
-man = 1;
+man = 0;
 f = me2ta(man,ecc);
 nT = 1000;
 oeC = nan(6,nT);
 oeW = nan(6,nT);
+
+
+
 %% Coordinate Switch
-radQ = sma*(1-ecc^2)/(1+ecc*cosd(f));     % r
+radQ = sma*((1-ecc^2)/(1+ecc*cosd(f)));     % r
 aolQ = pi/180*(aop + f);                  % theta
 ranQ = pi/180*ran;                        % nu
 vraP = sqrt(mu/sma/(1-ecc^2))*ecc*sind(f);% R
@@ -25,14 +33,22 @@ amzP = amoP*cosd(inc);                    % N
 X = mu*J2*Re^2*(0.5-1.5*amzP^2/amoP^2);
 iS = 1:3;
 h = 0.5*vraP^2 + 0.5*amoP^2/radQ^2 - mu/radQ + ...
-    0.25*mu*J2*Re^2/radQ^3*(1-3*amzP^2/amoP^2);
+    0.25*mu*J2*Re^2/radQ^3*(1-3*amzP^2/amoP^2); % initial energy
 hUp = (amoP^6+9*mu*X*amoP^2+(amoP^4+6*mu*X)^(3/2))/(27*X^2);
 hLow = (amoP^6+9*mu*X*amoP^2-(amoP^4+6*mu*X)^(3/2))/(27*X^2);
 l = acos((27*h/X-9*mu*amoP^2/X^2-amoP^6/X^3)/(amoP^4/X^2+6*mu/X)^(3/2));
+l2 = acos((-27*h/X+9*mu*amoP^2/X^2+amoP^6/X^3)/(amoP^4/X^2+6*mu/X)^(3/2));
 sSol = -1/3*amoP^2/X + 2/3*sqrt(amoP^4/X^2 + 6*mu/X)*cos((l+2*pi*iS)/3);
+sSol2 = -1/3*amoP^2/X - 2/3*sqrt(amoP^4/X^2 + 6*mu/X)*cos((l2+2*pi*(iS-2))/3);
+sSol3 = roots([X,amoP^2,-2*mu,-2*h]);
+sSol = sort(sSol3);
 s1 = sSol(1);
 s2 = sSol(2);
 s3 = sSol(3);
+% Diagnostics - energy at apses
+h1 = 0.5*amoP^2*s1^2 - mu*s1 + 0.25*mu*J2*Re^2*s1^3*(1-3*amzP^2/amoP^2);
+h2 = 0.5*amoP^2*s2^2 - mu*s2 + 0.25*mu*J2*Re^2*s2^3*(1-3*amzP^2/amoP^2);
+h3 = 0.5*amoP^2*s3^2 - mu*s3 + 0.25*mu*J2*Re^2*s3^3*(1-3*amzP^2/amoP^2);
 if X < 0    
     k0 = (s2-s1)/(s3-s1);
     k1 = 1/k0;
@@ -139,3 +155,5 @@ plot(t,oeC(5,:))
 figure(6)
 plot(t,oeW(6,:))
 
+figure(7)
+plot(t,fVec)
