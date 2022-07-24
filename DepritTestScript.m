@@ -1,16 +1,24 @@
 clear
-%% Scale
+%% Scale & Tolerance
 primary = earth();
+% True Scale
 mu = primary.mu;
 Re = primary.Re;
 J2 = primary.J2;
-
+dScale = 1;
+tScale = 1;
+% Normalized
+% dScale = sqrt(primary.J2)*primary.Re;
+% tScale = sqrt(dScale^3/primary.mu);
 % mu = 1;
+% Re = primary.Re/dScale;
+% J2 = 1/Re^2;
 
+imagTol = 1e-8;
 %% Initial Conditions
-sma = 10000;
+sma = 10000/dScale;
 ecc = 0.2;
-inc = 40;
+inc = 60;
 ran = 30;
 aop = 30;
 man = 0;
@@ -18,7 +26,6 @@ f = me2ta(man,ecc);
 nT = 1000;
 oeC = nan(6,nT);
 oeW = nan(6,nT);
-
 
 
 %% Coordinate Switch
@@ -31,16 +38,18 @@ amzP = amoP*cosd(inc);                    % N
 
 %% Solution
 X = mu*J2*Re^2*(0.5-1.5*amzP^2/amoP^2);
-iS = 1:3;
+
 h = 0.5*vraP^2 + 0.5*amoP^2/radQ^2 - mu/radQ + ...
     0.25*mu*J2*Re^2/radQ^3*(1-3*amzP^2/amoP^2); % initial energy
-hUp = (amoP^6+9*mu*X*amoP^2+(amoP^4+6*mu*X)^(3/2))/(27*X^2);
-hLow = (amoP^6+9*mu*X*amoP^2-(amoP^4+6*mu*X)^(3/2))/(27*X^2);
-l = acos((27*h/X-9*mu*amoP^2/X^2-amoP^6/X^3)/(amoP^4/X^2+6*mu/X)^(3/2));
-l2 = acos((-27*h/X+9*mu*amoP^2/X^2+amoP^6/X^3)/(amoP^4/X^2+6*mu/X)^(3/2));
-sSol = -1/3*amoP^2/X + 2/3*sqrt(amoP^4/X^2 + 6*mu/X)*cos((l+2*pi*iS)/3);
-sSol2 = -1/3*amoP^2/X - 2/3*sqrt(amoP^4/X^2 + 6*mu/X)*cos((l2+2*pi*(iS-2))/3);
-sSol3 = roots([X,amoP^2,-2*mu,-2*h]);
+% hUp = (amoP^6+9*mu*X*amoP^2+(amoP^4+6*mu*X)^(3/2))/(27*X^2);
+% hLow = (amoP^6+9*mu*X*amoP^2-(amoP^4+6*mu*X)^(3/2))/(27*X^2);
+% iS = 1:3;
+% l = acos((27*h/X-9*mu*amoP^2/X^2-amoP^6/X^3)/(amoP^4/X^2+6*mu/X)^(3/2));
+% l2 = acos((-27*h/X+9*mu*amoP^2/X^2+amoP^6/X^3)/(amoP^4/X^2+6*mu/X)^(3/2));
+% sSol = -1/3*amoP^2/X + 2/3*sqrt(amoP^4/X^2 + 6*mu/X)*cos((l+2*pi*iS)/3);
+% sSol2 = -1/3*amoP^2/X - 2/3*sqrt(amoP^4/X^2 + 6*mu/X)*cos((l2+2*pi*(iS-2))/3);
+% Numerical root finding - most accurate
+sSol3 = roots([1,amoP^2/X,-2*mu/X,-2*h/X]);
 sSol = sort(sSol3);
 s1 = sSol(1);
 s2 = sSol(2);
@@ -56,6 +65,11 @@ if X < 0
     n1 = n0*k1;
     sV = linspace(1/radQ,s1,nT);
     z0 = (sV-s1)/(s2-s1);
+    if max(z0-1) < imagTol % remove small imaginary stuff
+        z0(z0>1)=1;
+    else
+        error('Apsis error too large!')
+    end
     z1 = z0*k0;
     phi = asin(sqrt(z0));
     
@@ -88,6 +102,11 @@ elseif X > 0
     n1 = n0*k1;
     sV = linspace(1/radQ,s2,nT);
     z0 = (s3-sV)/(s3-s2);
+    if max(z0-1) < imagTol % remove small imaginary stuff
+        z0(z0>1)=1;
+    else
+        error('Apsis error too large!')
+    end
     z1 = z0*k0;
     phi = asin(sqrt(z0));
     
@@ -123,6 +142,13 @@ oeW(3,:) = ranQ -1.5*mu*J2*Re^2*amzP/amoP^2*Iv;
 oeW(4,:) = sqrt(2*h + 2*mu.*sV - amoP^2.*sV.^2 - X.*sV.^3);
 oeW(5,:) = amoP;
 oeW(6,:) = amzP;
+hVec = 0.5*oeW(4,:).^2 + 0.5*oeW(5,:).^2.*sV.^2 - mu.*sV + ...
+    0.25*mu*J2*Re^2.*sV.^3.*(1-3*oeW(6,:).^2./oeW(5,:).^2);
+if max(abs(hVec-h)) < imagTol
+    oeW = real(oeW);
+else
+    error('Energy error too large!')
+end
 %% Convert to Conventional
 oeC(1,:) = -mu*oeW(1,:).^2/(oeW(1,:).^2.*oeW(4,:).^2+...
     oeW(5,:).^2-2*mu*oeW(1,:));
