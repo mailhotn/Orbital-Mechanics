@@ -2,7 +2,7 @@ clear
 %% Define Parameters
 dataFolder = 'C:\Users\User\Dropbox\Fourier Data\Error Mapping';
 primary = earth();
-kMax = 4;
+kMax = 3;
 nOrb = 1;
 dT = 100; % sec
 % Region Params
@@ -18,7 +18,7 @@ errTenF = inf(nEcc,nInc,6);
 errTenB = inf(nEcc,nInc,6);
 
 %% Loops
-for iEcc = 1:nEcc
+parfor iEcc = 1:nEcc
     ecc = eccRange(iEcc);
     minSma = (primary.Re+1)/(1-ecc); % Can change to not go through the atmosphere
     for iInc = 1:nInc
@@ -26,7 +26,7 @@ for iEcc = 1:nEcc
         % Average Error Vectors
         errVecB = zeros(6,1);
         errVecF = zeros(6,1);
-        parfor iTry = 1:nMonte
+        for iTry = 1:nMonte
             % Get OE
             rNum = rand(4,1);
             sma = minSma + rNum(1)*(maxSma-minSma);

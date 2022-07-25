@@ -14,22 +14,25 @@ tScale = 1;
 % Re = primary.Re/dScale;
 % J2 = 1/Re^2;
 
-imagTol = 1e-8;
+imagTol = 1e-12;
+nOrb = 3; % number of orbits
+nTArc = 200; % number of time-steps per half orbit
+nT = nTArc*nOrb*2; % number of time steps
 %% Initial Conditions
 sma = 10000/dScale;
 ecc = 0.2;
-inc = 60;
+inc = 40;
 ran = 30;
 aop = 30;
-man = 0;
+man = 10;
 f = me2ta(man,ecc);
-nT = 1000;
+
 oeC = nan(6,nT);
 oeW = nan(6,nT);
 
 
 %% Coordinate Switch
-radQ = sma*((1-ecc^2)/(1+ecc*cosd(f)));     % r
+radQ = sma*((1-ecc^2)/(1+ecc*cosd(f)));   % r
 aolQ = pi/180*(aop + f);                  % theta
 ranQ = pi/180*ran;                        % nu
 vraP = sqrt(mu/sma/(1-ecc^2))*ecc*sind(f);% R
@@ -63,7 +66,15 @@ if X < 0
     k1 = 1/k0;
     n0 = (s2-s1)/s1;
     n1 = n0*k1;
-    sV = linspace(1/radQ,s1,nT);
+    if f < 180 % Ascending IC
+        tS = pi*(s2-1/radQ)/(s2-s1)+linspace(0,2*pi*nOrb,nT);
+        sV = s1+(s2-s1)/2*(1-sawtooth(tS,0.5));
+    else % Descending IC
+        tS = pi*(1/radQ-s1)/(s2-s1)+linspace(0,2*pi*nOrb,nT);
+        sV = s1+(s2-s1)/2*(1+sawtooth(tS,0.5));  
+    end
+    signR = square(tS);
+    
     z0 = (sV-s1)/(s2-s1);
     if max(z0-1) < imagTol % remove small imaginary stuff
         z0(z0>1)=1;
@@ -100,7 +111,14 @@ elseif X > 0
     k1 = 1/k0;
     n0 = (s3-s2)/s3;
     n1 = n0*k1;
-    sV = linspace(1/radQ,s2,nT);
+    if f < 180 % Ascending IC
+        tS = pi*(s3-1/radQ)/(s3-s2)+linspace(0,2*pi*nOrb,nT);
+        sV = s2+(s3-s2)/2*(1-sawtooth(tS,0.5));
+    else % Descending IC
+        tS = pi*(1/radQ-s2)/(s3-s2)+linspace(0,2*pi*nOrb,nT);
+        sV = s2+(s3-s2)/2*(1+sawtooth(tS,0.5));
+    end
+    signR = square(tS);
     z0 = (s3-sV)/(s3-s2);
     if max(z0-1) < imagTol % remove small imaginary stuff
         z0(z0>1)=1;
@@ -115,12 +133,12 @@ elseif X > 0
         sqrt((s3-s1)/s1)*ellipticE(k0));
     Iv = 2*sqrt(s1/X)*(sqrt(s1/(s3-s1))*ellipticF(phi,k0)-...
         sqrt((s3-s1)/s1)*ellipticE(phi,k0));
-    v0 = -3/2*mu*J2*Re^2*amzP/amoP^2*Iv0;
+    v0 = -3/2*mu*J2*Re^2*amzP/amoP^2*Iv0; %v*
     
     % AOL solution
     Ith0 = 2/(sqrt(X)*sqrt(s3-s1))*ellipticK(k0);
     Ith = 2/(sqrt(X)*sqrt(s3-s1))*ellipticF(phi,k0);
-    th0 = amoP*Ith0 - v0*amzP/amoP;
+    th0 = amoP*Ith0 - v0*amzP/amoP; %th*
     
     % Time Solution
     T0 = 1/(sqrt(X)*s3^2*sqrt(s3-s2))*sqrt(k0)/(1-n0)*...
@@ -138,8 +156,11 @@ end
 % Finish solution
 oeW(1,:) = 1./sV; % radial position
 oeW(2,:) = aolQ + 1.5*mu*J2*Re^2*amzP^2/amoP^3*Iv + amoP*Ith;
-oeW(3,:) = ranQ -1.5*mu*J2*Re^2*amzP/amoP^2*Iv;
-oeW(4,:) = sqrt(2*h + 2*mu.*sV - amoP^2.*sV.^2 - X.*sV.^3);
+% unwrap RAAN
+dRan = -1.5*mu*J2*Re^2*amzP/amoP^2*Iv;
+oeW(3,:) = v0/(2*pi)*unwrap(2*pi/v0*dRan.*signR)+ranQ;
+% Fix Velocity sign
+oeW(4,:) = signR.*sqrt(2*h + 2*mu.*sV - amoP^2.*sV.^2 - X.*sV.^3);
 oeW(5,:) = amoP;
 oeW(6,:) = amzP;
 hVec = 0.5*oeW(4,:).^2 + 0.5*oeW(5,:).^2.*sV.^2 - mu.*sV + ...
@@ -164,22 +185,49 @@ oeC(6,:) = ta2me(fVec*180/pi,oeC(2,:));
 
 %% Plot
 figure(1)
-plot(t,oeW(1,:))
+plot(oeW(1,:))
 
 figure(2)
-plot(t,oeW(2,:))
+plot(oeW(2,:))
 
 figure(3)
-plot(t,oeW(3,:))
+plot(oeW(3,:))
 
 figure(4)
-plot(t,oeW(4,:))
+plot(oeW(4,:))
 
 figure(5)
-plot(t,oeC(5,:))
+plot(oeW(5,:))
 
 figure(6)
-plot(t,oeW(6,:))
+plot(oeW(6,:))
 
 figure(7)
-plot(t,fVec)
+plot(fVec)
+
+% %% Linearity test
+% oeI = [sma,ecc,inc,ran,aop,man];
+% Sat = SingleSat(oeI);
+% Prop = Propagator(Sat);
+% T = 2*pi*sqrt(sma^3/mu);
+% tVec = linspace(0,T*nOrb,nT);
+% 
+% [t,oe] = Prop.PropOeOsc(tVec);
+% 
+% fV = me2ta(oe(:,6),oe(:,2));
+% r = oe(:,1).*(1-oe(:,2).^2)./(1+oe(:,2).*cosd(fV));
+% s = 1./r;
+% 
+% figure(20)
+% plot(t,pi/180*oe(:,4))
+
+%% Dumb Shit
+
+tUW = T0/(2*pi)*unwrap(2*pi/T0*(t-t(1)))+t(1);
+plot(tUW)
+plot(unwrap(2*pi/T0*(t-t(1))));
+tUW = T0/(2*pi)*unwrap(2*pi/T0*(t-t(1)).*signR);
+plot(tUW)
+tUW = T0/(2*pi)*unwrap(2*pi/T0*(t-T0).*signR)+T0;
+plot(tUW)
+max(tUW)/T0
