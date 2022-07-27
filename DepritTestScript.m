@@ -20,11 +20,12 @@ nTArc = 200; % number of time-steps per half orbit
 nT = nTArc*nOrb*2; % number of time steps
 %% Initial Conditions
 sma = 10000/dScale;
-ecc = 0.2;
+ecc = 0.1;
 inc = 40;
+% inc = 54.73561031;%7245346
 ran = 30;
 aop = 30;
-man = 10;
+man = 0;
 f = me2ta(man,ecc);
 
 oeC = nan(6,nT);
@@ -142,7 +143,7 @@ elseif X > 0
     
     % Time Solution
     T0 = 1/(sqrt(X)*s3^2*sqrt(s3-s2))*sqrt(k0)/(1-n0)*...
-        (((3-2*n0)*k0-(2*k0-n0)*n0)/(k0-n0)*ellipticPi(n0,k0) - ...
+        (((3-2*n0)*k0-(2-n0)*n0)/(k0-n0)*ellipticPi(n0,k0) - ...
         n0/(k0-n0)*ellipticE(k0) - ellipticK(k0));
     It = 1/(sqrt(X)*s3^2*sqrt(s3-s2))*sqrt(k0)/(1-n0)*...
         (n0/2*n0/(k0-n0)*sqrt(1-k0*sin(phi).^2)./(1-n0*sin(phi).^2).*sin(2*phi)...
@@ -152,10 +153,13 @@ elseif X > 0
     
 else
 end
-
+% unwrap Time
+t = T0/(4*pi)*unwrap(4*pi/T0*(t).*signR)-t(1);
 % Finish solution
 oeW(1,:) = 1./sV; % radial position
-oeW(2,:) = aolQ + 1.5*mu*J2*Re^2*amzP^2/amoP^3*Iv + amoP*Ith;
+% unwrap AOL
+dAol = 1.5*mu*J2*Re^2*amzP^2/amoP^3*Iv + amoP*Ith;
+oeW(2,:) = th0/(2*pi)*unwrap(2*pi/th0*dAol.*signR)+aolQ;
 % unwrap RAAN
 dRan = -1.5*mu*J2*Re^2*amzP/amoP^2*Iv;
 oeW(3,:) = v0/(2*pi)*unwrap(2*pi/v0*dRan.*signR)+ranQ;
@@ -171,63 +175,88 @@ else
     error('Energy error too large!')
 end
 %% Convert to Conventional
-oeC(1,:) = -mu*oeW(1,:).^2/(oeW(1,:).^2.*oeW(4,:).^2+...
+oeC(1,:) = -dScale*mu*oeW(1,:).^2/(oeW(1,:).^2.*oeW(4,:).^2+...
     oeW(5,:).^2-2*mu*oeW(1,:));
-oeC(2,:) = sqrt(1-oeW(5,:).^2./(mu*oeC(1,:)));
+oeC(2,:) = sqrt(1-oeW(5,:).^2./(mu*oeC(1,:)/dScale));
 oeC(3,:) = acosd(oeW(6,:)./oeW(5,:));
 oeC(4,:) = 180/pi*oeW(3,:);
-fVec = atan2(oeW(5,:).*oeW(4,:)./(mu*oeC(2,:)),...
-    (oeW(5,:).^2-mu*oeW(1,:))./(mu*oeW(1,:).*oeC(2,:)));
+fVec = unwrap(atan2(oeW(5,:).*oeW(4,:)./(mu*oeC(2,:)),...
+    (oeW(5,:).^2-mu*oeW(1,:))./(mu*oeW(1,:).*oeC(2,:))));
 oeC(5,:) = 180/pi*(oeW(2,:) - fVec);
 oeC(6,:) = ta2me(fVec*180/pi,oeC(2,:));
+t = t*tScale;
 
+
+%% Numerical Integration
+oeI = [sma*dScale,ecc,inc,ran,aop,man];
+Sat = SingleSat(oeI);
+Prop = Propagator(Sat);
+T = 2*pi*sqrt(sma^3/mu)*tScale;
+
+[t2,oe] = Prop.PropOeOsc(t);
 
 
 %% Plot
 figure(1)
-plot(oeW(1,:))
+plot(t/T0/2,oeC(1,:))
+xlabel('Orbits')
+xlim([0,nOrb])
+hold on
+plot(t2/T,oe(:,1),'--')
+hold off
 
 figure(2)
-plot(oeW(2,:))
+plot(t/T0/2,oeC(2,:))
+xlabel('Orbits')
+xlim([0,nOrb])
+hold on
+plot(t2/T,oe(:,2),'--')
+hold off
+
+
 
 figure(3)
-plot(oeW(3,:))
+plot(t/T0/2,oeC(3,:))
+xlabel('Orbits')
+xlim([0,nOrb])
+hold on
+plot(t2/T,oe(:,3),'--')
+hold off
+
+
 
 figure(4)
-plot(oeW(4,:))
+plot(t/T0/2,oeC(4,:))
+xlabel('Orbits')
+xlim([0,nOrb])
+hold on
+plot(t2/T,oe(:,4),'--')
+hold off
+
 
 figure(5)
-plot(oeW(5,:))
+plot(t/T0/2,oeC(5,:))
+xlabel('Orbits')
+xlim([0,nOrb])
+hold on
+plot(t2/T,oe(:,5),'--')
+hold off
+
 
 figure(6)
-plot(oeW(6,:))
+plot(t/T0/2,oeC(6,:))
+xlabel('Orbits')
+xlim([0,nOrb])
+hold on
+plot(t2/T,oe(:,6),'--')
+hold off
+
 
 figure(7)
-plot(fVec)
+plot(t/T0/2,fVec)
+xlabel('Orbits')
+xlim([0,nOrb])
 
-% %% Linearity test
-% oeI = [sma,ecc,inc,ran,aop,man];
-% Sat = SingleSat(oeI);
-% Prop = Propagator(Sat);
-% T = 2*pi*sqrt(sma^3/mu);
-% tVec = linspace(0,T*nOrb,nT);
-% 
-% [t,oe] = Prop.PropOeOsc(tVec);
-% 
-% fV = me2ta(oe(:,6),oe(:,2));
-% r = oe(:,1).*(1-oe(:,2).^2)./(1+oe(:,2).*cosd(fV));
-% s = 1./r;
-% 
-% figure(20)
-% plot(t,pi/180*oe(:,4))
 
-%% Dumb Shit
 
-tUW = T0/(2*pi)*unwrap(2*pi/T0*(t-t(1)))+t(1);
-plot(tUW)
-plot(unwrap(2*pi/T0*(t-t(1))));
-tUW = T0/(2*pi)*unwrap(2*pi/T0*(t-t(1)).*signR);
-plot(tUW)
-tUW = T0/(2*pi)*unwrap(2*pi/T0*(t-T0).*signR)+T0;
-plot(tUW)
-max(tUW)/T0
+
