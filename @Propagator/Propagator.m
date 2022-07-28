@@ -115,8 +115,9 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             [Time, X] = ode45(@P.DynEciJ3,T,IC,opts);
         end
         
-        function [Time, X] = PropOeFourier(P,T,kMax)
+        function [Time, X] = PropOeFourierNum(P,T,kMax)
             % Propagate for time T using Fourier series of LPE
+            % Very stupid
             % Currently only works for one satellite
             opts = odeset('reltol',P.relTol,'abstol',P.absTol);
             IC = reshape(P.Con.InitialOeOsc,[6*P.Con.nSats,1]);
@@ -128,6 +129,11 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         end
         
         function [Time, X] = PropOeFourier2(P,T,kMax)
+            % Refactoring Bullshit
+            [Time, X] = PropOeFourier(P,T,kMax);
+        end
+        
+        function [Time, X] = PropOeFourier(P,T,kMax)
             % Propagate for time T using Fourier LPE
             % Assume constant coefficients, assume M is not affected by J2
             
@@ -150,7 +156,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             % Continue with the rest
             n = sqrt(P.Con.primary.mu/a^3);
             [~,lpeSpec] = P.DynOeFourier([],IC,kMax);
-%             n = n + lpeSpec(11,1); % <-------------------  Work on this
+            %             n = n + lpeSpec(11,1); % <-------------------  Work on this
             M = n*T+IC(6);
             k = 1:kMax;
             X = nan(6*P.Con.nSats,length(T));
@@ -179,13 +185,207 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                     sum(trigsum1(5:6)); sum(trigsum1(7:8)); sum(trigsum1(9:10));...
                     sum(trigsum1(11:12))];
                 X(:,iTime) = IC + lpeSpec(1:2:11,1)*T(iTime) + trigsum2 - InitVal;
-%                 X(6,iTime) = X(6,iTime) + M2(iTime); % without M Fix
+                %                 X(6,iTime) = X(6,iTime) + M2(iTime); % without M Fix
                 X(6,iTime) = M2(iTime); % M fix
             end
             X(3:end,:) = wrapTo360(X(3:end,:)*180/pi);
             Time = T;
         end
         
+        function [Time, X] = PropOeDeprit(P,nTime,nOrb)
+            % Propagate a number of orbits with Deprit method.
+            % Single Satellite only - could add more but probably not worth the time
+            % ****** Has to start at perigee!!! ******
+            mu = P.Con.primary.mu;
+            Re = P.Con.primary.Re;
+            J2 = P.Con.primary.J2;
+            
+            imagTol = 1e-12; % numerical tolerance for errors
+            % Initial Conditions
+            IC = P.Con.InitialOeOsc;
+            sma = IC(1);
+            ecc = IC(2);
+            inc = IC(3);
+            ran = IC(4);
+            aop = IC(5);
+            man = IC(6);
+            f = me2ta(man,ecc);
+            
+            oeC = nan(nTime,6);
+            oeW = nan(nTime,6);
+            
+            % Coordinate Switch
+            radQ = sma*((1-ecc^2)/(1+ecc*cosd(f)));   % r
+            aolQ = pi/180*(aop + f);                  % theta
+            ranQ = pi/180*ran;                        % nu
+            vraP = sqrt(mu/sma/(1-ecc^2))*ecc*sind(f);% R
+            amoP = sqrt((1-ecc^2)*sma*mu);            % Theta
+            amzP = amoP*cosd(inc);                    % N
+            % Solution
+            X = mu*J2*Re^2*(0.5-1.5*amzP^2/amoP^2);
+            
+            h = 0.5*vraP^2 + 0.5*amoP^2/radQ^2 - mu/radQ + ...
+                0.25*mu*J2*Re^2/radQ^3*(1-3*amzP^2/amoP^2);
+            % Numerical root finding - most accurate
+            p = [1,amoP^2/X,-2*mu/X,-2*h/X];
+            A = diag(ones(2,1),-1);
+            A(1,:) = -p(2:4)./p(1);
+            
+            if cond(A) < 1/imagTol % Check cond number of companion matrix
+                % Well conditioned, i is not too close to critical - numerical errors
+                % will be reasonable
+                sSol3 = roots(p);
+                sSol = sort(sSol3);
+                s1 = sSol(1);
+                s2 = sSol(2);
+                s3 = sSol(3);
+                if X < 0
+                    k0 = (s2-s1)/(s3-s1);
+                    n0 = (s2-s1)/s1;
+                    if f < 180 % Ascending IC
+                        tS = pi*(s2-1/radQ)/(s2-s1)+linspace(0,2*pi*nOrb,nTime).';
+                        sVec = s1+(s2-s1)/2*(1-sawtooth(tS,0.5));
+                    else % Descending IC
+                        tS = pi*(1/radQ-s1)/(s2-s1)+linspace(0,2*pi*nOrb,nTime).';
+                        sVec = s1+(s2-s1)/2*(1+sawtooth(tS,0.5));
+                    end
+                    signR = square(tS);
+                    
+                    z0 = (sVec-s1)/(s2-s1);
+                    if max(z0-1) < imagTol % remove small imaginary stuff
+                        z0(z0>1)=1;
+                    else
+                        error('Apsis error too large!')
+                    end
+                    phi = asin(sqrt(z0));
+                    
+                    % RAAN solution
+                    Iv0 = 2*sqrt(s3/-X)*(sqrt(s3/(s3-s1))*ellipticK(k0)-...
+                        sqrt((s3-s1)/s3)*ellipticE(k0));
+                    Iv = Iv0 - 2*sqrt(s3/-X)*(sqrt(s3/(s3-s1))*ellipticF(phi,k0)-...
+                        sqrt((s3-s1)/s3)*ellipticE(phi,k0));
+                    v0 = -3/2*mu*J2*Re^2*amzP/amoP^2*Iv0;
+                    
+                    % AOL solution
+                    Ith0 = 2/(sqrt(-X)*sqrt(s3-s1))*ellipticK(k0);
+                    Ith = Ith0 - 2/(sqrt(-X)*sqrt(s3-s1))*ellipticF(phi,k0);
+                    th0 = amoP*Ith0 - v0*amzP/amoP;
+                    
+                    % Time Solution
+                    T0 = 1/(sqrt(-X)*s1^2*sqrt(s2-s1))*sqrt(k0)/(1+n0)*...
+                        (((3+2*n0)*k0+(2+n0)*n0)/(k0+n0)*ellipticPi(-n0,k0) + ...
+                        n0/(k0+n0)*ellipticE(k0) - ellipticK(k0));
+                    It = T0 - 1/(sqrt(-X)*s1^2*sqrt(s2-s1))*sqrt(k0)/(1+n0)*...
+                        (n0/2*n0/(k0+n0)*sqrt(1-k0*sin(phi).^2)./(1+n0*sin(phi).^2).*sin(2*phi)...
+                        +((3+2*n0)*k0+(2+n0)*n0)/(k0+n0)*ellipticPi(-n0,phi,k0) ...
+                        + n0/(k0+n0)*ellipticE(phi,k0) -ellipticF(phi,k0));
+                    t = It;
+                    
+                elseif X > 0
+                    k0 = 1-(s2-s1)/(s3-s1);
+                    n0 = (s3-s2)/s3;
+                    if f < 180 % Ascending IC
+                        tS = pi*(s3-1/radQ)/(s3-s2)+linspace(0,2*pi*nOrb,nTime).';
+                        sVec = s2+(s3-s2)/2*(1-sawtooth(tS,0.5));
+                    else % Descending IC
+                        tS = pi*(1/radQ-s2)/(s3-s2)+linspace(0,2*pi*nOrb,nTime).';
+                        sVec = s2+(s3-s2)/2*(1+sawtooth(tS,0.5));
+                    end
+                    signR = square(tS);
+                    z0 = (s3-sVec)/(s3-s2);
+                    if max(z0-1) < imagTol % remove small imaginary stuff
+                        z0(z0>1)=1;
+                    else
+                        error('Apsis error too large!')
+                    end
+                    phi = asin(sqrt(z0));
+                    
+                    % RAAN solution
+                    Iv0 = 2*sqrt(s1/X)*(sqrt(s1/(s3-s1))*ellipticK(k0)-...
+                        sqrt((s3-s1)/s1)*ellipticE(k0));
+                    Iv = 2*sqrt(s1/X)*(sqrt(s1/(s3-s1))*ellipticF(phi,k0)-...
+                        sqrt((s3-s1)/s1)*ellipticE(phi,k0));
+                    v0 = -3/2*mu*J2*Re^2*amzP/amoP^2*Iv0; %v*
+                    
+                    % AOL solution
+                    Ith0 = 2/(sqrt(X)*sqrt(s3-s1))*ellipticK(k0);
+                    Ith = 2/(sqrt(X)*sqrt(s3-s1))*ellipticF(phi,k0);
+                    th0 = amoP*Ith0 - v0*amzP/amoP; %th*
+                    
+                    % Time Solution
+                    T0 = 1/(sqrt(X)*s3^2*sqrt(s3-s2))*sqrt(k0)/(1-n0)*...
+                        (((3-2*n0)*k0-(2-n0)*n0)/(k0-n0)*ellipticPi(n0,k0) - ...
+                        n0/(k0-n0)*ellipticE(k0) - ellipticK(k0));
+                    It = 1/(sqrt(X)*s3^2*sqrt(s3-s2))*sqrt(k0)/(1-n0)*...
+                        (n0/2*n0/(k0-n0)*sqrt(1-k0*sin(phi).^2)./(1-n0*sin(phi).^2).*sin(2*phi)...
+                        +(3*k0-2*n0-(2*k0-n0)*n0)/(k0-n0)*ellipticPi(n0,phi,k0) ...
+                        - n0/(k0-n0)*ellipticE(phi,k0) -ellipticF(phi,k0));
+                    t = It;
+                end
+                
+                % unwrap Time - T0 is half period
+                t = T0/(4*pi)*unwrap(4*pi/T0*(t).*signR);
+                t = t-t(1);
+                % Finish solution
+                rVec = 1./sVec; % radial position
+                % Fix Velocity sign
+                RVec = signR.*sqrt(2*h + 2*mu.*sVec - amoP^2.*sVec.^2 - X.*sVec.^3);
+                hVec = 0.5*RVec.^2 + 0.5*amoP.^2.*sVec.^2 - mu.*sVec + ...
+                    0.25*mu*J2*Re^2.*sVec.^3.*(1-3*amzP.^2./amoP.^2);
+                if max(abs(hVec-h)) < imagTol
+                    RVec = real(RVec);
+                else
+                    error('Energy error too large!')
+                end
+                fVec = unwrap(atan2(amoP.*RVec./(mu*ecc),...
+                    (amoP.^2-mu*rVec)./(mu*rVec.*ecc)));
+            else
+                % Companion matrix is ill-conditioned, i is near critical,
+                % and numerical errors would be large.
+                % Keplerian Orbit
+                T0 = 2*pi*sqrt(sma^3/mu)/2;
+                t = linspace(0,T0*2*nOrb,nTime);
+                manVec = man + 180/pi*sqrt(mu/sma^3)*t; % deg
+                fVec = unwrap(pi/180*me2ta(manVec,ecc)).'; % rad
+                % RAAN solution
+                Iv = mu/amoP^3*(fVec+ecc*sin(fVec));
+                v0 = -1.5*J2*mu^2*Re^2*amzP/amoP^5*pi;
+                % AOL solution
+                Ith = fVec/amoP;
+                th0 = pi*(1+1.5*J2*mu^2*Re^2*amzP^2/amoP^6);
+                % Other stuff
+                rVec = sma*(1-ecc^2)./(1+ecc*cos(fVec));
+                RVec = sqrt(mu/sma/(1-ecc^2))*ecc*sin(fVec);
+                signR = 1;
+                
+            end
+            % Finish Solution
+            oeW(:,1) = rVec;
+            % unwrap AOL
+            dAol = 1.5*mu*J2*Re^2*amzP^2/amoP^3*Iv + amoP*Ith;
+            oeW(:,2) = th0/(2*pi)*unwrap(2*pi/th0*dAol.*signR)+aolQ;
+            % unwrap RAAN
+            dRan = -1.5*mu*J2*Re^2*amzP/amoP^2*Iv;
+            oeW(:,3) = v0/(2*pi)*unwrap(2*pi/v0*dRan.*signR)+ranQ;
+            oeW(:,4) = RVec;
+            oeW(:,5) = amoP;
+            oeW(:,6) = amzP;
+            
+            
+            % Convert to Conventional
+            oeC(:,1) = -mu*oeW(:,1).^2./(oeW(:,1).^2.*oeW(:,4).^2+...
+                oeW(:,5).^2-2*mu*oeW(:,1));
+            oeC(:,2) = sqrt(1-oeW(:,5).^2./(mu*oeC(:,1)));
+            oeC(:,3) = acosd(oeW(:,6)./oeW(:,5));
+            oeC(:,4) = 180/pi*oeW(:,3);
+            oeC(:,5) = 180/pi*(oeW(:,2) - fVec);
+            oeC(:,6) = ta2me(fVec*180/pi,oeC(:,2));
+            
+            % Output
+            Time = t;
+            X = oeC;
+            
+        end
     end
     
     methods(Access = protected) % Equations of Motion
@@ -662,12 +862,12 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             dX(6) = n -2/n/a*dJ2da -eta^2/n/a^2/e*dJ2de;
             
             % Fix a,n - Not clear if helpful
-%             f = me2ta(M,e);
-%             a_r = (1+e.*cos(f))./eta.^2;
-%             g2 = -P.Con.primary.J2/2*(P.Con.primary.Re/a)^2;
-%             a = a + a*g2*((3*cos(i)^2-1).*(a_r^3 - 1/eta^3) ...
-%                 + 3*(1-cos(i)^2)*a_r^3*cos(2*aop + 2*f));
-%             n = sqrt(P.Con.primary.mu/a^3);
+            %             f = me2ta(M,e);
+            %             a_r = (1+e.*cos(f))./eta.^2;
+            %             g2 = -P.Con.primary.J2/2*(P.Con.primary.Re/a)^2;
+            %             a = a + a*g2*((3*cos(i)^2-1).*(a_r^3 - 1/eta^3) ...
+            %                 + 3*(1-cos(i)^2)*a_r^3*cos(2*aop + 2*f));
+            %             n = sqrt(P.Con.primary.mu/a^3);
             
             lpeSpec = nan(12,kMax+1);
             
