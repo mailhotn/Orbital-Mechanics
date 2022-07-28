@@ -192,7 +192,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             Time = T;
         end
         
-        function [Time, X] = PropOeDeprit(P,nTime,nOrb)
+        function [Time, X, hVec] = PropOeDeprit(P,nTime,nOrb)
             % Propagate a number of orbits with Deprit method.
             % Single Satellite only - could add more but probably not worth the time
             % ****** Has to start at perigee!!! ******
@@ -357,7 +357,9 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 rVec = sma*(1-ecc^2)./(1+ecc*cos(fVec));
                 RVec = sqrt(mu/sma/(1-ecc^2))*ecc*sin(fVec);
                 signR = 1;
-                
+                vVec = sqrt(mu/sma/(1-ecc^2))*sqrt(1+e^2+2*e*cos(fVec));
+                hVec = 0.5*vVec.^2 - mu./rVec +...
+                    0.25*mu*J2*Re^2./rVec.^3*(1-3*amzP^2/amoP^3); % should be 0
             end
             % Finish Solution
             oeW(:,1) = rVec;
