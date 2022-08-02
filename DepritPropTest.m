@@ -3,11 +3,11 @@ clear
 nTime = 300;
 nOrb = 1;
 nErr = 0;
-nTest = 100000;
+nTest = 10000;
 maxSma = 25000;
 
 hErr = inf(nTest,1);
-
+oeErr = [];
 %% Physical Parameters
 primary = earth();
 mu = primary.mu;
@@ -48,7 +48,14 @@ for iTest = 1:nTest
         hErr(iTest) = max(abs(hVec-h));
     catch 
         nErr = nErr + 1;
+        oeErr = [oeErr;IC];
     end
     
 end
 toc
+
+%% Test Errors
+iErr = 1;
+Sat = SingleSat(oeErr(iErr,:));
+Prop = Propagator(Sat);
+[~,oe,hVec] = Prop.PropOeDeprit(nTime,nOrb);

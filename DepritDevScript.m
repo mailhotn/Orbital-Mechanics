@@ -26,13 +26,16 @@ inc = 60;
 ran = 30;
 aop = 30;
 man = 0;
-f = me2ta(man,ecc);
 
 oeC = nan(nTime,6);
 oeW = nan(nTime,6);
 
-
+%% Bad IC
+open('DepritErrIC.mat');
+iErr = 1;
+sma = oeErr(
 %% Coordinate Switch
+f = me2ta(man,ecc);
 radQ = sma*((1-ecc^2)/(1+ecc*cosd(f)));   % r
 aolQ = pi/180*(aop + f);                  % theta
 ranQ = pi/180*ran;                        % nu
