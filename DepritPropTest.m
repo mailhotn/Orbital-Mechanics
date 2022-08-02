@@ -52,10 +52,14 @@ for iTest = 1:nTest
     end
     
 end
-toc
+eTime = toc;
+dbPath = 'C:\Users\User\Dropbox'; % ASRI
+% dbPath = 'D:\Dropbox'; % Laptop
+reportIFTTT(dbPath,eTime);
+
 
 %% Test Errors
-iErr = 1;
-Sat = SingleSat(oeErr(iErr,:));
-Prop = Propagator(Sat);
-[~,oe,hVec] = Prop.PropOeDeprit(nTime,nOrb);
+% iErr = 1;
+% Sat = SingleSat(oeErr(iErr,:));
+% Prop = Propagator(Sat);
+% [~,oe,hVec] = Prop.PropOeDeprit(nTime,nOrb);
