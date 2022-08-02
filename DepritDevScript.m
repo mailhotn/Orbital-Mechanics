@@ -15,8 +15,8 @@ tScale = 1;
 % J2 = 1/Re^2;
 
 imagTol = 1e-12;
-nOrb = 3; % number of orbits
-nTArc = 200; % number of time-steps per half orbit
+nOrb = 1; % number of orbits
+nTArc = 150; % number of time-steps per half orbit
 nTime = nTArc*nOrb*2; % number of time steps
 %% Initial Conditions
 sma = 10000/dScale;
@@ -31,9 +31,15 @@ oeC = nan(nTime,6);
 oeW = nan(nTime,6);
 
 %% Bad IC
-open('DepritErrIC.mat');
-iErr = 1;
-sma = oeErr(
+dataStruct = open('DepritErrorIC.mat');
+oeErr = dataStruct.oeErr;
+iErr = 5;
+sma = oeErr(iErr,1);
+ecc = oeErr(iErr,2);
+inc = oeErr(iErr,3);
+ran = oeErr(iErr,4);
+aop = oeErr(iErr,5);
+man = oeErr(iErr,6);
 %% Coordinate Switch
 f = me2ta(man,ecc);
 radQ = sma*((1-ecc^2)/(1+ecc*cosd(f)));   % r
@@ -88,8 +94,9 @@ if cond(A) < 1/imagTol % Check cond number of companion matrix
         signR = square(tS);
         
         z0 = (sVec-s1)/(s2-s1);
-        if max(z0-1) < imagTol % remove small imaginary stuff
-            z0(z0>1)=1;
+        if max(z0-1) < imagTol && min(z0) > -imagTol% remove small imaginary stuff
+            z0(z0>1) = 1;
+            z0(z0<0) = 0;
         else
             error('Apsis error too large!')
         end
@@ -132,8 +139,9 @@ if cond(A) < 1/imagTol % Check cond number of companion matrix
         end
         signR = square(tS);
         z0 = (s3-sVec)/(s3-s2);
-        if max(z0-1) < imagTol % remove small imaginary stuff
-            z0(z0>1)=1;
+        if max(z0-1) < imagTol && min(z0) > -imagTol% remove small imaginary stuff
+            z0(z0>1) = 1;
+            z0(z0<0) = 0;
         else
             error('Apsis error too large!')
         end

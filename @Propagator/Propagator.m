@@ -252,8 +252,9 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                     signR = square(tS);
                     
                     z0 = (sVec-s1)/(s2-s1);
-                    if max(z0-1) < imagTol % remove small imaginary stuff
-                        z0(z0>1)=1;
+                    if max(z0-1) < imagTol && min(z0) > -imagTol% remove small imaginary stuff
+                        z0(z0>1) = 1;
+                        z0(z0<0) = 0;
                     else
                         error('Apsis error too large!')
                     end
@@ -293,8 +294,9 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                     end
                     signR = square(tS);
                     z0 = (s3-sVec)/(s3-s2);
-                    if max(z0-1) < imagTol % remove small imaginary stuff
-                        z0(z0>1)=1;
+                    if max(z0-1) < imagTol && min(z0) > -imagTol% remove small imaginary stuff
+                        z0(z0>1) = 1;
+                        z0(z0<0) = 0;
                     else
                         error('Apsis error too large!')
                     end
