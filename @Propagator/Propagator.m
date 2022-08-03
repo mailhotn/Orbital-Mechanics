@@ -359,7 +359,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 rVec = sma*(1-ecc^2)./(1+ecc*cos(fVec));
                 RVec = sqrt(mu/sma/(1-ecc^2))*ecc*sin(fVec);
                 signR = 1;
-                vVec = sqrt(mu/sma/(1-ecc^2))*sqrt(1+e^2+2*e*cos(fVec));
+                vVec = sqrt(mu/sma/(1-ecc^2))*sqrt(1+ecc^2+2*ecc*cos(fVec));
                 hVec = 0.5*vVec.^2 - mu./rVec +...
                     0.25*mu*J2*Re^2./rVec.^3*(1-3*amzP^2/amoP^3); % should be 0
             end

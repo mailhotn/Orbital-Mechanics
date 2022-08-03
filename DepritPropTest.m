@@ -3,7 +3,7 @@ clear
 nTime = 300;
 nOrb = 1;
 nErr = 0;
-nTest = 10000;
+nTest = 100000;
 maxSma = 25000;
 
 hErr = inf(nTest,1);
@@ -18,10 +18,10 @@ tScale = 1;
 
 %% Test
 tic
-for iTest = 1:nTest
+parfor iTest = 1:nTest
     r = rand(5,1);
     ecc = r(2)*0.7+0.001;
-    minSma = (primary.Re+100)/(1-ecc);
+    minSma = (Re+100)/(1-ecc);
     sma = minSma + r(1)*(maxSma-minSma);
     inc = r(3)*180;
     ran = r(4)*360;
@@ -59,7 +59,7 @@ reportIFTTT(dbPath,eTime);
 
 
 %% Test Errors
-% iErr = 1;
-% Sat = SingleSat(oeErr(iErr,:));
-% Prop = Propagator(Sat);
-% [~,oe,hVec] = Prop.PropOeDeprit(nTime,nOrb);
+iErr = 1;
+Sat = SingleSat(oeErr(iErr,:));
+Prop = Propagator(Sat);
+[~,oe,hVec] = Prop.PropOeDeprit(nTime,nOrb);

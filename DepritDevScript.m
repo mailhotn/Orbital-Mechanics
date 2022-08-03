@@ -33,7 +33,7 @@ oeW = nan(nTime,6);
 %% Bad IC
 dataStruct = open('DepritErrorIC.mat');
 oeErr = dataStruct.oeErr;
-iErr = 5;
+iErr = 1;
 sma = oeErr(iErr,1);
 ecc = oeErr(iErr,2);
 inc = oeErr(iErr,3);
@@ -207,7 +207,10 @@ else
     sVec = 1./rVec;
     RVec = sqrt(mu/sma/(1-ecc^2))*ecc*sin(fVec);
     signR = 1;
+    vVec = sqrt(mu/sma/(1-ecc^2))*sqrt(1+ecc^2+2*ecc*cos(fVec));
     
+    hVec = 0.5*vVec.^2 - mu./rVec +...
+        0.25*mu*J2*Re^2./rVec.^3*(1-3*amzP^2/amoP^3); % should be 0
 end
 % Finish Solution
 oeW(:,1) = rVec;
