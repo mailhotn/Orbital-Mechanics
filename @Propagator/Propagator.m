@@ -189,6 +189,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 X(6,iTime) = M2(iTime); % M fix
             end
             X(3:end,:) = wrapTo360(X(3:end,:)*180/pi);
+            X = X.';
             Time = T;
         end
         
@@ -328,6 +329,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 % unwrap Time - T0 is half period
                 t = T0/(4*pi)*unwrap(4*pi/T0*(t).*signR);
                 t = t-t(1);
+                t = t.';
                 % Finish solution
                 rVec = 1./sVec; % radial position
                 % Fix Velocity sign
@@ -370,7 +372,11 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             oeW(:,2) = th0/(2*pi)*unwrap(2*pi/th0*dAol.*signR)+aolQ;
             % unwrap RAAN
             dRan = -1.5*mu*J2*Re^2*amzP/amoP^2*Iv;
-            oeW(:,3) = v0/(2*pi)*unwrap(2*pi/v0*dRan.*signR)+ranQ;
+            if v0 ~= 0 % Check for singularity in unwrapping
+                oeW(:,3) = v0/(2*pi)*unwrap(2*pi/v0*dRan.*signR)+ranQ;
+            else % Polar orbit, RAAN is constant
+                oeW(:,3) = ranQ;
+            end
             oeW(:,4) = RVec;
             oeW(:,5) = amoP;
             oeW(:,6) = amzP;
@@ -381,9 +387,9 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 oeW(:,5).^2-2*mu*oeW(:,1));
             oeC(:,2) = sqrt(1-oeW(:,5).^2./(mu*oeC(:,1)));
             oeC(:,3) = acosd(oeW(:,6)./oeW(:,5));
-            oeC(:,4) = 180/pi*oeW(:,3);
-            oeC(:,5) = 180/pi*(oeW(:,2) - fVec);
-            oeC(:,6) = ta2me(fVec*180/pi,oeC(:,2));
+            oeC(:,4) = wrapTo360(180/pi*oeW(:,3));
+            oeC(:,5) = wrapTo360(180/pi*(oeW(:,2) - fVec));
+            oeC(:,6) = wrapTo360(ta2me(fVec*180/pi,oeC(:,2)));
             
             % Output
             Time = t;

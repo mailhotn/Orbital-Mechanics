@@ -59,7 +59,7 @@ reportIFTTT(dbPath,eTime);
 
 
 %% Test Errors
-iErr = 1;
-Sat = SingleSat(oeErr(iErr,:));
-Prop = Propagator(Sat);
-[~,oe,hVec] = Prop.PropOeDeprit(nTime,nOrb);
+% iErr = 1;
+% Sat = SingleSat(oeErr(iErr,:));
+% Prop = Propagator(Sat);
+% [~,oe,hVec] = Prop.PropOeDeprit(nTime,nOrb);
