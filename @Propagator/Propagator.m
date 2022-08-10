@@ -711,7 +711,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 Jk = besselj(k,k*e);
                 dJkde = 0.5*(besselj(k-1,k*e) - besselj(k+1,k*e));
                 Jn = besselj(n,-k*e);
-                dJnde = 0.5*(besselj(n-1,-k*e) - besselj(n+1,-k*e));
+                dJnde = 0.5*(-besselj(1-n,-k*e) - besselj(n+1,-k*e)); % uses identity only correct for n = 0
                 
                 Akda = C1xA1*Jk +...
                     Jn*C.'*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5];

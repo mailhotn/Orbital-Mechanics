@@ -1,6 +1,7 @@
 clear
 %% Define Parameters
 dataFolder = 'C:\Users\User\Dropbox\Fourier Data\Error Mapping';
+dbPath = 'C:\Users\User\Dropbox'; % ASRI
 primary = earth();
 kMax = 4;
 nOrb = 1;
@@ -8,11 +9,11 @@ dT = 100; % sec
 depritFlag = 1;
 nT = 80;
 % Region Params
-nInc = 360;
-nEcc = 200;
-nMonte = 1000;
+nInc = 180;
+nEcc = 25;
+nMonte = 200; % 200 trials is about 1 minute
 incRange = linspace(0.1,90,nInc);
-eccRange = linspace(0.001,0.7,nEcc);
+eccRange = linspace(0.001,0.5,nEcc);
 maxSma = 25000;
 
 %% Initialize Error Tensors
@@ -20,9 +21,13 @@ errTenF = inf(nEcc,nInc,6);
 errTenB = inf(nEcc,nInc,6);
 errTenD = inf(nEcc,nInc,6);
 
+bTime = 0;
+cTime = 0;
+fTime = 0;
+dTime = 0;
 %% Loops
 tic
-parfor iEcc = 1:nEcc
+for iEcc = 1:nEcc
     ecc = eccRange(iEcc);
     minSma = (primary.Re+100)/(1-ecc); % Can change to not go through the atmosphere
     for iInc = 1:nInc
@@ -48,8 +53,15 @@ parfor iEcc = 1:nEcc
             T = 2*pi*sqrt(oe(1)^3/Sat.primary.mu);
             if depritFlag
                 try
+                    tic
                     [t,oeD] = Prop.PropOeDeprit(nT,nOrb);
+                    
+                    testT = toc;
+                    dTime = dTime + testT;
                     oeD = oeD.';
+                    if any(diff(t)<0)
+                        errorIFTTT(dbPath,'non-monotonic time!');
+                    end
                 catch
                     t = linspace(0,nOrb*T,nT);
                     oeD = nan(6,80);
@@ -59,12 +71,19 @@ parfor iEcc = 1:nEcc
                 oeD = nan(6,80);
             end
             % Prop Numerical
+            tic
             [~,oeC] = Prop.PropOeOsc(t);
+            testT = toc;
+            cTime = cTime + testT;
             oeC = oeC.';
+            
             try
                 % Prop Brouwer
+                tic
                 [~,OeM] = Prop.PropOeMeanFast(t);
                 oeB = me2osc(OeM.');
+                testT = toc;
+                bTime = bTime + testT;
                 errB = abs(oeC-oeB);
                 errB = [errB(1,:)/oe(1);errB(2,:)/oe(2);errB(3:end,:)*pi/180];
                 errVecB = errVecB + trapz(t.',errB,2)/t(end);
@@ -73,10 +92,13 @@ parfor iEcc = 1:nEcc
                 errVecB = errVecB + inf(6,1);
             end
             % Prop Fourier
+            tic
             [~,oeF] = Prop.PropOeFourier(t,kMax);
+            testT = toc;
+            fTime = fTime + testT;
             oeF = oeF.';
             
-            % Fourier Error          
+            % Fourier Error
             errF = abs(oeC-oeF);
             errF = [errF(1,:)/oe(1);errF(2,:)/oe(2);errF(3:end,:)*pi/180];
             errVecF = errVecF + trapz(t.',errF,2)/t(end);
@@ -98,7 +120,6 @@ parfor iEcc = 1:nEcc
     end
 end
 eTime = toc;
-dbPath = 'C:\Users\User\Dropbox'; % ASRI
 reportIFTTT(dbPath,eTime);
 %% Save Data
 MapData = struct();

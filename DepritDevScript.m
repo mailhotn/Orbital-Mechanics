@@ -19,27 +19,27 @@ nOrb = 1; % number of orbits
 nTArc = 150; % number of time-steps per half orbit
 nTime = nTArc*nOrb*2; % number of time steps
 %% Initial Conditions
-sma = 10000/dScale;
-ecc = 0.1;
-inc = 60;
+sma = 25000/dScale;
+ecc = 0.5;
+inc = 1;
 % inc = 180-acosd(1/sqrt(3)); % singularity test
-ran = 30;
-aop = 30;
+ran = 50;
+aop = 359;
 man = 0;
 
 oeC = nan(nTime,6);
 oeW = nan(nTime,6);
 
 %% Bad IC
-dataStruct = open('DepritErrorIC.mat');
-oeErr = dataStruct.oeErr;
-iErr = 1;
-sma = oeErr(iErr,1);
-ecc = oeErr(iErr,2);
-inc = oeErr(iErr,3);
-ran = oeErr(iErr,4);
-aop = oeErr(iErr,5);
-man = oeErr(iErr,6);
+% dataStruct = open('DepritErrorIC.mat');
+% oeErr = dataStruct.oeErr;
+% iErr = 1;
+% sma = oeErr(iErr,1);
+% ecc = oeErr(iErr,2);
+% inc = oeErr(iErr,3);
+% ran = oeErr(iErr,4);
+% aop = oeErr(iErr,5);
+% man = oeErr(iErr,6);
 %% Coordinate Switch
 f = me2ta(man,ecc);
 radQ = sma*((1-ecc^2)/(1+ecc*cosd(f)));   % r
@@ -301,9 +301,9 @@ hold off
 
 
 figure(7)
-plot(t/T0/2,fVec)
+plot(t)
 xlabel('Orbits')
-xlim([0,nOrb])
+% xlim([0,nOrb])
 
 
 
