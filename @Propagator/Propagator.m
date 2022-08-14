@@ -93,7 +93,9 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             IC = reshape(OE,[6*P.Con.nSats,1]);
             [Time, X] = ode45(@P.DynOeOsc,T,IC,opts);
             inddeg = reshape((3:6).'+(0:P.Con.nSats-1)*6,4*P.Con.nSats,1);
-            X(:,inddeg) = wrapTo360(180/pi*X(:,inddeg));
+            indWrap = reshape((3:5).'+(0:P.Con.nSats-1)*6,3*P.Con.nSats,1);
+            X(:,inddeg) = (180/pi*X(:,inddeg));
+            X(:,indWrap) = wrapTo360(X(:,indWrap));
         end
         
         function [Time, X] = PropOeOsc2(P,T)
@@ -188,7 +190,8 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 %                 X(6,iTime) = X(6,iTime) + M2(iTime); % without M Fix
                 X(6,iTime) = M2(iTime); % M fix
             end
-            X(3:end,:) = wrapTo360(X(3:end,:)*180/pi);
+            X(3:5,:) = wrapTo360(X(3:5,:)*180/pi);
+            X(6,:) = X(6,:)*180/pi;
             X = X.';
             Time = T;
         end
@@ -209,8 +212,10 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             inc = IC(3);
             ran = IC(4);
             aop = IC(5);
-            man = IC(6);
-            f = me2ta(man,ecc);
+%             man = IC(6);
+%             f = me2ta(man,ecc);
+            man = 0;
+            f = 0;
             
             oeC = nan(nTime,6);
             oeW = nan(nTime,6);
@@ -245,10 +250,12 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                     n0 = (s2-s1)/s1;
                     if f < 180 % Ascending IC
                         tS = pi*(s2-1/radQ)/(s2-s1)+linspace(0,2*pi*nOrb,nTime).';
-                        sVec = s1+(s2-s1)/2*(1-sawtooth(tS,0.5));
+                        %             sVec = s1+(s2-s1)/2*(1-sawtooth(tS,0.5));
+                        sVec = s1+(s2-s1)/2*(1+cos(tS));
                     else % Descending IC
                         tS = pi*(1/radQ-s1)/(s2-s1)+linspace(0,2*pi*nOrb,nTime).';
-                        sVec = s1+(s2-s1)/2*(1+sawtooth(tS,0.5));
+                        %             sVec = s1+(s2-s1)/2*(1+sawtooth(tS,0.5));
+                        sVec = s1+(s2-s1)/2*(1-cos(tS));
                     end
                     signR = square(tS);
                     
@@ -288,10 +295,12 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                     n0 = (s3-s2)/s3;
                     if f < 180 % Ascending IC
                         tS = pi*(s3-1/radQ)/(s3-s2)+linspace(0,2*pi*nOrb,nTime).';
-                        sVec = s2+(s3-s2)/2*(1-sawtooth(tS,0.5));
+                        %             sVec = s2+(s3-s2)/2*(1-sawtooth(tS,0.5));
+                        sVec = s2+(s3-s2)/2*(1+cos(tS));
                     else % Descending IC
                         tS = pi*(1/radQ-s2)/(s3-s2)+linspace(0,2*pi*nOrb,nTime).';
-                        sVec = s2+(s3-s2)/2*(1+sawtooth(tS,0.5));
+                        %             sVec = s2+(s3-s2)/2*(1+sawtooth(tS,0.5));
+                        sVec = s2+(s3-s2)/2*(1-cos(tS));
                     end
                     signR = square(tS);
                     z0 = (s3-sVec)/(s3-s2);
@@ -389,7 +398,8 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             oeC(:,3) = acosd(oeW(:,6)./oeW(:,5));
             oeC(:,4) = wrapTo360(180/pi*oeW(:,3));
             oeC(:,5) = wrapTo360(180/pi*(oeW(:,2) - fVec));
-            oeC(:,6) = wrapTo360(ta2me(fVec*180/pi,oeC(:,2)));
+            oeC(:,6) = 180/pi*unwrap(pi/180*ta2me(fVec*180/pi,oeC(:,2)));
+            oeC(:,6) = oeC(:,6) - oeC(1,6); % force start at periapsis
             
             % Output
             Time = t;

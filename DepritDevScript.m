@@ -16,7 +16,7 @@ tScale = 1;
 
 imagTol = 1e-12;
 nOrb = 1; % number of orbits
-nTArc = 150; % number of time-steps per half orbit
+nTArc = 40; % number of time-steps per half orbit
 nTime = nTArc*nOrb*2; % number of time steps
 %% Initial Conditions
 sma = 25000/dScale;
@@ -31,15 +31,15 @@ oeC = nan(nTime,6);
 oeW = nan(nTime,6);
 
 %% Bad IC
-% dataStruct = open('DepritErrorIC.mat');
-% oeErr = dataStruct.oeErr;
-% iErr = 1;
-% sma = oeErr(iErr,1);
-% ecc = oeErr(iErr,2);
-% inc = oeErr(iErr,3);
-% ran = oeErr(iErr,4);
-% aop = oeErr(iErr,5);
-% man = oeErr(iErr,6);
+dataStruct = open('DepritTErrorIC.mat');
+oeErr = dataStruct.oeErr;
+iErr = 1;
+sma = oeErr(iErr,1);
+ecc = oeErr(iErr,2);
+inc = oeErr(iErr,3);
+ran = oeErr(iErr,4);
+aop = oeErr(iErr,5);
+man = oeErr(iErr,6);
 %% Coordinate Switch
 f = me2ta(man,ecc);
 radQ = sma*((1-ecc^2)/(1+ecc*cosd(f)));   % r
@@ -86,10 +86,12 @@ if cond(A) < 1/imagTol % Check cond number of companion matrix
         n1 = n0*k1;
         if f < 180 % Ascending IC
             tS = pi*(s2-1/radQ)/(s2-s1)+linspace(0,2*pi*nOrb,nTime).';
-            sVec = s1+(s2-s1)/2*(1-sawtooth(tS,0.5));
+%             sVec = s1+(s2-s1)/2*(1-sawtooth(tS,0.5));
+            sVec = s1+(s2-s1)/2*(1+cos(tS));
         else % Descending IC
             tS = pi*(1/radQ-s1)/(s2-s1)+linspace(0,2*pi*nOrb,nTime).';
-            sVec = s1+(s2-s1)/2*(1+sawtooth(tS,0.5));
+%             sVec = s1+(s2-s1)/2*(1+sawtooth(tS,0.5));
+            sVec = s1+(s2-s1)/2*(1-cos(tS));
         end
         signR = square(tS);
         
@@ -132,10 +134,12 @@ if cond(A) < 1/imagTol % Check cond number of companion matrix
         n1 = n0*k1;
         if f < 180 % Ascending IC
             tS = pi*(s3-1/radQ)/(s3-s2)+linspace(0,2*pi*nOrb,nTime).';
-            sVec = s2+(s3-s2)/2*(1-sawtooth(tS,0.5));
+%             sVec = s2+(s3-s2)/2*(1-sawtooth(tS,0.5));
+            sVec = s2+(s3-s2)/2*(1+cos(tS));
         else % Descending IC
             tS = pi*(1/radQ-s2)/(s3-s2)+linspace(0,2*pi*nOrb,nTime).';
-            sVec = s2+(s3-s2)/2*(1+sawtooth(tS,0.5));
+%             sVec = s2+(s3-s2)/2*(1+sawtooth(tS,0.5));
+            sVec = s2+(s3-s2)/2*(1-cos(tS));
         end
         signR = square(tS);
         z0 = (s3-sVec)/(s3-s2);

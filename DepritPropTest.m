@@ -1,9 +1,10 @@
 clear
 %% Test parameters
-nTime = 300;
+nTime = 80;
 nOrb = 1;
 nErr = 0;
-nTest = 100000;
+nTErr = 0;
+nTest = 10000;
 maxSma = 25000;
 
 hErr = inf(nTest,1);
@@ -44,8 +45,12 @@ parfor iTest = 1:nTest
     Sat = SingleSat(IC);
     Prop = Propagator(Sat);
     try
-        [~,oe,hVec] = Prop.PropOeDeprit(nTime,nOrb);
+        [t,oe,hVec] = Prop.PropOeDeprit(nTime,nOrb);
         hErr(iTest) = max(abs(hVec-h));
+        if any(diff(t)<0)
+            nTErr = nTErr + 1;
+            oeErr = [oeErr;IC];
+        end
     catch 
         nErr = nErr + 1;
         oeErr = [oeErr;IC];
@@ -62,4 +67,4 @@ reportIFTTT(dbPath,eTime);
 % iErr = 1;
 % Sat = SingleSat(oeErr(iErr,:));
 % Prop = Propagator(Sat);
-% [~,oe,hVec] = Prop.PropOeDeprit(nTime,nOrb);
+% [t,oe,hVec] = Prop.PropOeDeprit(nTime,nOrb);

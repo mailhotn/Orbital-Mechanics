@@ -10,10 +10,10 @@ depritFlag = 1;
 nT = 80;
 % Region Params
 nInc = 180;
-nEcc = 25;
+nEcc = 50;
 nMonte = 200; % 200 trials is about 1 minute
 incRange = linspace(0.1,90,nInc);
-eccRange = linspace(0.001,0.5,nEcc);
+eccRange = linspace(0.01,0.5,nEcc);
 maxSma = 25000;
 
 %% Initialize Error Tensors
@@ -82,6 +82,10 @@ for iEcc = 1:nEcc
                 tic
                 [~,OeM] = Prop.PropOeMeanFast(t);
                 oeB = me2osc(OeM.');
+                oeB(6,:) = 180/pi*unwrap(pi/180*oeB(6,:));
+                if oeB(6,1) > 180
+                    oeB(6,:) = oeB(6,:) - 360;
+                end
                 testT = toc;
                 bTime = bTime + testT;
                 errB = abs(oeC-oeB);
@@ -105,7 +109,7 @@ for iEcc = 1:nEcc
             
             % Deprit Error
             errD = abs(oeC-oeD);
-            errD = [errD(1,:)/oe(1);errF(2,:)/oe(2);errF(3:end,:)*pi/180];
+            errD = [errD(1,:)/oe(1);errD(2,:)/oe(2);errD(3:end,:)*pi/180];
             errVecD = errVecD + trapz(t.',errD,2)/t(end);
             
         end
@@ -137,4 +141,5 @@ MapData.errTenB = errTenB;
 MapData.errTenD = errTenD;
 
 c = clock;
-save([dataFolder '\ErrMaps_' num2str(c(3)) '-' num2str(c(2)) '-' num2str(c(1)) '_' num2str(c(4)) '-' num2str(c(5)), '.mat'],'MapData');
+save([dataFolder '\ErrMaps_' num2str(c(3)) '-' num2str(c(2)) '-' ...
+    num2str(c(1)) '_' num2str(c(4)) '-' num2str(c(5)), '.mat'],'MapData');

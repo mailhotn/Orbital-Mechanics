@@ -1,11 +1,12 @@
 clear
 %% Load Data
-% dataFolder = 'C:\Users\User\Dropbox\Fourier Data\Error Mapping'; % ASRI
-dataFolder = 'D:\Dropbox\Fourier Data\Error Mapping'; % Laptop
+dataFolder = 'C:\Users\User\Dropbox\Fourier Data\Error Mapping'; % ASRI
+% dataFolder = 'D:\Dropbox\Fourier Data\Error Mapping'; % Laptop
 % load([dataFolder '\ErrMaps_15-6-2022_9-52.mat']); % First run e:0.005-0.55, i:0.4-90
 % load([dataFolder '\ErrMaps_15-6-2022_11-13.mat']); % Singularity test e:0.5-0.7, i:60-70
-load([dataFolder '\ErrMaps_21-6-2022_4-33.mat']); % Big Mapping e:0.001-0.7, i:0.1-179.9
-
+% load([dataFolder '\ErrMaps_21-6-2022_4-33.mat']); % Big Mapping e:0.001-0.7, i:0.1-179.9
+% Added Deprit
+load([dataFolder '\ErrMaps_12-8-2022_1-22.mat']); % First Deprit - total garbage due to error
 
 
 incRange = MapData.incRange;
@@ -17,10 +18,10 @@ errTenB = MapData.errTenB;
 
 errTenB(errTenB==inf) = nan;
 %% Cut off low ecc
-eccCut = 0.1;
-eccRange = eccRange(eccRange>eccCut);
-errTenF = errTenF((nEcc-length(eccRange)+1):end,:,:);
-errTenB = errTenB((nEcc-length(eccRange)+1):end,:,:);
+% eccCut = 0.1;
+% eccRange = eccRange(eccRange>eccCut);
+% errTenF = errTenF((nEcc-length(eccRange)+1):end,:,:);
+% errTenB = errTenB((nEcc-length(eccRange)+1):end,:,:);
 
 %% Plot Relative Errors
 
