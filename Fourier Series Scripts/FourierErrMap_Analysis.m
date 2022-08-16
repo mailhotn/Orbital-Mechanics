@@ -1,12 +1,13 @@
 clear
 %% Load Data
-dataFolder = 'C:\Users\User\Dropbox\Fourier Data\Error Mapping'; % ASRI
-% dataFolder = 'D:\Dropbox\Fourier Data\Error Mapping'; % Laptop
+% dataFolder = 'C:\Users\User\Dropbox\Fourier Data\Error Mapping'; % ASRI
+dataFolder = 'D:\Dropbox\Fourier Data\Error Mapping'; % Laptop
 % load([dataFolder '\ErrMaps_15-6-2022_9-52.mat']); % First run e:0.005-0.55, i:0.4-90
 % load([dataFolder '\ErrMaps_15-6-2022_11-13.mat']); % Singularity test e:0.5-0.7, i:60-70
 % load([dataFolder '\ErrMaps_21-6-2022_4-33.mat']); % Big Mapping e:0.001-0.7, i:0.1-179.9
 % Added Deprit
-load([dataFolder '\ErrMaps_12-8-2022_1-22.mat']); % First Deprit - total garbage due to error
+% load([dataFolder '\ErrMaps_12-8-2022_1-22.mat']); % First Deprit - total garbage due to error
+load([dataFolder '\ErrMaps_16-8-2022_0-53.mat']); % First functional Deprit 
 
 
 incRange = MapData.incRange;
@@ -15,6 +16,7 @@ nEcc = length(eccRange);
 nInc = length(incRange);
 errTenF = MapData.errTenF;
 errTenB = MapData.errTenB;
+errTenD = MapData.errTenD;
 
 errTenB(errTenB==inf) = nan;
 %% Cut off low ecc
@@ -49,7 +51,7 @@ levelsMan = [linspace(-max(abs(errTenF(:,:,6)-errTenB(:,:,6)),[],'all'),0,10),..
 [xV,yV] = meshgrid([1,2],[1,2]);
 
 
-% Plot
+% Plot Brouwer v Fourier
 figure(1)
 contourf(xV,yV,levelsSma(end)*[1,0;0,-1],levelsSma)
 colorbar
@@ -128,6 +130,105 @@ xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12
 ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
 hold off
 
+
+% Plot Deprit v Fourier
+% Level Vectors for colorbar
+levelsSma = [linspace(-max(abs(errTenF(:,:,1)-errTenD(:,:,1)),[],'all'),0,10),...
+    linspace(0,max(abs(errTenF(:,:,1)-errTenD(:,:,1)),[],'all'),10)];
+
+levelsEcc = [linspace(-max(abs(errTenF(:,:,2)-errTenD(:,:,2)),[],'all'),0,10),...
+    linspace(0,max(abs(errTenF(:,:,2)-errTenD(:,:,2)),[],'all'),10)];
+
+levelsInc = [linspace(-max(abs(errTenF(:,:,3)-errTenD(:,:,3)),[],'all'),0,10),...
+    linspace(0,max(abs(errTenF(:,:,3)-errTenD(:,:,3)),[],'all'),10)];
+
+levelsRan = [linspace(-max(abs(errTenF(:,:,4)-errTenD(:,:,4)),[],'all'),0,10),...
+    linspace(0,max(abs(errTenF(:,:,4)-errTenD(:,:,4)),[],'all'),10)];
+
+levelsAop = [linspace(-max(abs(errTenF(:,:,5)-errTenD(:,:,5)),[],'all'),0,10),...
+    linspace(0,max(abs(errTenF(:,:,5)-errTenD(:,:,5)),[],'all'),10)];
+
+levelsMan = [linspace(-max(abs(errTenF(:,:,6)-errTenD(:,:,6)),[],'all'),0,10),...
+    linspace(0,max(abs(errTenF(:,:,6)-errTenD(:,:,6)),[],'all'),10)];
+
+
+figure(101)
+contourf(xV,yV,levelsSma(end)*[1,0;0,-1],levelsSma)
+colorbar
+colormap jet
+shading interp
+hold on
+contourf(incMesh,eccMesh,errTenF(:,:,1)-errTenD(:,:,1),levelsSma,'LineColor','none')
+xlim([incRange(1),incRange(end)])
+ylim([eccRange(1),eccRange(end)])
+xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
+ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
+hold off
+
+figure(102)
+contourf(xV,yV,levelsEcc(end)*[1,0;0,-1],levelsEcc)
+colorbar
+colormap jet
+shading interp
+hold on
+contourf(incMesh,eccMesh,errTenF(:,:,2)-errTenD(:,:,2),levelsEcc,'LineColor','none')
+xlim([incRange(1),incRange(end)])
+ylim([eccRange(1),eccRange(end)])
+xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
+ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
+hold off
+
+figure(103)
+contourf(xV,yV,levelsInc(end)*[1,0;0,-1],levelsInc)
+colorbar
+colormap jet
+shading interp
+hold on
+contourf(incMesh,eccMesh,errTenF(:,:,3)-errTenD(:,:,3),levelsInc,'LineColor','none')
+xlim([incRange(1),incRange(end)])
+ylim([eccRange(1),eccRange(end)])
+xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
+ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
+hold off
+
+figure(104)
+contourf(xV,yV,levelsRan(end)*[1,0;0,-1],levelsRan)
+colorbar
+colormap jet
+shading interp
+hold on
+contourf(incMesh,eccMesh,errTenF(:,:,4)-errTenD(:,:,4),levelsRan,'LineColor','none')
+xlim([incRange(1),incRange(end)])
+ylim([eccRange(1),eccRange(end)])
+xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
+ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
+hold off
+
+figure(105)
+contourf(xV,yV,levelsAop(end)*[1,0;0,-1],levelsAop)
+colorbar
+colormap jet
+shading interp
+hold on
+contourf(incMesh,eccMesh,errTenF(:,:,5)-errTenD(:,:,5),levelsAop,'LineColor','none')
+xlim([incRange(1),incRange(end)])
+ylim([eccRange(1),eccRange(end)])
+xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
+ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
+hold off
+
+figure(106)
+contourf(xV,yV,levelsMan(end)*[1,0;0,-1],levelsMan)
+colorbar
+colormap jet
+shading interp
+hold on
+contourf(incMesh,eccMesh,errTenF(:,:,6)-errTenD(:,:,6),levelsMan,'LineColor','none')
+xlim([incRange(1),incRange(end)])
+ylim([eccRange(1),eccRange(end)])
+xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
+ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
+hold off
 %% Plot Absolute Errors - Brouwer
 % Creat Mesh
 [incMesh, eccMesh] = meshgrid(incRange,eccRange);
@@ -308,6 +409,99 @@ colormap jet
 shading interp
 hold on
 contourf(incMesh,eccMesh,errTenF(:,:,6),levelsMan,'LineColor','none')
+xlim([incRange(1),incRange(end)])
+ylim([eccRange(1),eccRange(end)])
+xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
+ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
+hold off
+
+%% Plot Absolute Errors - Deprit
+% Creat Mesh
+[incMesh, eccMesh] = meshgrid(incRange,eccRange);
+% Level Vectors for colorbar
+levelsSma = linspace(0,max(errTenD(:,:,1),[],'all'),20);
+levelsEcc = linspace(0,max(errTenD(:,:,2),[],'all'),20);
+levelsInc = linspace(0,max(errTenD(:,:,3),[],'all'),20);
+levelsRan = linspace(0,max(errTenD(:,:,4),[],'all'),20);
+levelsAop = linspace(0,max(errTenD(:,:,5),[],'all'),20);
+levelsMan = linspace(0,max(errTenD(:,:,6),[],'all'),20);
+% Virtual colorfix mesh
+[xV,yV] = meshgrid([1,2],[1,2]);
+
+
+% Plot
+figure(31)
+contourf(xV,yV,levelsSma(end)*[1,0;0,1],levelsSma)
+colorbar
+colormap jet
+shading interp
+hold on
+contourf(incMesh,eccMesh,errTenD(:,:,1),levelsSma,'LineColor','none')
+xlim([incRange(1),incRange(end)])
+ylim([eccRange(1),eccRange(end)])
+xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
+ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
+hold off
+
+figure(32)
+contourf(xV,yV,levelsEcc(end)*[1,0;0,1],levelsEcc)
+colorbar
+colormap jet
+shading interp
+hold on
+contourf(incMesh,eccMesh,errTenD(:,:,2),levelsEcc,'LineColor','none')
+xlim([incRange(1),incRange(end)])
+ylim([eccRange(1),eccRange(end)])
+xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
+ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
+hold off
+
+figure(33)
+contourf(xV,yV,levelsInc(end)*[1,0;0,1],levelsInc)
+colorbar
+colormap jet
+shading interp
+hold on
+contourf(incMesh,eccMesh,errTenD(:,:,3),levelsInc,'LineColor','none')
+xlim([incRange(1),incRange(end)])
+ylim([eccRange(1),eccRange(end)])
+xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
+ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
+hold off
+
+figure(34)
+contourf(xV,yV,levelsRan(end)*[1,0;0,1],levelsRan)
+colorbar
+colormap jet
+shading interp
+hold on
+contourf(incMesh,eccMesh,errTenD(:,:,4),levelsRan,'LineColor','none')
+xlim([incRange(1),incRange(end)])
+ylim([eccRange(1),eccRange(end)])
+xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
+ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
+hold off
+
+figure(35)
+contourf(xV,yV,levelsAop(end)*[1,0;0,1],levelsAop)
+colorbar
+colormap jet
+shading interp
+hold on
+contourf(incMesh,eccMesh,errTenD(:,:,5),levelsAop,'LineColor','none')
+xlim([incRange(1),incRange(end)])
+ylim([eccRange(1),eccRange(end)])
+xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
+ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
+hold off
+
+figure(36)
+contourf(xV,yV,levelsMan(end)*[1,0;0,1],levelsMan)
+colorbar
+colormap jet
+shading interp
+hold on
+contourf(incMesh,eccMesh,errTenD(:,:,6),levelsMan,'LineColor','none')
 xlim([incRange(1),incRange(end)])
 ylim([eccRange(1),eccRange(end)])
 xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)

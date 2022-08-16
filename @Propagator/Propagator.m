@@ -267,23 +267,25 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                         error('Apsis error too large!')
                     end
                     phi = asin(sqrt(z0));
+                    % Precalc Elliptics
+                    [eK,eE] = ellipke(k0);
                     
                     % RAAN solution
-                    Iv0 = 2*sqrt(s3/-X)*(sqrt(s3/(s3-s1))*ellipticK(k0)-...
-                        sqrt((s3-s1)/s3)*ellipticE(k0));
+                    Iv0 = 2*sqrt(s3/-X)*(sqrt(s3/(s3-s1))*eK-...
+                        sqrt((s3-s1)/s3)*eE);
                     Iv = Iv0 - 2*sqrt(s3/-X)*(sqrt(s3/(s3-s1))*ellipticF(phi,k0)-...
                         sqrt((s3-s1)/s3)*ellipticE(phi,k0));
                     v0 = -3/2*mu*J2*Re^2*amzP/amoP^2*Iv0;
                     
                     % AOL solution
-                    Ith0 = 2/(sqrt(-X)*sqrt(s3-s1))*ellipticK(k0);
+                    Ith0 = 2/(sqrt(-X)*sqrt(s3-s1))*eK;
                     Ith = Ith0 - 2/(sqrt(-X)*sqrt(s3-s1))*ellipticF(phi,k0);
                     th0 = amoP*Ith0 - v0*amzP/amoP;
                     
                     % Time Solution
                     T0 = 1/(sqrt(-X)*s1^2*sqrt(s2-s1))*sqrt(k0)/(1+n0)*...
                         (((3+2*n0)*k0+(2+n0)*n0)/(k0+n0)*ellipticPi(-n0,k0) + ...
-                        n0/(k0+n0)*ellipticE(k0) - ellipticK(k0));
+                        n0/(k0+n0)*eE - eK);
                     It = T0 - 1/(sqrt(-X)*s1^2*sqrt(s2-s1))*sqrt(k0)/(1+n0)*...
                         (n0/2*n0/(k0+n0)*sqrt(1-k0*sin(phi).^2)./(1+n0*sin(phi).^2).*sin(2*phi)...
                         +((3+2*n0)*k0+(2+n0)*n0)/(k0+n0)*ellipticPi(-n0,phi,k0) ...
@@ -310,24 +312,26 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                     else
                         error('Apsis error too large!')
                     end
-                    phi = asin(sqrt(z0));
+                    phi = asin(sqrt(z0));                    
+                    % Precalc Elliptics
+                    [eK,eE] = ellipke(k0);
                     
                     % RAAN solution
-                    Iv0 = 2*sqrt(s1/X)*(sqrt(s1/(s3-s1))*ellipticK(k0)-...
-                        sqrt((s3-s1)/s1)*ellipticE(k0));
+                    Iv0 = 2*sqrt(s1/X)*(sqrt(s1/(s3-s1))*eK-...
+                        sqrt((s3-s1)/s1)*eE);
                     Iv = 2*sqrt(s1/X)*(sqrt(s1/(s3-s1))*ellipticF(phi,k0)-...
                         sqrt((s3-s1)/s1)*ellipticE(phi,k0));
                     v0 = -3/2*mu*J2*Re^2*amzP/amoP^2*Iv0; %v*
                     
                     % AOL solution
-                    Ith0 = 2/(sqrt(X)*sqrt(s3-s1))*ellipticK(k0);
+                    Ith0 = 2/(sqrt(X)*sqrt(s3-s1))*eK;
                     Ith = 2/(sqrt(X)*sqrt(s3-s1))*ellipticF(phi,k0);
                     th0 = amoP*Ith0 - v0*amzP/amoP; %th*
                     
                     % Time Solution
                     T0 = 1/(sqrt(X)*s3^2*sqrt(s3-s2))*sqrt(k0)/(1-n0)*...
                         (((3-2*n0)*k0-(2-n0)*n0)/(k0-n0)*ellipticPi(n0,k0) - ...
-                        n0/(k0-n0)*ellipticE(k0) - ellipticK(k0));
+                        n0/(k0-n0)*eE - eK);
                     It = 1/(sqrt(X)*s3^2*sqrt(s3-s2))*sqrt(k0)/(1-n0)*...
                         (n0/2*n0/(k0-n0)*sqrt(1-k0*sin(phi).^2)./(1-n0*sin(phi).^2).*sin(2*phi)...
                         +(3*k0-2*n0-(2*k0-n0)*n0)/(k0-n0)*ellipticPi(n0,phi,k0) ...
