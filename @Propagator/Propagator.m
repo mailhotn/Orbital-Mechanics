@@ -268,9 +268,10 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                     end
                     phi = asin(sqrt(z0));
                     % Precalc Elliptics
-                    [eK,eE] = ellipke(k0);
-                    eFi = ellipticF(phi,k0);
-                    eEi = ellipticE(phi,k0);
+                    [eK,eE,eP] = elliptic123(k0,-n0); % complete
+                    [eFi,eEi,ePi] = elliptic123(phi,k0,-n0); % incomplete
+%                     eFi = ellipticF(phi,k0);
+%                     eEi = ellipticE(phi,k0);
                     
                     % RAAN solution
                     Iv0 = 2*sqrt(s3/-X)*(sqrt(s3/(s3-s1))*eK-...
@@ -286,11 +287,11 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                     
                     % Time Solution
                     T0 = 1/(sqrt(-X)*s1^2*sqrt(s2-s1))*sqrt(k0)/(1+n0)*...
-                        (((3+2*n0)*k0+(2+n0)*n0)/(k0+n0)*ellipticPi(-n0,k0) + ...
+                        (((3+2*n0)*k0+(2+n0)*n0)/(k0+n0)*eP + ...
                         n0/(k0+n0)*eE - eK);
                     It = T0 - 1/(sqrt(-X)*s1^2*sqrt(s2-s1))*sqrt(k0)/(1+n0)*...
                         (n0/2*n0/(k0+n0)*sqrt(1-k0*sin(phi).^2)./(1+n0*sin(phi).^2).*sin(2*phi)...
-                        +((3+2*n0)*k0+(2+n0)*n0)/(k0+n0)*ellipticPi(-n0,phi,k0) ...
+                        +((3+2*n0)*k0+(2+n0)*n0)/(k0+n0)*ePi ...
                         + n0/(k0+n0)*eEi -eFi);
                     t = It;
                     
@@ -316,9 +317,10 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                     end
                     phi = asin(sqrt(z0));                    
                     % Precalc Elliptics
-                    [eK,eE] = ellipke(k0);
-                    eFi = ellipticF(phi,k0);
-                    eEi = ellipticE(phi,k0);
+                    [eK,eE,eP] = elliptic123(k0,n0);
+                    [eFi,eEi,ePi] = elliptic123(phi,k0,n0);
+%                     eFi = ellipticF(phi,k0);
+%                     eEi = ellipticE(phi,k0);
                     
                     % RAAN solution
                     Iv0 = 2*sqrt(s1/X)*(sqrt(s1/(s3-s1))*eK-...
@@ -334,11 +336,11 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                     
                     % Time Solution
                     T0 = 1/(sqrt(X)*s3^2*sqrt(s3-s2))*sqrt(k0)/(1-n0)*...
-                        (((3-2*n0)*k0-(2-n0)*n0)/(k0-n0)*ellipticPi(n0,k0) - ...
+                        (((3-2*n0)*k0-(2-n0)*n0)/(k0-n0)*eP - ...
                         n0/(k0-n0)*eE - eK);
                     It = 1/(sqrt(X)*s3^2*sqrt(s3-s2))*sqrt(k0)/(1-n0)*...
                         (n0/2*n0/(k0-n0)*sqrt(1-k0*sin(phi).^2)./(1-n0*sin(phi).^2).*sin(2*phi)...
-                        +(3*k0-2*n0-(2*k0-n0)*n0)/(k0-n0)*ellipticPi(n0,phi,k0) ...
+                        +(3*k0-2*n0-(2*k0-n0)*n0)/(k0-n0)*ePi ...
                         - n0/(k0-n0)*eEi -eFi);
                     t = It;
                 end

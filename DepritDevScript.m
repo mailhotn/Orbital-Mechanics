@@ -21,7 +21,7 @@ nTime = nTArc*nOrb*2; % number of time steps
 %% Initial Conditions
 sma = 25000/dScale;
 ecc = 0.05;
-inc = 50;
+inc = 40;
 % inc = 180-acosd(1/sqrt(3)); % singularity test
 ran = 50;
 aop = 30;
