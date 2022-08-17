@@ -15,31 +15,31 @@ tScale = 1;
 % J2 = 1/Re^2;
 
 imagTol = 1e-12;
-nOrb = 1; % number of orbits
+nOrb = 3; % number of orbits
 nTArc = 40; % number of time-steps per half orbit
 nTime = nTArc*nOrb*2; % number of time steps
 %% Initial Conditions
 sma = 25000/dScale;
-ecc = 0.5;
-inc = 1;
+ecc = 0.05;
+inc = 50;
 % inc = 180-acosd(1/sqrt(3)); % singularity test
 ran = 50;
-aop = 359;
+aop = 30;
 man = 0;
 
 oeC = nan(nTime,6);
 oeW = nan(nTime,6);
 
 %% Bad IC
-dataStruct = open('DepritTErrorIC.mat');
-oeErr = dataStruct.oeErr;
-iErr = 1;
-sma = oeErr(iErr,1);
-ecc = oeErr(iErr,2);
-inc = oeErr(iErr,3);
-ran = oeErr(iErr,4);
-aop = oeErr(iErr,5);
-man = oeErr(iErr,6);
+% dataStruct = open('DepritTErrorIC.mat');
+% oeErr = dataStruct.oeErr;
+% iErr = 1;
+% sma = oeErr(iErr,1);
+% ecc = oeErr(iErr,2);
+% inc = oeErr(iErr,3);
+% ran = oeErr(iErr,4);
+% aop = oeErr(iErr,5);
+% man = oeErr(iErr,6);
 %% Coordinate Switch
 f = me2ta(man,ecc);
 radQ = sma*((1-ecc^2)/(1+ecc*cosd(f)));   % r
@@ -249,7 +249,7 @@ T = 2*pi*sqrt(sma^3/mu)*tScale;
 [t2,oe] = Prop.PropOeOsc(t);
 
 
-%% Plot
+%% Plot Conventional
 figure(1)
 plot(t/T0/2,oeC(:,1))
 xlabel('Orbits')
@@ -308,6 +308,53 @@ figure(7)
 plot(t)
 xlabel('Orbits')
 % xlim([0,nOrb])
+
+
+%% Plot Whittaker
+figure(11)
+plot(t/T0/2,1./oeW(:,1))
+xlabel('Orbits')
+ylabel('1/r')
+xlim([0,nOrb])
+
+
+figure(12)
+plot(t/T0/2,oeW(:,2))
+xlabel('Orbits')
+xlim([0,nOrb])
+
+
+figure(13)
+plot(t/T0/2,oeW(:,3))
+xlabel('Orbits')
+xlim([0,nOrb])
+
+
+
+figure(14)
+plot(t/T0/2,oeW(:,4))
+xlabel('Orbits')
+xlim([0,nOrb])
+
+
+
+figure(15)
+plot(t/T0/2,oeW(:,5))
+xlabel('Orbits')
+xlim([0,nOrb])
+
+
+figure(16)
+plot(t/T0/2,oeW(:,6))
+xlabel('Orbits')
+xlim([0,nOrb])
+
+figure(7)
+plot(t)
+xlabel('Orbits')
+% xlim([0,nOrb])
+
+
 
 
 
