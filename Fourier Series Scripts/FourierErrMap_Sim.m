@@ -11,7 +11,7 @@ nT = 80;
 % Region Params
 nInc = 180;
 nEcc = 50;
-nMonte = 200; % 200 trials is about 1 minute
+nMonte = 200; % 200 trials is about 0.5 minute
 incRange = linspace(0.1,90,nInc);
 eccRange = linspace(0.01,0.5,nEcc);
 maxSma = 25000;
@@ -26,8 +26,9 @@ cTime = 0;
 fTime = 0;
 dTime = 0;
 %% Loops
-tic
-for iEcc = 1:nEcc
+disp(['Starting Mapping' newline 'Estimated runtime: ' num2str(nInc*nEcc*nMonte/400/4/60) 'h'])
+totalTime = tic;
+parfor iEcc = 1:nEcc
     ecc = eccRange(iEcc);
     minSma = (primary.Re+100)/(1-ecc); % Can change to not go through the atmosphere
     for iInc = 1:nInc
@@ -123,7 +124,7 @@ for iEcc = 1:nEcc
         errTenD(iEcc,iInc,:) = errVecD;
     end
 end
-eTime = toc;
+eTime = toc(totalTime);
 reportIFTTT(dbPath,eTime);
 %% Save Data
 MapData = struct();
@@ -135,6 +136,13 @@ MapData.nOrb = nOrb;
 MapData.dT = dT;
 MapData.nT = nT;
 MapData.nMonte = nMonte;
+
+MapData.eTime = eTime;
+MapData.cTime = cTime;
+MapData.dTime = dTime;
+MapData.fTime = fTime;
+MapData.bTime = bTime;
+
 
 MapData.errTenF = errTenF;
 MapData.errTenB = errTenB;
