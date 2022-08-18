@@ -4,7 +4,7 @@ nTime = 80;
 nOrb = 1;
 nErr = 0;
 nTErr = 0;
-nTest = 10000;
+nTest = 100000;
 maxSma = 25000;
 
 hErr = inf(nTest,1);
@@ -18,8 +18,8 @@ dScale = 1;
 tScale = 1;
 
 %% Test
-tic
-parfor iTest = 1:nTest
+totalTime = tic;
+for iTest = 1:nTest
     r = rand(5,1);
     ecc = r(2)*0.7+0.001;
     minSma = (Re+100)/(1-ecc);
@@ -57,7 +57,7 @@ parfor iTest = 1:nTest
     end
     
 end
-eTime = toc;
+eTime = toc(totalTime);
 dbPath = 'C:\Users\User\Dropbox'; % ASRI
 % dbPath = 'D:\Dropbox'; % Laptop
 reportIFTTT(dbPath,eTime);
