@@ -9,9 +9,9 @@ dT = 100; % sec
 depritFlag = 1;
 nT = 80;
 % Region Params
-nInc = 180;
+nInc = 360;
 nEcc = 100;
-nMonte = 1000; % 6000 trials is about 1 minute (not parallel
+nMonte = 1000; % 6000 trials is about 1 minute (not parallel)
 incRange = linspace(0.1,90,nInc);
 eccRange = linspace(0.01,0.5,nEcc);
 maxSma = 25000;
