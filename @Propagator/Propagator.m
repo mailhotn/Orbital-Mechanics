@@ -754,7 +754,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 Bkdl = Bkda;
                 
                 n = 1;
-                while n <= k + 8
+                while n <= k + 5
                     % positive n
                     g2 = b.^abs(m2+n+k-2);
                     g3 = abs(m3+n+k-2).*b.^abs(m3+n+k-3) + e/sqrt(1-e^2)*b.^abs(m3+n+k-2);

@@ -23,13 +23,15 @@ tic
 oeB = me2osc(OeM.');
 bTime = toc
 %% Fourier
-[~,oeF2] = Prop.PropOeFourier2(t,2);
-[~,oeF5] = Prop.PropOeFourier2(t,5);
+% [~,oeF2] = Prop.PropOeFourier2(t,2);
+% [~,oeF5] = Prop.PropOeFourier2(t,5);
 tic
 [~,oeFLow] = Prop.PropOeFourier2(t,kLow);
+oeFLow = oeFLow.';
 F10Time = toc
 tic
 [~,oeFHigh] = Prop.PropOeFourier2(t,kHigh);
+oeFHigh = oeFHigh.';
 F15Time = toc
 t = t/T;
 %% Plot
