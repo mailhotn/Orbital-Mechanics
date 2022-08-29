@@ -152,6 +152,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             f = pi/180*me2ta(IC(6)*180/pi,e);
             a_r = (1+e.*cos(f))./eta.^2;
             g2 = -P.Con.primary.J2/2*(P.Con.primary.Re/a)^2;
+%             a = a + 1.5*g2*a*(1-1.5*sin(i)^2)/eta^3; % Kozai - weird
             a = a + a*g2*((3*cos(i)^2-1).*(a_r^3 - 1/eta^3) ...
                 + 3*(1-cos(i)^2)*a_r^3*cos(2*aop + 2*f));
             
