@@ -85,6 +85,39 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             Time = T;
         end
         
+        function [Time, X] = PropOeMeanShort(P,T)
+            % Directly calculates linear solution without numerical
+            % integration, using Kozai w/o Long Period. Avoids singularity
+            IC = reshape(P.Con.InitialOeMeanShort,[6*P.Con.nSats,1]);
+            % move stuff around
+            order = 6*P.Con.nSats;
+            X2 = reshape(IC,[6,P.Con.nSats]);
+            aV = X2(1,:);
+            eV = X2(2,:);
+            iV = X2(3,:);
+            sma = reshape(repmat(aV,6,1),order,1);
+            ecc = reshape(repmat(eV,6,1),order,1);
+            inc = reshape(repmat(iV,6,1),order,1);
+            % Derived values
+            p = sma.*(1-ecc.^2);
+            n = sqrt(P.Con.mu./sma.^3);
+            eta = sqrt(1-ecc.^2);
+            % Eq of motion
+            dO = 180/pi*repmat([0,0,0,1,0,0].',P.Con.nSats,1).*...
+                (-3/2*P.Con.J2.*(P.Con.Re./p).^2.*n.*cosd(inc));
+            dw = 180/pi*repmat([0,0,0,0,1,0].',P.Con.nSats,1).*...
+                (3/4*P.Con.J2.*(P.Con.Re./p).^2.*n.*(5*cosd(inc).^2-1));
+            dM = 180/pi*repmat([0,0,0,0,0,1].',P.Con.nSats,1).*...
+                (3/4*P.Con.J2.*(P.Con.Re./p).^2.*n.*eta.*(3*cosd(inc).^2-1) + n);
+            dX = dO + dw + dM;
+            % "Propagate"
+            X = zeros(order,length(T));
+            X(:,1) = IC;
+            X(:,2:end) = X(:,1) + dX*T(2:end);
+            X = X.';
+            Time = T;            
+        end
+        
         function [Time, X] = PropOeOsc(P,T)
             % Use this I think
             opts = odeset('reltol',P.relTol,'abstol',P.absTol);
@@ -152,12 +185,13 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             f = pi/180*me2ta(IC(6)*180/pi,e);
             a_r = (1+e.*cos(f))./eta.^2;
             g2 = -P.Con.primary.J2/2*(P.Con.primary.Re/a)^2;
-%             a = a + 1.5*g2*a*(1-1.5*sin(i)^2)/eta^3; % Kozai - weird
+%             a = a + 3*g2*a*(1-1.5*sin(i)^2)/eta^3; % Kozai - weird
             a = a + a*g2*((3*cos(i)^2-1).*(a_r^3 - 1/eta^3) ...
                 + 3*(1-cos(i)^2)*a_r^3*cos(2*aop + 2*f));
             
             % Continue with the rest
             n = sqrt(P.Con.primary.mu/a^3);
+%             n = sqrt(P.Con.primary.mu/a^3)*(1+3*g2*(1-1.5*sin(i)^2)/eta^3); % kozai Fix
             [~,lpeSpec] = P.DynOeFourier([],IC,kMax);
             %             n = n + lpeSpec(11,1); % <-------------------  Work on this
             M = n*T+IC(6);
@@ -171,26 +205,39 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 sum(trigsum1(5:6)); sum(trigsum1(7:8)); sum(trigsum1(9:10));...
                 sum(trigsum1(11:12))];
             M2 = M;
+           
+%             for iTime = 1:length(T)
+%                 trigMat = [sin(k*M(iTime))./k/n;-cos(k*M(iTime))./k/n];
+%                 trigsum1 = sum(lpeSpec(11:12,2:end).*trigMat,2);
+%                 trigsum2 = sum(trigsum1);
+%                 M2(iTime) = lpeSpec(11,1)*T(iTime) + trigsum2 - InitVal(6) + M(iTime);
+%             end
             % Fix M
+            Sk = sin(k.'*M)./k.'/n;
+            Ck = -cos(k.'*M)./k.'/n;
+            AkM = lpeSpec(11,2:end);
+            BkM = lpeSpec(12,2:end);
+            M2 = lpeSpec(11,1)*T + AkM*Sk + BkM*Ck - InitVal(6) + M;
             
-            for iTime = 1:length(T)
-                trigMat = [sin(k*M(iTime))./k/n;-cos(k*M(iTime))./k/n];
-                trigsum1 = sum(lpeSpec(11:12,2:end).*trigMat,2);
-                trigsum2 = sum(trigsum1);
-                M2(iTime) = lpeSpec(11,1)*T(iTime) + trigsum2 - InitVal(6) + M(iTime);
-            end
+            % Calculate all elements
+            Sk = sin(k.'*M2)./k.'/n;
+            Ck = -cos(k.'*M2)./k.'/n;
+            Ak = lpeSpec(1:2:11,2:end);
+            Bk = lpeSpec(2:2:12,2:end);
             
+            X = IC + lpeSpec(1:2:11,1)*T + Ak*Sk + Bk*Ck -InitVal;
+            X(6,:) = M2;
             %
-            for iTime = 1:length(T)
-                trigMat = repmat([sin(k*M2(iTime))./k/n;-cos(k*M2(iTime))./k/n],6,1);
-                trigsum1 = sum(lpeSpec(:,2:end).*trigMat,2);
-                trigsum2 = [sum(trigsum1(1:2)); sum(trigsum1(3:4));...
-                    sum(trigsum1(5:6)); sum(trigsum1(7:8)); sum(trigsum1(9:10));...
-                    sum(trigsum1(11:12))];
-                X(:,iTime) = IC + lpeSpec(1:2:11,1)*T(iTime) + trigsum2 - InitVal;
-                %                 X(6,iTime) = X(6,iTime) + M2(iTime); % without M Fix
-                X(6,iTime) = M2(iTime); % M fix
-            end
+%             for iTime = 1:length(T)
+%                 trigMat = repmat([sin(k*M2(iTime))./k/n;-cos(k*M2(iTime))./k/n],6,1);
+%                 trigsum1 = sum(lpeSpec(:,2:end).*trigMat,2);
+%                 trigsum2 = [sum(trigsum1(1:2)); sum(trigsum1(3:4));...
+%                     sum(trigsum1(5:6)); sum(trigsum1(7:8)); sum(trigsum1(9:10));...
+%                     sum(trigsum1(11:12))];
+%                 X(:,iTime) = IC + lpeSpec(1:2:11,1)*T(iTime) + trigsum2 - InitVal;
+%                 %                 X(6,iTime) = X(6,iTime) + M2(iTime); % without M Fix
+%                 X(6,iTime) = M2(iTime); % M fix
+%             end
             X(3:5,:) = wrapTo360(X(3:5,:)*180/pi);
             X(6,:) = X(6,:)*180/pi;
             X = X.';

@@ -22,6 +22,9 @@ tic
 [~,OeM] = Prop.PropOeMeanFast(t);
 oeB = me2osc(OeM.');
 bTime = toc
+%% Mean SP only
+[~,OeS] = Prop.PropOeMeanShort(t);
+oeS = me2oscSP(OeS.');
 %% Fourier
 % [~,oeF2] = Prop.PropOeFourier2(t,2);
 % [~,oeF5] = Prop.PropOeFourier2(t,5);

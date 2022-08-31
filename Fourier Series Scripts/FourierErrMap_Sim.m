@@ -81,8 +81,8 @@ parfor iEcc = 1:nEcc
             try
                 % Prop Brouwer
                 tic
-                [~,OeM] = Prop.PropOeMeanFast(t);
-                oeB = me2osc(OeM.');
+                [~,OeM] = Prop.PropOeMeanShort(t);
+                oeB = me2oscSP(OeM.');
                 oeB(6,:) = 180/pi*unwrap(pi/180*oeB(6,:));
                 if oeB(6,1) > 180
                     oeB(6,:) = oeB(6,:) - 360;

@@ -1,4 +1,4 @@
-function [OE_osc] = me2oscSP(OE_m,primary)
+function [oeOsc] = me2oscSP(oeM,primary)
 %me2oscSP Calculates the osculating orbital elements of a satellite
 %   Based on Kozai 1959
 %   Accepts a 6xN Matrix of osculating elements in the following order:
@@ -19,12 +19,12 @@ end
 J2 = primary.J2;
 Re = primary.Re;
 
-sma0 = OE_m(1,:);
-ecc0 = OE_m(2,:);
-inc0 = pi/180*OE_m(3,:);
-ran0 = wrapTo2Pi(pi/180*OE_m(4,:));
-aop0 = wrapTo2Pi(pi/180*OE_m(5,:));
-man0 = wrapTo360(OE_m(6,:));
+sma0 = oeM(1,:);
+ecc0 = oeM(2,:);
+inc0 = pi/180*oeM(3,:);
+ran0 = (pi/180*oeM(4,:));
+aop0 = (pi/180*oeM(5,:));
+man0 = (oeM(6,:));
 f = me2ta(man0,ecc0);
 man0 = pi/180*man0;
 f = pi/180*f;
@@ -42,7 +42,7 @@ s2i = sin(inc0).^2;
 dSmaS = A2./sma0.*(2/3*(1-1.5*s2i).*(aR.^3 - 1./eta.^3) + ...
         aR.^3.*s2i.*cos(2*f+2*aop0));
 
-dEccS = (1-ecc0.^2)./ecc0*A2./sma0.^2.*((1-1.5*s2i)/3.*(aR.^3-eta.^3) + ...
+dEccS = (1-ecc0.^2)./ecc0*A2./sma0.^2.*((1-1.5*s2i)/3.*(aR.^3-1./eta.^3) + ...
         0.5*aR.^3.*s2i.*cos(2*f+2*aop0)) - ...
         s2i/2./ecc0*A2./(sma0.*p).*(cos(2*f+2*aop0) +...
         ecc0.*cos(f+2*aop0) + ecc0/3.*cos(3*f+2*aop0));
@@ -61,7 +61,7 @@ dAopS = A2./p.^2.*((2-2.5*s2i).*(f-man0+ecc0.*sin(f)) + ...
     +3/8*s2i.*sin(4*f+2*aop0) + ecc0/16.*s2i.*sin(5*f+2*aop0));
 
 dManS = A2./p.^2.*eta./ecc0.*(-(1-1.5*s2i).*((1-0.25*ecc0.^2).*sin(f) ...
-    +0.5*ecc0.*sin(2*f) +ecc^2/12.*sin(3*f))...
+    +0.5*ecc0.*sin(2*f) +ecc0.^2/12.*sin(3*f))...
     +s2i.*((0.25+5/16*ecc0.^2).*sin(f+2*aop0) - ecc0.^2/16.*sin(f-2*aop0)...
     -7/12.*(1-ecc0.^2/28).*sin(3*f+2*aop0) -3/8*ecc0.*sin(4*f+2*aop0)...
     -ecc0.^2/16.*sin(5*f+2*aop0)));
@@ -77,7 +77,7 @@ dRanM = -A2./p.^2/6.*cos(inc0).*c2f.*sin(2*aop0);
 
 dAopM = A2./p.^2.*(s2i.*(1/8+(1-ecc0.^2)./ecc0.^2/6.*c2f) + c2f.*(1-s2i)/6).*sin(2*aop0);
 
-dManM = -A2./p.^2.*eta.*s2i.*(1.8+(1/6./ecc0.^2+1/12).*c2f).*sin(2*aop0);
+dManM = -A2./p.^2.*eta.*s2i.*(1/8+(1/6./ecc0.^2+1/12).*c2f).*sin(2*aop0);
 
 % Assign Elements
 sma1 = sma0 + dSmaS;
@@ -87,4 +87,5 @@ ran1 = ran0 + dRanS - dRanM;
 aop1 = aop0 + dAopS - dAopM;
 man1 = man0 + dManS - dManM;
 
-OE_osc = [sma1;ecc1;inc1;ran1;aop1;man1];
+oeOsc = [sma1;ecc1;180/pi*inc1;180/pi*ran1;180/pi*aop1;180/pi*man1];
+oeOsc(3:end,:) = wrapTo360(oeOsc(3:end,:));

@@ -54,6 +54,11 @@ classdef SingleSat < Constellation
             [R, V] = oe2eci(oeOsc,Sat.primary);
             X = [R; V];
         end
+        
+        function oeM = InitialOeMeanShort(Sat)
+            oeOsc = Sat.InitialOeOsc;
+            oeM = osc2meSP(oeOsc,Sat.primary);
+        end
     end
     
      methods(Access = protected, Sealed)
