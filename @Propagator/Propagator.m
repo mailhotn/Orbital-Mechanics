@@ -177,7 +177,8 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             IC(3:end) = IC(3:end)*pi/180;
             a = IC(1);
             
-            % Get mean a - nonsingular, somewhat weird
+            % Get mean a by substracting short period variations. The mean
+            % mean motion resulting *should* be the correct frequency for M
             e = IC(2);
             i = IC(3);
             aop = IC(5);
@@ -188,6 +189,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
 %             a = a + 3*g2*a*(1-1.5*sin(i)^2)/eta^3; % Kozai - weird
             a = a + a*g2*((3*cos(i)^2-1).*(a_r^3 - 1/eta^3) ...
                 + 3*(1-cos(i)^2)*a_r^3*cos(2*aop + 2*f));
+            IC(1) = a; % Reassign a given averaging
             
             % Continue with the rest
             n = sqrt(P.Con.primary.mu/a^3);
@@ -205,13 +207,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 sum(trigsum1(5:6)); sum(trigsum1(7:8)); sum(trigsum1(9:10));...
                 sum(trigsum1(11:12))];
             M2 = M;
-           
-%             for iTime = 1:length(T)
-%                 trigMat = [sin(k*M(iTime))./k/n;-cos(k*M(iTime))./k/n];
-%                 trigsum1 = sum(lpeSpec(11:12,2:end).*trigMat,2);
-%                 trigsum2 = sum(trigsum1);
-%                 M2(iTime) = lpeSpec(11,1)*T(iTime) + trigsum2 - InitVal(6) + M(iTime);
-%             end
+
             % Fix M
             Sk = sin(k.'*M)./k.'/n;
             Ck = -cos(k.'*M)./k.'/n;
@@ -227,17 +223,8 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             
             X = IC + lpeSpec(1:2:11,1)*T + Ak*Sk + Bk*Ck -InitVal;
             X(6,:) = M2;
-            %
-%             for iTime = 1:length(T)
-%                 trigMat = repmat([sin(k*M2(iTime))./k/n;-cos(k*M2(iTime))./k/n],6,1);
-%                 trigsum1 = sum(lpeSpec(:,2:end).*trigMat,2);
-%                 trigsum2 = [sum(trigsum1(1:2)); sum(trigsum1(3:4));...
-%                     sum(trigsum1(5:6)); sum(trigsum1(7:8)); sum(trigsum1(9:10));...
-%                     sum(trigsum1(11:12))];
-%                 X(:,iTime) = IC + lpeSpec(1:2:11,1)*T(iTime) + trigsum2 - InitVal;
-%                 %                 X(6,iTime) = X(6,iTime) + M2(iTime); % without M Fix
-%                 X(6,iTime) = M2(iTime); % M fix
-%             end
+
+            
             X(3:5,:) = wrapTo360(X(3:5,:)*180/pi);
             X(6,:) = X(6,:)*180/pi;
             X = X.';

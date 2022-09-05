@@ -1,7 +1,7 @@
 clear
 %% Load Data
-% dataFolder = 'C:\Users\User\Dropbox\Fourier Data\Error Mapping'; % ASRI
-dataFolder = 'D:\Dropbox\Fourier Data\Error Mapping'; % Laptop
+dataFolder = 'C:\Users\User\Dropbox\Fourier Data\Error Mapping'; % ASRI
+% dataFolder = 'D:\Dropbox\Fourier Data\Error Mapping'; % Laptop
 % load([dataFolder '\ErrMaps_15-6-2022_9-52.mat']); % First run e:0.005-0.55, i:0.4-90
 % load([dataFolder '\ErrMaps_15-6-2022_11-13.mat']); % Singularity test e:0.5-0.7, i:60-70
 % load([dataFolder '\ErrMaps_21-6-2022_4-33.mat']); % Big Mapping e:0.001-0.7, i:0.1-179.9
@@ -9,7 +9,9 @@ dataFolder = 'D:\Dropbox\Fourier Data\Error Mapping'; % Laptop
 % load([dataFolder '\ErrMaps_12-8-2022_1-22.mat']); % First Deprit - total garbage due to error
 % load([dataFolder '\ErrMaps_16-8-2022_0-53.mat']); % First functional Deprit
 % load([dataFolder '\ErrMaps_19-8-2022_19-57.mat']); % Deprit w/ new elliptics
-load([dataFolder '\ErrMaps_22-8-2022_15-3.mat']); % Deprit w/ new elliptics - more thorough
+% load([dataFolder '\ErrMaps_22-8-2022_15-3.mat']); % Deprit w/ new elliptics - more thorough
+
+load([dataFolder '\ErrMaps_5-9-2022_13-45.mat']); % SP + Deprit + k5
 
 
 incRange = MapData.incRange;
