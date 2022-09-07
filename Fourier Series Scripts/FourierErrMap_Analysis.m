@@ -10,10 +10,10 @@ dataFolder = 'C:\Users\User\Dropbox\Fourier Data\Error Mapping'; % ASRI
 % load([dataFolder '\ErrMaps_16-8-2022_0-53.mat']); % First functional Deprit
 % load([dataFolder '\ErrMaps_19-8-2022_19-57.mat']); % Deprit w/ new elliptics
 % load([dataFolder '\ErrMaps_22-8-2022_15-3.mat']); % Deprit w/ new elliptics - more thorough
-load([dataFolder '\ErrMaps_1-9-2022_13-9.mat']); % Deprit & SP
-
-load([dataFolder '\ErrMaps_5-9-2022_13-45.mat']); % SP + Deprit + k5
-
+% load([dataFolder '\ErrMaps_1-9-2022_13-9.mat']); % Deprit & SP
+% load([dataFolder '\ErrMaps_5-9-2022_13-45.mat']); % SP + Deprit + k5
+% Added mean sma to all of Fourier
+load([dataFolder '\ErrMaps_6-9-2022_13-30.mat']); % SP + Deprit + k4
 
 incRange = MapData.incRange;
 eccRange = MapData.eccRange;
