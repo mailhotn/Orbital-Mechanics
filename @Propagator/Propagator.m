@@ -678,58 +678,74 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             db4de = [0,8,-48*e,96*e^2+16,-64*e^3-48*e,0,64*e^3+48*e,-96*e^2-16,48*e,-8,0].';
             
             
-            C1xA1 = 6*(3*sin(i)^2*cos(aop)^2-1)/(1-e^2)^2;
-            
-            dC1xA1di = 36*sin(i)*cos(i)*cos(aop)^2/(1-e^2)^2;
-            dC1xA1do = -36*sin(i)^2*sin(aop)*cos(aop)/(1-e^2)^2;
-            dC1xA1de =  24*e*(3*sin(i)^2*cos(aop)^2-1)/(1-e^2)^3;
-            
-            C = [(9*e^2*sin(i)^2*cos(aop)^2+3*sin(i)^2*(sin(aop)^2-cos(aop)^2)-3*e^2)/2/(1-e^2)^(7/2);
+%             C1xA1 = 6*(3*sin(i)^2*cos(aop)^2-1)/(1-e^2)^2;
+%             
+%             dC1xA1di = 36*sin(i)*cos(i)*cos(aop)^2/(1-e^2)^2;
+%             dC1xA1do = -36*sin(i)^2*sin(aop)*cos(aop)/(1-e^2)^2;
+%             dC1xA1de =  24*e*(3*sin(i)^2*cos(aop)^2-1)/(1-e^2)^3;
+%             
+            C = [6*(3*sin(i)^2*cos(aop)^2-1)/(1-e^2)^2;
+                (9*e^2*sin(i)^2*cos(aop)^2+3*sin(i)^2*(sin(aop)^2-cos(aop)^2)-3*e^2)/2/(1-e^2)^3.5;
                 (3*e^3*sin(i)^2*cos(aop)^2+9*e*sin(i)^2*(sin(aop)^2-cos(aop)^2)-e^3)/4/(1-e^2)^4;
-                (9*e^2*sin(i)^2*(sin(aop)^2-cos(aop)^2))/8/(1-e^2)^(9/2);
+                (9*e^2*sin(i)^2*(sin(aop)^2-cos(aop)^2))/8/(1-e^2)^4.5;
                 (3*e^3*sin(i)^2*(sin(aop)^2-cos(aop)^2))/16/(1-e^2)^5];
             
-            dCdi = [3*(3*e^2*sin(i)*cos(i)*cos(aop)^2+sin(i)*cos(i)*(sin(aop)^2-cos(aop)^2))/(1-e^2)^(7/2);
-                3*(e^3*sin(i)*cos(i)*cos(aop)^2+3*e*sin(i)*cos(i)*(sin(aop)^2-cos(aop)^2))/2/(1-e^2)^4;
-                9*e^2*sin(i)*cos(i)*(sin(aop)^2-cos(aop)^2)/4/(1-e^2)^(9/2);
-                3*e^3*sin(i)*cos(i)*(sin(aop)^2-cos(aop)^2)/8/(1-e^2)^5];
+            dCdi_si = [36*cos(aop)^2*cos(i)/(1-e^2)^2; % all pre-divided by sin(i)
+                3*cos(i)*(3*e^2*cos(aop)^2+1-2*cos(aop)^2)/(1-e^2)^3.5;
+                3*e*cos(i)*(3+(e^2-6)*cos(aop)^2)/2/(1-e^2)^4;
+                9*e^2*cos(i)*(2*cos(aop)^2-1)/4/(1-e^2)^4.5;
+                3*e^3*cos(i)*(2*cos(aop)^2)-1/8/(1-e^2)^5];
             
-            dCdo = [3*(-3*e^2+2)*sin(i)^2*sin(aop)*cos(aop)/(1-e^2)^(7/2);
+            dCdo = [-36*sin(i)^2*sin(aop)*cos(aop)/(1-e^2)^2;
+                3*(-3*e^2+2)*sin(i)^2*sin(aop)*cos(aop)/(1-e^2)^3.5;
                 -3*e*(e^2-6)*sin(i)^2*sin(aop)*cos(aop)/2/(1-e^2)^4;
-                9*e^2*sin(i)^2*sin(aop)*cos(aop)/2/(1-e^2)^(9/2);
+                9*e^2*sin(i)^2*sin(aop)*cos(aop)/2/(1-e^2)^4.5;
                 3*e^3*sin(i)^2*sin(aop)*cos(aop)/4/(1-e^2)^5];
             
-            dCde = [3*e*(15*e^2*sin(i)^2*cos(aop)^2 +7*sin(i)^2*sin(aop)^2 -sin(i)^2*cos(aop)^2 -5*e^2 -2)/2/(1-e^2)^(9/2);
+            dCdo_si = [-36*sin(i)*sin(aop)*cos(aop)/(1-e^2)^2;
+                3*(-3*e^2+2)*sin(i)*sin(aop)*cos(aop)/(1-e^2)^3.5;
+                -3*e*(e^2-6)*sin(i)*sin(aop)*cos(aop)/2/(1-e^2)^4;
+                9*e^2*sin(i)*sin(aop)*cos(aop)/2/(1-e^2)^4.5;
+                3*e^3*sin(i)*sin(aop)*cos(aop)/4/(1-e^2)^5];
+            
+            
+            dCde = [24*e*(3*sin(i)^2*cos(aop)^2-1)/(1-e^2)^3;
+                3*e*(15*e^2*sin(i)^2*cos(aop)^2 +7*sin(i)^2*sin(aop)^2 -sin(i)^2*cos(aop)^2 -5*e^2 -2)/2/(1-e^2)^4.5;
                 ((15*e^4-54*e^2-9)*sin(i)^2*cos(aop)^2 + (63*e^2+9)*sin(i)^2*sin(aop)^2 -5*e^4 -3*e^2)/4/(1-e^2)^5;
-                -9*e*sin(i)^2*(cos(aop)^2-sin(aop)^2)*(7*e^2+2)/8/(1-e^2)^(11/2);
+                -9*e*sin(i)^2*(cos(aop)^2-sin(aop)^2)*(7*e^2+2)/8/(1-e^2)^5.5;
                 -3*e^2*sin(i)^2*(cos(aop)^2-sin(aop)^2)*(7*e^2+3)/16/(1-e^2)^6];
             
             
             S = -[6*sin(i)^2*sin(aop)*cos(aop)/2/(1-e^2)^3;
-                18*e*sin(i)^2*sin(aop)*cos(aop)/4/(1-e^2)^(7/2);
+                18*e*sin(i)^2*sin(aop)*cos(aop)/4/(1-e^2)^3.5;
                 18*e^2*sin(i)^2*sin(aop)*cos(aop)/8/(1-e^2)^4;
-                6*e^3*sin(i)^2*sin(aop)*cos(aop)/16/(1-e^2)^(9/2)];
+                6*e^3*sin(i)^2*sin(aop)*cos(aop)/16/(1-e^2)^4.5];
             
-            dSdi = -[12*sin(i)*cos(i)*sin(aop)*cos(aop)/2/(1-e^2)^3;
-                36*e*sin(i)*cos(i)*sin(aop)*cos(aop)/4/(1-e^2)^(7/2);
-                36*e^2*sin(i)*cos(i)*sin(aop)*cos(aop)/8/(1-e^2)^4;
-                12*e^3*sin(i)*cos(i)*sin(aop)*cos(aop)/16/(1-e^2)^(9/2)];
+            dSdi_si = -[12*cos(i)*sin(aop)*cos(aop)/2/(1-e^2)^3;
+                36*e*cos(i)*sin(aop)*cos(aop)/4/(1-e^2)^3.5;
+                36*e^2*cos(i)*sin(aop)*cos(aop)/8/(1-e^2)^4;
+                12*e^3*cos(i)*sin(aop)*cos(aop)/16/(1-e^2)^4.5];
             
             dSdo = -[6*sin(i)^2*(2*cos(aop)^2-1)/2/(1-e^2)^3;
-                18*e*sin(i)^2*(2*cos(aop)^2-1)/4/(1-e^2)^(7/2);
+                18*e*sin(i)^2*(2*cos(aop)^2-1)/4/(1-e^2)^3.5;
                 18*e^2*sin(i)^2*(2*cos(aop)^2-1)/8/(1-e^2)^4;
-                6*e^3*sin(i)^2*(2*cos(aop)^2-1)/16/(1-e^2)^(9/2)];
+                6*e^3*sin(i)^2*(2*cos(aop)^2-1)/16/(1-e^2)^4.5];
+            
+            dSdo_si = -[6*sin(i)*(2*cos(aop)^2-1)/2/(1-e^2)^3;
+                18*e*sin(i)*(2*cos(aop)^2-1)/4/(1-e^2)^3.5;
+                18*e^2*sin(i)*(2*cos(aop)^2-1)/8/(1-e^2)^4;
+                6*e^3*sin(i)*(2*cos(aop)^2-1)/16/(1-e^2)^4.5];
             
             dSde = [-18*e*sin(i)^2*sin(aop)*cos(aop)/(1-e^2)^4;
-                -9*sin(i)^2*sin(aop)*cos(aop)*(6*e^2+1)/2/(1-e^2)^(9/2);
+                -9*sin(i)^2*sin(aop)*cos(aop)*(6*e^2+1)/2/(1-e^2)^4.5;
                 -9*e*sin(i)^2*sin(aop)*cos(aop)*(3*e^2+1)/2/(1-e^2)^5;
-                -9*e^2*sin(i)^2*sin(aop)*cos(aop)*(2*e^2+1)/8/(1-e^2)^(11/2)];
+                -9*e^2*sin(i)^2*sin(aop)*cos(aop)*(2*e^2+1)/8/(1-e^2)^5.5];
             
-            dJ2daFreq = dRda*[[R0;0],zeros(2,kMax)];
-            dJ2deFreq = R*[[dR0de;0],zeros(2,kMax)];
-            dJ2diFreq = R*[[dR0di;0],zeros(2,kMax)];
-            dJ2doFreq = R*[[dR0do;0],zeros(2,kMax)];
-            dJ2dlFreq = R*[[dR0dl;0],zeros(2,kMax)];
+%             dJ2daFreq = dRda*[[R0;0],zeros(2,kMax)];
+%             dJ2deFreq = R*[[dR0de;0],zeros(2,kMax)];
+%             dJ2diFreq = R*[[dR0di;0],zeros(2,kMax)];
+%             dJ2doFreq = R*[[dR0do;0],zeros(2,kMax)];
+%             dJ2dlFreq = R*[[dR0dl;0],zeros(2,kMax)];
             
             k = 1;
             
@@ -764,29 +780,36 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                     15*e^2/2/(1-e^2)^(5/2)*b.^abs(m5+n+k-2);
                 
                 Jk = besselj(k,k*e);
+                Jk_e = 0.5*(besselj(k+1,k*e) + besselj(k-1,k*e));
                 dJkde = 0.5*(besselj(k-1,k*e) - besselj(k+1,k*e));
+                
                 Jn = besselj(n,-k*e);
+                Jn_e = 0.5*k(besselj(k+1,k*e) + besselj(k-1,k*e));
                 dJnde = 0.5*(-besselj(1-n,-k*e) - besselj(n+1,-k*e)); % uses identity only correct for n = 0
                 
-                Akda = C1xA1*Jk +...
-                    Jn*C.'*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5];
-                Akde = (C1xA1*k*dJkde + dC1xA1de*Jk) + ...
-                    -k*dJnde*C.'*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5]+...
-                    Jn*(dCde.'*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5] + ...
-                    C.'*[da2de.'*g2+a2.'*dg2de; da3de.'*g3+a3.'*dg3de; da4de.'*g4+a4.'*dg4de; da5de.'*g5+a5.'*dg5de]);
-                Akdi = dC1xA1di*Jk +...
-                    Jn*dCdi.'*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5];
-                Akdo = dC1xA1do*Jk +...
-                    Jn*dCdo.'*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5];
-                Akdl = Akda;
+                Ak = [Jk; Jn*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5]];
                 
-                Bkda = Jn*S.'*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5];
-                Bkde = -k*dJnde*S.'*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5]+...
-                    Jn*(dSde.'*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5] + ...
-                    S.'*[db1de.'*g2+b1.'*dg2de; db2de.'*g3+b2.'*dg3de; db3de.'*g4+b3.'*dg4de; db4de.'*g5+b4.'*dg5de]);
-                Bkdi = Jn*dSdi.'*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5];
-                Bkdo = Jn*dSdo.'*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5];
-                Bkdl = Bkda;
+%                 Akda = C1xA1*Jk +...
+%                     Jn*C.'*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5];
+%                 Akde = (C1xA1*k*dJkde + dC1xA1de*Jk) + ...
+%                     -k*dJnde*C.'*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5]+...
+%                     Jn*(dCde.'*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5] + ...
+%                     C.'*[da2de.'*g2+a2.'*dg2de; da3de.'*g3+a3.'*dg3de; da4de.'*g4+a4.'*dg4de; da5de.'*g5+a5.'*dg5de]);
+%                 Akdi = dC1xA1di*Jk +...
+%                     Jn*dCdi.'*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5];
+%                 Akdo = dC1xA1do*Jk +...
+%                     Jn*dCdo.'*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5];
+%                 Akdl = Akda;
+                
+                Bk = Jn*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5];
+                
+%                 Bkda = Jn*S.'*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5];
+%                 Bkde = -k*dJnde*S.'*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5]+...
+%                     Jn*(dSde.'*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5] + ...
+%                     S.'*[db1de.'*g2+b1.'*dg2de; db2de.'*g3+b2.'*dg3de; db3de.'*g4+b3.'*dg4de; db4de.'*g5+b4.'*dg5de]);
+%                 Bkdi = Jn*dSdi.'*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5];
+%                 Bkdo = Jn*dSdo.'*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5];
+%                 Bkdl = Bkda;
                 
                 n = 1;
                 while n <= k + 5
