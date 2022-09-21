@@ -628,6 +628,10 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         
         function [dX,lpeSpec] = DynOeFourier(P,t,X,kMax) %#ok<INUSL>
             
+            J2 = P.Con.primary.J2;
+            Re = P.Con.primary.Re;
+            mu = P.Con.primary.mu;
+            
             % handle elements vector
             a = X(1);
             e = X(2);
@@ -636,16 +640,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             M = X(6);
             b = (1-sqrt(1-e^2))/e;
             
-            % constant potential values
-            R = -P.Con.primary.mu*P.Con.primary.J2*P.Con.primary.Re^2/2/a^3; % common factor
-            dRda = -3*R/a;
-            
-            R0 = -(3*cos(i)^2-1)/2/(1-e^2)^(3/2); % 0 freq element
-            dR0di = 3*cos(i)*sin(i)/(1-e^2)^(3/2);
-            dR0de = -3*e*(3*cos(i)^2-1)/2/(1-e^2)^(5/2); %
-            dR0do = 0;
-            dR0dl = 0;
-            
+                        
             % constant vectors
             m2 = (0:4).';
             m3 = (0:6).';
@@ -984,15 +979,44 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
 %             dX(4) = 1/n/a^2/eta/sin(i)*dJ2di;
 %             dX(5) = eta/n/a^2/e*dJ2de - cos(i)/n/a^2/eta/sin(i)*dJ2di;
 %             dX(6) = n -2/n/a*dJ2da -eta^2/n/a^2/e*dJ2de;
-                        
+            
+            n = sqrt(mu/a^3);
+            eta = sqrt(1-e^2); 
+            % constant potential values
+            R = -n^2*Re^2/2; % common factor
+            Rsma = -n*J2*Re^2/a;
+            Recc = -n*eta*J2*Re^2/2/a^2; 
+            Rinc = -n*J2*Re^2*cos(i)/2/a^2/eta;
+            Rran = -n*J2*Re^2/2/a^2/eta;
+            Raop = -n*J2*Re^2/2/a^2;
+            Rman = Raop;
+            
+            % Freq 0 elements without common factor
+            ran0 = -3*cos(i)/eta^3;
+            aop0 = -1.5*(5*cos(i)^2-1)/eta^4;
+            man0 = -1.5*(3*cos(i)^2-1)/eta^3;
+%             dRda = -3*R/a;
+            
+%             R0 = -(3*cos(i)^2-1)/2/(1-e^2)^(3/2); % 0 freq element
+%             dR0di = 3*cos(i)*sin(i)/(1-e^2)^(3/2);
+%             dR0de = -3*e*(3*cos(i)^2-1)/2/(1-e^2)^(5/2); %
+%             dR0do = 0;
+%             dR0dl = 0;
+            
             lpeSpec = nan(12,kMax+1);
             
-            lpeSpec(1:2,:) = 2/n/a*dJ2dlFreq;
-            lpeSpec(3:4,:) = eta^2/n/a^2/e*dJ2dlFreq - eta/n/a^2/e*dJ2doFreq;
-            lpeSpec(5:6,:) = cos(i)/n/a^2/eta/sin(i)*dJ2doFreq;
-            lpeSpec(7:8,:) = 1/n/a^2/eta/sin(i)*dJ2diFreq;
-            lpeSpec(9:10,:) = eta/n/a^2/e*dJ2deFreq - cos(i)/n/a^2/eta/sin(i)*dJ2diFreq;
-            lpeSpec(11:12,:) = -2/n/a*dJ2daFreq -eta^2/n/a^2/e*dJ2deFreq;
+            lpeSpec(1:2,:) = Rsma*[0, S.'*(BkM.*k);
+                                   0, C.'*(AkM.*k)];
+            lpeSpec(3:4,:) = Recc*[0, eta*S.'*(Bk_eM.*k) - dCdo.'*Ak_eM;
+                                   0, -eta*C.'*(Ak_eM.*k) - dSdo.'*Bk_eM];
+            lpeSpec(5:6,:) = Rinc*[0, dCdo_si.'*AkM;
+                                   0, dSdo_si.'*BkM];
+            lpeSpec(7:8,:) = Rran*[ran0, dCdi_si.'*AkM;
+                                                 0, dSdi_si.'*BkM]; 
+            lpeSpec(9:10,:) = Raop*[aop0, eta*(dCde.'*Ak_eM + C.'*Akde_eM) - cos(i)/eta*dCdi_si.'*AkM;
+                                       0, eta*(dSde.'*Bk_eM + S.'*Bkde_eM) - cos(i)/eta*dSdi_si.'*BkM];
+            lpeSpec(11:12,:) = Rman*[man0, -eta^2*(dCde.'*Ak_eM + C.'*Akde_eM) + 6*C.'*AkM;
+                                        0, -eta^2*(dSde.'*Bk_eM + S.'*Bkde_eM) + 6*S.'*BkM];
         end
         
     end
