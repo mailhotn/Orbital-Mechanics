@@ -159,8 +159,8 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             IC(3:end) = IC(3:end)*pi/180;
             [Time, X] = ode45(@(T,X) P.DynOeFourier(T,X,kMax),T,IC,opts);
             X(:,3:end) = X(:,3:end)*180/pi;
-            X = X.';
-            X(3:end,:) = wrapTo360(X(3:end,:));
+%             X = X;
+%             X(3:end,:) = wrapTo360(X(3:end,:));
         end
         
         function [Time, X] = PropOeFourier2(P,T,kMax)
@@ -680,10 +680,10 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 (3*e^3*sin(i)^2*(sin(aop)^2-cos(aop)^2))/16/(1-e^2)^5];
             
             dCdi_si = [36*cos(aop)^2*cos(i)/(1-e^2)^2; % all pre-divided by sin(i)
-                3*cos(i)*(3*e^2*cos(aop)^2+1-2*cos(aop)^2)/(1-e^2)^3.5;
+                3*cos(i)*(3*e^2*cos(aop)^2-2*cos(aop)^2+1)/(1-e^2)^3.5;
                 3*e*cos(i)*(3+(e^2-6)*cos(aop)^2)/2/(1-e^2)^4;
-                9*e^2*cos(i)*(2*cos(aop)^2-1)/4/(1-e^2)^4.5;
-                3*e^3*cos(i)*(2*cos(aop)^2)-1/8/(1-e^2)^5];
+                -9*e^2*cos(i)*(2*cos(aop)^2-1)/4/(1-e^2)^4.5;
+                -3*e^3*cos(i)*(2*cos(aop)^2-1)/8/(1-e^2)^5];
             
             dCdo = [-36*sin(i)^2*sin(aop)*cos(aop)/(1-e^2)^2;
                 3*(-3*e^2+2)*sin(i)^2*sin(aop)*cos(aop)/(1-e^2)^3.5;
@@ -710,10 +710,10 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 18*e^2*sin(i)^2*sin(aop)*cos(aop)/8/(1-e^2)^4;
                 6*e^3*sin(i)^2*sin(aop)*cos(aop)/16/(1-e^2)^4.5];
             
-            dSdi_si = -[12*cos(i)*sin(aop)*cos(aop)/2/(1-e^2)^3;
-                36*e*cos(i)*sin(aop)*cos(aop)/4/(1-e^2)^3.5;
-                36*e^2*cos(i)*sin(aop)*cos(aop)/8/(1-e^2)^4;
-                12*e^3*cos(i)*sin(aop)*cos(aop)/16/(1-e^2)^4.5];
+            dSdi_si = -[6*cos(i)*sin(aop)*cos(aop)/(1-e^2)^3;
+                9*e*cos(i)*sin(aop)*cos(aop)/(1-e^2)^3.5;
+                9*e^2*cos(i)*sin(aop)*cos(aop)/2/(1-e^2)^4;
+                3*e^3*cos(i)*sin(aop)*cos(aop)/4/(1-e^2)^4.5];
             
             dSdo = -[6*sin(i)^2*(2*cos(aop)^2-1)/2/(1-e^2)^3;
                 18*e*sin(i)^2*(2*cos(aop)^2-1)/4/(1-e^2)^3.5;
@@ -793,7 +793,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 if abs(n)~=1
                     dJnde_e = k^2/4/(n^2-1)*(2*Jn + (n+1)*besselj(n-2,-k*e) - (n-1)*besselj(n+2,-k*e));
                 else
-                    dJnde_e = 0.5*k/e*(besselj(n-1,-k*e) - besselj(n+1,-k*e));
+                    dJnde_e = -0.5*k/e*(besselj(n-1,-k*e) - besselj(n+1,-k*e));
                 end
                 % Jn/e^2 nonsingular
                 if abs(n)>1
@@ -855,7 +855,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                     if abs(n)~=1
                         dJnde_e = k^2/4/(n^2-1)*(2*Jn + (n+1)*besselj(n-2,-k*e) - (n-1)*besselj(n+2,-k*e));
                     else
-                        dJnde_e = 0.5*k/e*(besselj(n-1,-k*e) - besselj(n+1,-k*e));
+                        dJnde_e = -0.5*k/e*(besselj(n-1,-k*e) - besselj(n+1,-k*e));
                     end
                     % Jn/e^2 nonsingular
                     if abs(n)>1
@@ -917,7 +917,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                     if abs(n)~=1
                         dJnde_e = k^2/4/(n^2-1)*(2*Jn + (n+1)*besselj(n-2,-k*e) - (n-1)*besselj(n+2,-k*e));
                     else
-                        dJnde_e = 0.5*k/e*(besselj(n-1,-k*e) - besselj(n+1,-k*e));
+                        dJnde_e = -0.5*k/e*(besselj(n-1,-k*e) - besselj(n+1,-k*e));
                     end
                     % Jn/e^2 nonsingular
                     if abs(n)>1
@@ -960,27 +960,9 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                                 
                 k = k+1;
             end
-            k = 0:kMax;
-            trigMat = [cos(k*M);sin(k*M)];
             
-%             dJ2da = sum(dJ2daFreq.*trigMat,'all');
-%             dJ2de = sum(dJ2deFreq.*trigMat,'all');
-%             dJ2di = sum(dJ2diFreq.*trigMat,'all');
-%             dJ2do = sum(dJ2doFreq.*trigMat,'all');
-%             dJ2dl = sum(dJ2dlFreq.*trigMat,'all');
-%             
-%             dX = zeros(6,1);
-%             n = sqrt(P.Con.primary.mu/a^3);
-%             eta = sqrt(1-e^2);
-%             
-%             dX(1) = 2/n/a*dJ2dl;
-%             dX(2) = eta^2/n/a^2/e*dJ2dl - eta/n/a^2/e*dJ2do;
-%             dX(3) = cos(i)/n/a^2/eta/sin(i)*dJ2do;
-%             dX(4) = 1/n/a^2/eta/sin(i)*dJ2di;
-%             dX(5) = eta/n/a^2/e*dJ2de - cos(i)/n/a^2/eta/sin(i)*dJ2di;
-%             dX(6) = n -2/n/a*dJ2da -eta^2/n/a^2/e*dJ2de;
             
-            n = sqrt(mu/a^3);
+            n = sqrt(mu/a^3); % bad practice, should rename but whatever
             eta = sqrt(1-e^2); 
             % constant potential values
             R = -n^2*Re^2/2; % common factor
@@ -992,21 +974,16 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             Rman = Raop;
             
             % Freq 0 elements without common factor
-            ran0 = -3*cos(i)/eta^3;
+            ran0 = 3*cos(i)/eta^3;
             aop0 = -1.5*(5*cos(i)^2-1)/eta^4;
             man0 = -1.5*(3*cos(i)^2-1)/eta^3;
-%             dRda = -3*R/a;
-            
-%             R0 = -(3*cos(i)^2-1)/2/(1-e^2)^(3/2); % 0 freq element
-%             dR0di = 3*cos(i)*sin(i)/(1-e^2)^(3/2);
-%             dR0de = -3*e*(3*cos(i)^2-1)/2/(1-e^2)^(5/2); %
-%             dR0do = 0;
-%             dR0dl = 0;
-            
+
+            % Calculate Spectrum of Elements
+            k = 1:kMax;
             lpeSpec = nan(12,kMax+1);
             
             lpeSpec(1:2,:) = Rsma*[0, S.'*(BkM.*k);
-                                   0, C.'*(AkM.*k)];
+                                   0, -C.'*(AkM.*k)];
             lpeSpec(3:4,:) = Recc*[0, eta*S.'*(Bk_eM.*k) - dCdo.'*Ak_eM;
                                    0, -eta*C.'*(Ak_eM.*k) - dSdo.'*Bk_eM];
             lpeSpec(5:6,:) = Rinc*[0, dCdo_si.'*AkM;
@@ -1017,6 +994,14 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                                        0, eta*(dSde.'*Bk_eM + S.'*Bkde_eM) - cos(i)/eta*dSdi_si.'*BkM];
             lpeSpec(11:12,:) = Rman*[man0, -eta^2*(dCde.'*Ak_eM + C.'*Akde_eM) + 6*C.'*AkM;
                                         0, -eta^2*(dSde.'*Bk_eM + S.'*Bkde_eM) + 6*S.'*BkM];
+            % ******* Output dX *******
+            k = 0:kMax;
+            Ck = cos(k.'*M);
+            Sk = sin(k.'*M);
+            
+            dX = lpeSpec(1:2:11,:)*Ck + lpeSpec(2:2:12,:)*Sk;
+            dX(6) = dX(6) + n;
+            
         end
         
     end
