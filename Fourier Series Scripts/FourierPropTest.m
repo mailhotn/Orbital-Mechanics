@@ -4,10 +4,10 @@ oe = [10000, 0.1, 45, 30, 70, 50];
 Sat = SingleSat(oe,earth());
 Prop = Propagator(Sat);
 T = 2*pi*sqrt(oe(1)^3/Sat.primary.mu);
-nOrb = 100;
+nOrb = 10;
 t = 0:60:nOrb*T;
 kLow = 4;
-kHigh = 5;
+kHigh = 6;
 %% Conventional ECI
 [~,Xeci] = Prop.PropEciJ2(t);
 oeC = eci2oe(Xeci(:,1:3),Xeci(:,4:6));
@@ -28,19 +28,20 @@ oeS = me2oscSP(OeS.');
 %% Fourier
 % [~,oeF2] = Prop.PropOeFourier2(t,2);
 % [~,oeF5] = Prop.PropOeFourier2(t,5);
+% tic
+% [~,oeFLow] = Prop.PropOeFourier2(t,kLow);
+% oeFLow = oeFLow.';
+% F10Time = toc
+
 tic
-[~,oeFLow] = Prop.PropOeFourier2(t,kLow);
-oeFLow = oeFLow.';
-F10Time = toc
-tic
-[~,oeFHigh] = Prop.PropOeFourier2(t,kHigh);
+[~,oeFHigh] = Prop.PropOeFourierNum(t,kHigh);
 oeFHigh = oeFHigh.';
 F15Time = toc
 t = t/T;
 %% Plot
 % semimajor axis
 f = figure(1);
-f.Position(3:4) = [500,250];
+% f.Position(3:4) = [500,250];
 plot(t,oeC(1,:)/oe(1),t,oeFHigh(1,:)/oe(1),'--','linewidth',1.5)
 legend('Conventional','Fourier')
 ylabel('$\frac{a_x\left(t\right)}{a\left(0\right)}$','fontsize',18,'interpreter','latex')
@@ -49,14 +50,20 @@ grid on
 xlim([0,nOrb])
 xticks(1:nOrb)
 
-% eccentricity
+% % eccentricity
 figure(2)
-plot(t,oeC(2,:),t,oeB(2,:),'.'...
-    ,t,oeFLow(2,:),'--',t,oeFHigh(2,:),'--','linewidth',1.5)
-legend('ECI','Brouwer','F2','F5','F10','F15')
+% f.Position(3:4) = [500,250];
+plot(t,oeC(2,:),t,oeFHigh(2,:),'--','linewidth',1.5)
+legend('Conventional','Fourier')
+ylabel('$e_x$','fontsize',16,'interpreter','latex')
+xlabel('$Orbit$','interpreter','latex','fontsize',16)
+grid on
+xlim([0,nOrb])
+xticks(1:nOrb)
+
 % inclination
 f = figure(3);
-f.Position(3:4) = [500,250];
+% f.Position(3:4) = [500,250];
 plot(t,oeC(3,:),t,oeFHigh(3,:),'--','linewidth',1.5)
 legend('Conventional','Fourier')
 ylabel('$i_x \left[{rad}\right]$','fontsize',16,'interpreter','latex')
@@ -64,33 +71,53 @@ xlabel('$Orbit$','interpreter','latex','fontsize',16)
 grid on
 xlim([0,nOrb])
 xticks(1:nOrb)
-% RAAN
-figure(4)
-plot(t,oeC(4,:),t,oeB(4,:),'.'...
-    ,t,oeFLow(4,:),'--',t,oeFHigh(4,:),'--','linewidth',1.5)
-legend('ECI','Brouwer','F2','F5','F10','F15')
-% AOP
-figure(5)
-plot(t,oeC(5,:),t,oeB(5,:),'.'...
-    ,t,oeFLow(5,:),'--',t,oeFHigh(5,:),'--','linewidth',1.5)
-legend('ECI','Brouwer','F2','F5','F10','F15')
-% mean anomaly
-figure(6)
-plot(t,oeC(6,:),t,oeB(6,:),'.'...
-    ,t,oeFLow(6,:),'--',t,oeFHigh(6,:),'--','linewidth',1.5)
-legend('ECI','Brouwer','F2','F5','F10','F15')
 
-% %% Plot errors
-% errB = abs(oeC-oeB);
+% % RAAN
+figure(4)
+% f.Position(3:4) = [500,250];
+plot(t,oeC(4,:),t,oeFHigh(4,:),'--','linewidth',1.5)
+legend('Conventional','Fourier')
+ylabel('$\Omega_x \left[{rad}\right]$','fontsize',16,'interpreter','latex')
+xlabel('$Orbit$','interpreter','latex','fontsize',16)
+grid on
+xlim([0,nOrb])
+xticks(1:nOrb)
+
+% % AOP
+figure(5)
+% f.Position(3:4) = [500,250];
+plot(t,oeC(5,:),t,oeFHigh(5,:),'--','linewidth',1.5)
+legend('Conventional','Fourier')
+ylabel('$\omega_x \left[{rad}\right]$','fontsize',16,'interpreter','latex')
+xlabel('$Orbit$','interpreter','latex','fontsize',16)
+grid on
+xlim([0,nOrb])
+xticks(1:nOrb)
+
+% % mean anomaly
+figure(6)
+% f.Position(3:4) = [500,250];
+plot(t,oeC(6,:),t,oeFHigh(6,:),'--','linewidth',1.5)
+legend('Conventional','Fourier')
+ylabel('$M_x \left[{rad}\right]$','fontsize',16,'interpreter','latex')
+xlabel('$Orbit$','interpreter','latex','fontsize',16)
+grid on
+xlim([0,nOrb])
+xticks(1:nOrb)
+
+
+
+%% Plot errors
+errB = abs(oeC-oeB);
 % errFLow = abs(oeC-oeFLow);
-% errFHigh = abs(oeC-oeFHigh);
-% errB = [errB(1,:)/oe(1);errB(2,:)/oe(2);errB(3:end,:)*pi/180];
+errFHigh = abs(oeC-oeFHigh);
+errB = [errB(1,:)/oe(1);errB(2,:)/oe(2);errB(3:end,:)*pi/180];
 % errFLow = [errFLow(1,:)/oe(1);errFLow(2,:)/oe(2);errFLow(3:end,:)*pi/180];
-% errFHigh = [errFHigh(1,:)/oe(1);errFHigh(2,:)/oe(2);errFHigh(3:end,:)*pi/180];
+errFHigh = [errFHigh(1,:)/oe(1);errFHigh(2,:)/oe(2);errFHigh(3:end,:)*pi/180];
 % intErrB = trapz(t.',errB,2)/t(end)
 % intErr10 = trapz(t.',errFLow,2)/t(end)
-% intErr15 = trapz(t.',errFHigh,2)/t(end)
-% 
+intErr15 = trapz(t.',errFHigh,2)/t(end)
+
 % labelHigh = ['Fourier'];
 % 
 % % 

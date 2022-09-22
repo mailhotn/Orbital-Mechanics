@@ -159,8 +159,8 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             IC(3:end) = IC(3:end)*pi/180;
             [Time, X] = ode45(@(T,X) P.DynOeFourier(T,X,kMax),T,IC,opts);
             X(:,3:end) = X(:,3:end)*180/pi;
-            X = X.';
-            X(3:end,:) = wrapTo360(X(3:end,:));
+%             X = X;
+%             X(3:end,:) = wrapTo360(X(3:end,:));
         end
         
         function [Time, X] = PropOeFourier2(P,T,kMax)
