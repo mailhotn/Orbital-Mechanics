@@ -173,30 +173,34 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             % Assume constant coefficients, assume M is not affected by J2
             
             % Handle Initial conditions
-            IC = reshape(P.Con.InitialOeOsc,[6*P.Con.nSats,1]);
-            IC(3:end) = IC(3:end)*pi/180;
-            a = IC(1);
+            ic = reshape(P.Con.InitialOeOsc,[6*P.Con.nSats,1]);
+            icOsc = ic;
+            ic = osc2meSP(ic);
+            ic(3:end) = ic(3:end)*pi/180;
             
-            % Get mean a by substracting short period variations. The mean
-            % mean motion resulting *should* be the correct frequency for M
-            e = IC(2);
-            i = IC(3);
-            aop = IC(5);
-            eta = sqrt(1-e^2);
-            f = pi/180*me2ta(IC(6)*180/pi,e);
-            a_r = (1+e.*cos(f))./eta.^2;
-            g2 = -P.Con.primary.J2/2*(P.Con.primary.Re/a)^2;
-%             a = a + 3*g2*a*(1-1.5*sin(i)^2)/eta^3; % Kozai - weird
-            a = a + a*g2*((3*cos(i)^2-1).*(a_r^3 - 1/eta^3) ...
-                + 3*(1-cos(i)^2)*a_r^3*cos(2*aop + 2*f));
-            IC(1) = a; % Reassign a given averaging
+            a = ic(1);
+            
+%             % Get mean a by substracting short period variations. The mean
+%             % mean motion resulting *should* be the correct frequency for M
+%             e = ic(2);
+%             i = ic(3);
+%             aop = ic(5);
+%             
+%             eta = sqrt(1-e^2);
+%             f = pi/180*me2ta(ic(6)*180/pi,e);
+%             a_r = (1+e.*cos(f))./eta.^2;
+%             g2 = -P.Con.primary.J2/2*(P.Con.primary.Re/a)^2;
+% %             a = a + 3*g2*a*(1-1.5*sin(i)^2)/eta^3; % Kozai - weird
+%             a = a + a*g2*((3*cos(i)^2-1).*(a_r^3 - 1/eta^3) ...
+%                 + 3*(1-cos(i)^2)*a_r^3*cos(2*aop + 2*f));
+%             ic(1) = a; % Reassign a given averaging
             
             % Continue with the rest
             n = sqrt(P.Con.primary.mu/a^3);
 %             n = sqrt(P.Con.primary.mu/a^3)*(1+3*g2*(1-1.5*sin(i)^2)/eta^3); % kozai Fix
-            [~,lpeSpec] = P.DynOeFourier([],IC,kMax);
+            [~,lpeSpec] = P.DynOeFourier([],ic,kMax);
             %             n = n + lpeSpec(11,1); % <-------------------  Work on this
-            M = n*T+IC(6);
+            M = n*T+ic(6);
             k = 1:kMax;
             X = nan(6*P.Con.nSats,length(T));
             
@@ -221,7 +225,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             Ak = lpeSpec(1:2:11,2:end);
             Bk = lpeSpec(2:2:12,2:end);
             
-            X = IC + lpeSpec(1:2:11,1)*T + Ak*Sk + Bk*Ck -InitVal;
+            X = icOsc + lpeSpec(1:2:11,1)*T + Ak*Sk + Bk*Ck -InitVal;
             X(6,:) = M2;
 
             

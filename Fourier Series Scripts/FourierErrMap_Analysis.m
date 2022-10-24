@@ -31,6 +31,12 @@ errTenB(errTenB==inf) = nan;
 % errTenF = errTenF((nEcc-length(eccRange)+1):end,:,:);
 % errTenB = errTenB((nEcc-length(eccRange)+1):end,:,:);
 
+%% Cut off high inc - shows that brouwer always had issues
+% incCut = 50;
+% incRange = incRange(incRange<incCut);
+% errTenF = errTenF(:,1:length(incRange),:);
+% errTenB = errTenB(:,1:length(incRange),:);
+% errTenD = errTenD(:,1:length(incRange),:);
 %% Plot Relative Errors
 
 % Creat Mesh
