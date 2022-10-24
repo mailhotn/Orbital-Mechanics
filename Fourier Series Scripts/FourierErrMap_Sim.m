@@ -1,6 +1,6 @@
 clear
 %% Define Parameters
-dataFolder = 'C:\Users\User\Dropbox\Fourier Data\Error Mapping';
+dataFolder = 'C:\Users\User\Dropbox\Doc Fourier Data\Error Mapping';
 dbPath = 'C:\Users\User\Dropbox'; % ASRI
 primary = earth();
 kMax = 4;
@@ -10,7 +10,7 @@ depritFlag = 1;
 nT = 80;
 % Region Params
 nInc = 360;
-nEcc = 100;
+nEcc = 200;
 nMonte = 1000; % 6000 trials is about 1 minute (not parallel)
 incRange = linspace(0.1,90,nInc);
 eccRange = linspace(0.01,0.5,nEcc);

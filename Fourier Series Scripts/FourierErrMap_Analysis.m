@@ -1,6 +1,6 @@
 clear
 %% Load Data
-dataFolder = 'C:\Users\User\Dropbox\Fourier Data\Error Mapping'; % ASRI
+dataFolder = 'C:\Users\User\Dropbox\Doc Fourier Data\Error Mapping'; % ASRI
 % dataFolder = 'D:\Dropbox\Fourier Data\Error Mapping'; % Laptop
 % load([dataFolder '\ErrMaps_15-6-2022_9-52.mat']); % First run e:0.005-0.55, i:0.4-90
 % load([dataFolder '\ErrMaps_15-6-2022_11-13.mat']); % Singularity test e:0.5-0.7, i:60-70
@@ -14,6 +14,7 @@ dataFolder = 'C:\Users\User\Dropbox\Fourier Data\Error Mapping'; % ASRI
 % load([dataFolder '\ErrMaps_5-9-2022_13-45.mat']); % SP + Deprit + k5
 % Added mean sma to all of Fourier
 load([dataFolder '\ErrMaps_6-9-2022_13-30.mat']); % SP + Deprit + k4
+% load([dataFolder '\ErrMaps_23-9-2022_14-27.mat']); % Cancellations, SP + Deprit + k4
 
 incRange = MapData.incRange;
 eccRange = MapData.eccRange;
