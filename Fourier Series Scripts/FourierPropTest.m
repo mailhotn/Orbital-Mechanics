@@ -34,7 +34,7 @@ oeS = me2oscSP(OeS.');
 % F10Time = toc
 
 tic
-[~,oeFHigh] = Prop.PropOeFourierNum(t,kHigh);
+[~,oeFHigh] = Prop.PropOeFourier(t,kHigh);
 oeFHigh = oeFHigh.';
 F15Time = toc
 t = t/T;

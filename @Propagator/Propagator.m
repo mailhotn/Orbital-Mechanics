@@ -175,6 +175,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             % Handle Initial conditions
             ic = reshape(P.Con.InitialOeOsc,[6*P.Con.nSats,1]);
             icOsc = ic;
+            icOsc(3:end) = icOsc(3:end)*pi/180;
             ic = osc2meSP(ic);
             ic(3:end) = ic(3:end)*pi/180;
             
