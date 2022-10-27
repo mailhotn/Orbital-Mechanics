@@ -119,6 +119,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         end
         
         function [Time, X] = PropOeOsc(P,T)
+            % Numerically propagate GVE for oscullating elements
             % Use this I think
             opts = odeset('reltol',P.relTol,'abstol',P.absTol);
             OE = P.Con.InitialOeOsc;
@@ -132,6 +133,8 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         end
         
         function [Time, X] = PropOeOsc2(P,T)
+            % Numerically propagate LPE for oscullating elements
+            % Tried different way of writing equations, didnt work well
             % probably worse?
             opts = odeset('reltol',P.relTol,'abstol',P.absTol);
             OE = P.Con.InitialOeOsc;
@@ -170,7 +173,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         
         function [Time, X] = PropOeFourier(P,T,kMax)
             % Propagate for time T using Fourier LPE
-            % Assume constant coefficients, assume M is not affected by J2
+            % Assume constant coefficients
             
             % Handle Initial conditions
             ic = reshape(P.Con.InitialOeOsc,[6*P.Con.nSats,1]);
@@ -201,7 +204,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
 %             n = sqrt(P.Con.primary.mu/a^3)*(1+3*g2*(1-1.5*sin(i)^2)/eta^3); % kozai Fix
             [~,lpeSpec] = P.DynOeFourier([],ic,kMax);
             %             n = n + lpeSpec(11,1); % <-------------------  Work on this
-            M = n*T+ic(6);
+            M = n*T+icOsc(6);
             k = 1:kMax;
             X = nan(6*P.Con.nSats,length(T));
             
@@ -441,7 +444,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             oeW(:,6) = amzP;
             
             
-            % Convert to Conventional
+            % Convert to Conventional elements
             oeC(:,1) = -mu*oeW(:,1).^2./(oeW(:,1).^2.*oeW(:,4).^2+...
                 oeW(:,5).^2-2*mu*oeW(:,1));
             oeC(:,2) = sqrt(1-oeW(:,5).^2./(mu*oeC(:,1)));

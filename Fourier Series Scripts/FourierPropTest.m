@@ -1,5 +1,5 @@
 clear
-oe = [10000, 0.1, 45, 30, 70, 50];
+oe = [10000, 0.01, 45, 40, 10, 0];
 
 Sat = SingleSat(oe,earth());
 Prop = Propagator(Sat);
@@ -7,7 +7,7 @@ T = 2*pi*sqrt(oe(1)^3/Sat.primary.mu);
 nOrb = 10;
 t = 0:60:nOrb*T;
 kLow = 4;
-kHigh = 6;
+kHigh = 4;
 %% Conventional ECI
 [~,Xeci] = Prop.PropEciJ2(t);
 oeC = eci2oe(Xeci(:,1:3),Xeci(:,4:6));
