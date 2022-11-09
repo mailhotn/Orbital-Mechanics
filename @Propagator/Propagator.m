@@ -115,7 +115,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             X(:,1) = IC;
             X(:,2:end) = X(:,1) + dX*T(2:end);
             X = X.';
-            Time = T;            
+            Time = T;
         end
         
         function [Time, X] = PropOeOsc(P,T)
@@ -162,8 +162,8 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             IC(3:end) = IC(3:end)*pi/180;
             [Time, X] = ode45(@(T,X) P.DynOeFourier(T,X,kMax),T,IC,opts);
             X(:,3:end) = X(:,3:end)*180/pi;
-%             X = X;
-%             X(3:end,:) = wrapTo360(X(3:end,:));
+            %             X = X;
+            %             X(3:end,:) = wrapTo360(X(3:end,:));
         end
         
         function [Time, X] = PropOeFourier2(P,T,kMax)
@@ -184,26 +184,26 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             
             a = ic(1);
             
-%             % Get mean a by substracting short period variations. The mean
-%             % mean motion resulting *should* be the correct frequency for M
-%             e = ic(2);
-%             i = ic(3);
-%             aop = ic(5);
-%             
-%             eta = sqrt(1-e^2);
-%             f = pi/180*me2ta(ic(6)*180/pi,e);
-%             a_r = (1+e.*cos(f))./eta.^2;
-%             g2 = -P.Con.primary.J2/2*(P.Con.primary.Re/a)^2;
-% %             a = a + 3*g2*a*(1-1.5*sin(i)^2)/eta^3; % Kozai - weird
-%             a = a + a*g2*((3*cos(i)^2-1).*(a_r^3 - 1/eta^3) ...
-%                 + 3*(1-cos(i)^2)*a_r^3*cos(2*aop + 2*f));
-%             ic(1) = a; % Reassign a given averaging
+            %             % Get mean a by substracting short period variations. The mean
+            %             % mean motion resulting *should* be the correct frequency for M
+            %             e = ic(2);
+            %             i = ic(3);
+            %             aop = ic(5);
+            %
+            %             eta = sqrt(1-e^2);
+            %             f = pi/180*me2ta(ic(6)*180/pi,e);
+            %             a_r = (1+e.*cos(f))./eta.^2;
+            %             g2 = -P.Con.primary.J2/2*(P.Con.primary.Re/a)^2;
+            % %             a = a + 3*g2*a*(1-1.5*sin(i)^2)/eta^3; % Kozai - weird
+            %             a = a + a*g2*((3*cos(i)^2-1).*(a_r^3 - 1/eta^3) ...
+            %                 + 3*(1-cos(i)^2)*a_r^3*cos(2*aop + 2*f));
+            %             ic(1) = a; % Reassign a given averaging
             
             % Continue with the rest
             n = sqrt(P.Con.primary.mu/a^3);
-%             n = sqrt(P.Con.primary.mu/a^3)*(1+3*g2*(1-1.5*sin(i)^2)/eta^3); % kozai Fix
+            %             n = sqrt(P.Con.primary.mu/a^3)*(1+3*g2*(1-1.5*sin(i)^2)/eta^3); % kozai Fix
             [~,lpeSpec] = P.DynOeFourier([],ic,kMax);
-            %             n = n + lpeSpec(11,1); % <-------------------  Work on this
+            %                         n = n + lpeSpec(11,1); % <-------------------  Work on this
             M = n*T+icOsc(6);
             k = 1:kMax;
             X = nan(6*P.Con.nSats,length(T));
@@ -215,7 +215,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 sum(trigsum1(5:6)); sum(trigsum1(7:8)); sum(trigsum1(9:10));...
                 sum(trigsum1(11:12))];
             M2 = M;
-
+            
             % Fix M
             Sk = sin(k.'*M)./k.'/n;
             Ck = -cos(k.'*M)./k.'/n;
@@ -231,7 +231,66 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             
             X = icOsc + lpeSpec(1:2:11,1)*T + Ak*Sk + Bk*Ck -InitVal;
             X(6,:) = M2;
+            
+            
+            X(3:5,:) = wrapTo360(X(3:5,:)*180/pi);
+            X(6,:) = X(6,:)*180/pi;
+            X = X.';
+            Time = T;
+        end
+        
+        function [Time, X] = PropOeFourier2Ord(P,T,kMax)
+            % Propagate for time T using Fourier LPE
+            % Assume coefficients varying in AOP up to first order
+            
+            %% Handle Initial conditions
+            
+            icOsc = reshape(P.Con.InitialOeOsc,[6*P.Con.nSats,1]); 
 
+            [freq0,lpeSpec] = P.DynOeFourier2Ord(T,icOsc,kMax);
+            
+            icM = osc2meSP(icOsc);
+            icOsc(3:end) = icOsc(3:end)*pi/180;
+            icM(3:end) = icM(3:end)*pi/180;
+            
+            a = icM(1);
+            
+            % Continue with the rest
+            n = sqrt(P.Con.primary.mu/a^3);
+            
+            M = n*T+icOsc(6);
+            k = 1:kMax;
+            X = nan(6*P.Con.nSats,length(T));
+            
+            % Initial M
+            trigMat = [sin(k.'*M(1))./k.'/n;-cos(k.'*M(1))./k.'/n];
+            InitM = sum(lpeSpec((10*kMax+1):end,1).*trigMat);
+            
+            
+            % Fix M
+            Sk = sin(k.'*M)./k.'/n;
+            Ck = -cos(k.'*M)./k.'/n;
+            AkM = lpeSpec((10*kMax+1):11*kMax,:);
+            BkM = lpeSpec((11*kMax+1):12*kMax,:);
+            M2 = freq0(6)*T + sum(AkM.*Sk + BkM.*Ck) - InitM + M;
+            
+            % Initial time - With fixed M
+            trigMat = repmat([sin(k.'*M2(1))./k.'/n;-cos(k.'*M2(1))./k.'/n],6,1);
+            trigsum1 = lpeSpec(:,1).*trigMat;
+            InitVal = [sum(trigsum1(1:2*kMax)); sum(trigsum1((2*kMax+1):4*kMax));...
+                sum(trigsum1((4*kMax+1):6*kMax)); sum(trigsum1((6*kMax+1):8*kMax));...
+                sum(trigsum1((8*kMax+1):10*kMax)); sum(trigsum1((10*kMax+1):12*kMax))];
+            
+            
+            % Calculate all elements
+            Sk = sin(k.'*M2)./k.'/n;
+            Ck = -cos(k.'*M2)./k.'/n;
+            Ak = lpeSpec(1:2:11,2:end);
+            Bk = lpeSpec(2:2:12,2:end);
+            
+            X = icOsc + lpeSpec(1:2:11,1)*T + Ak*Sk + Bk*Ck -InitVal;
+            X(6,:) = M2;
+            
             
             X(3:5,:) = wrapTo360(X(3:5,:)*180/pi);
             X(6,:) = X(6,:)*180/pi;
@@ -255,8 +314,8 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             inc = IC(3);
             ran = IC(4);
             aop = IC(5);
-%             man = IC(6);
-%             f = me2ta(man,ecc);
+            %             man = IC(6);
+            %             f = me2ta(man,ecc);
             man = 0;
             f = 0;
             
@@ -313,8 +372,8 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                     % Precalc Elliptics
                     [eK,eE,eP] = elliptic123(k0,-n0); % complete
                     [eFi,eEi,ePi] = elliptic123(phi,k0,-n0); % incomplete
-%                     eFi = ellipticF(phi,k0);
-%                     eEi = ellipticE(phi,k0);
+                    %                     eFi = ellipticF(phi,k0);
+                    %                     eEi = ellipticE(phi,k0);
                     
                     % RAAN solution
                     Iv0 = 2*sqrt(s3/-X)*(sqrt(s3/(s3-s1))*eK-...
@@ -358,12 +417,12 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                     else
                         error('Apsis error too large!')
                     end
-                    phi = asin(sqrt(z0));                    
+                    phi = asin(sqrt(z0));
                     % Precalc Elliptics
                     [eK,eE,eP] = elliptic123(k0,n0);
                     [eFi,eEi,ePi] = elliptic123(phi,k0,n0);
-%                     eFi = ellipticF(phi,k0);
-%                     eEi = ellipticE(phi,k0);
+                    %                     eFi = ellipticF(phi,k0);
+                    %                     eEi = ellipticE(phi,k0);
                     
                     % RAAN solution
                     Iv0 = 2*sqrt(s1/X)*(sqrt(s1/(s3-s1))*eK-...
@@ -648,7 +707,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             M = X(6);
             b = (1-sqrt(1-e^2))/e;
             
-                        
+            
             % constant vectors
             m2 = (0:4).';
             m3 = (0:6).';
@@ -813,14 +872,14 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 Ak = [Jk; Jn*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5]];
                 Ak_e = [Jk_e; Jn_e*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5]];
                 Akde_e = [dJkde_e; dJnde_e*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5] +...
-                           Jn_e*[da2de.'*g2; da3de.'*g3; da4de.'*g4; da5de.'*g5] +...
-                           Jn_e2*[a2.'*dg2deXe; a3.'*dg3deXe; a4.'*dg4deXe; a5.'*dg5deXe]];
-
+                    Jn_e*[da2de.'*g2; da3de.'*g3; da4de.'*g4; da5de.'*g5] +...
+                    Jn_e2*[a2.'*dg2deXe; a3.'*dg3deXe; a4.'*dg4deXe; a5.'*dg5deXe]];
+                
                 Bk = Jn*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5];
                 Bk_e = Jn_e*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5];
                 Bkde_e = dJnde_e*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5] +...
-                           Jn_e*[db1de.'*g2; db2de.'*g3; db3de.'*g4; db4de.'*g5] +...
-                           Jn_e2*[b1.'*dg2deXe; b2.'*dg3deXe; b3.'*dg4deXe; b4.'*dg5deXe];
+                    Jn_e*[db1de.'*g2; db2de.'*g3; db3de.'*g4; db4de.'*g5] +...
+                    Jn_e2*[b1.'*dg2deXe; b2.'*dg3deXe; b3.'*dg4deXe; b4.'*dg5deXe];
                 
                 n = 1;
                 while n <= k + 5
@@ -965,17 +1024,17 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 BkM(:,k) = Bk;
                 Bk_eM(:,k) = Bk_e;
                 Bkde_eM(:,k) = Bkde_e;
-                                
+                
                 k = k+1;
             end
             
             
             n = sqrt(mu/a^3); % bad practice, should rename but whatever
-            eta = sqrt(1-e^2); 
+            eta = sqrt(1-e^2);
             % constant potential values
             R = -n^2*Re^2/2; % common factor
             Rsma = -n*J2*Re^2/a;
-            Recc = -n*eta*J2*Re^2/2/a^2; 
+            Recc = -n*eta*J2*Re^2/2/a^2;
             Rinc = -n*J2*Re^2*cos(i)/2/a^2/eta;
             Rran = -n*J2*Re^2/2/a^2/eta;
             Raop = -n*J2*Re^2/2/a^2;
@@ -985,23 +1044,23 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             ran0 = 3*cos(i)/eta^3;
             aop0 = -1.5*(5*cos(i)^2-1)/eta^4;
             man0 = -1.5*(3*cos(i)^2-1)/eta^3;
-
+            
             % Calculate Spectrum of Elements
             k = 1:kMax;
             lpeSpec = nan(12,kMax+1);
             
             lpeSpec(1:2,:) = Rsma*[0, S.'*(BkM.*k);
-                                   0, -C.'*(AkM.*k)];
+                0, -C.'*(AkM.*k)];
             lpeSpec(3:4,:) = Recc*[0, eta*S.'*(Bk_eM.*k) - dCdo.'*Ak_eM;
-                                   0, -eta*C.'*(Ak_eM.*k) - dSdo.'*Bk_eM];
+                0, -eta*C.'*(Ak_eM.*k) - dSdo.'*Bk_eM];
             lpeSpec(5:6,:) = Rinc*[0, dCdo_si.'*AkM;
-                                   0, dSdo_si.'*BkM];
+                0, dSdo_si.'*BkM];
             lpeSpec(7:8,:) = Rran*[ran0, dCdi_si.'*AkM;
-                                                 0, dSdi_si.'*BkM]; 
+                0, dSdi_si.'*BkM];
             lpeSpec(9:10,:) = Raop*[aop0, eta*(dCde.'*Ak_eM + C.'*Akde_eM) - cos(i)/eta*dCdi_si.'*AkM;
-                                       0, eta*(dSde.'*Bk_eM + S.'*Bkde_eM) - cos(i)/eta*dSdi_si.'*BkM];
+                0, eta*(dSde.'*Bk_eM + S.'*Bkde_eM) - cos(i)/eta*dSdi_si.'*BkM];
             lpeSpec(11:12,:) = Rman*[man0, -eta^2*(dCde.'*Ak_eM + C.'*Akde_eM) + 6*C.'*AkM;
-                                        0, -eta^2*(dSde.'*Bk_eM + S.'*Bkde_eM) + 6*S.'*BkM];
+                0, -eta^2*(dSde.'*Bk_eM + S.'*Bkde_eM) + 6*S.'*BkM];
             % ******* Output dX *******
             k = 0:kMax;
             Ck = cos(k.'*M);
@@ -1009,6 +1068,467 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             
             dX = lpeSpec(1:2:11,:)*Ck + lpeSpec(2:2:12,:)*Sk;
             dX(6) = dX(6) + n;
+            
+        end
+        
+        function [freq0, lpeSpec] = DynOeFourier2Ord(P,t,icOsc,kMax) 
+            %% Handle Input
+            J2 = P.Con.primary.J2;
+            Re = P.Con.primary.Re;
+            mu = P.Con.primary.mu;
+            
+            nT = length(t);
+            
+            icM = osc2meSP(icOsc);
+            icM(3:end) = icM(3:end)*pi/180;
+            icOsc(3:end) = icOsc(3:end)*pi/180;
+            % handle elements vector
+            a = icM(1);
+            e = icM(2);
+            i = icM(3);
+            
+            nMo = sqrt(mu/a^3);
+            p = a*(1-e^2);
+            aop = icOsc(5) + (3/4*J2*(Re/p)^2*nMo*(5*cos(i)^2-1))*t;
+            
+            b = (1-sqrt(1-e^2))/e;
+            
+            %% constant vectors
+            m2 = (0:4).';
+            m3 = (0:6).';
+            m4 = (0:8).';
+            m5 = (0:10).';
+            
+            a2 = [1,-4*e,4*e^2+2,-4*e,1].';
+            a3 = [1,-6*e,12*e^2+3,-8*e^3-12*e,12*e^2+3,-6*e,1].';
+            a4 = [1,-8*e,24*e^2+4,-(32*e^3+24*e),(16*e^4+48*e^2+6),...
+                -(32*e^3+24*e),24*e^2+4,-8*e,1].';
+            a5 = [1,-10*e,40*e^2+5,-(80*e^3+40*e),(80*e^4+120*e^2+10),...
+                -(32*e^5+160*e^3+60*e),(80*e^4+120*e^2+10),-(80*e^3+40*e),40*e^2+5,...
+                -10*e,1].';
+            
+            b1 = [-1,2*e,0,-2*e,1].';
+            b2 = [-1,4*e,-4*e^2-1,0,4*e^2+1,-4*e,1].';
+            b3 = [-1,6*e,-12*e^2-2,8*e^3+6*e,0,-8*e^3-6*e,12*e^2+2,-6*e,1].';
+            b4 = [-1,8*e,-24*e^2-3,32*e^3+16*e,-16*e^4-24*e^2-2,0,16*e^4+24*e^2+2,...
+                -32*e^3-16*e,24*e^2+3,-8*e,1].';
+            
+            da2de = [0,-4,8*e,-4,0].';
+            da3de = [0,-6,24*e,(-24*e^2-12),24*e,-6,0].';
+            da4de = [0,-8,48*e,(-96*e^2-24),(64*e^3+96*e),(-96*e^2-24),48*e,-8,0].';
+            da5de = [0,-10,80*e,(-240*e^2-40),(320*e^3+240*e),(-160*e^4-480*e^2-60),...
+                (320*e^3+240*e),(-240*e^2-40),80*e,-10,0].';
+            
+            db1de = [0,2,0,-2,0].';
+            db2de = [0,4,-8*e,0,8*e,-4,0].';
+            db3de = [0,6,-24*e,24*e^2+6,0,-24*e^2-6,24*e,-6,0].';
+            db4de = [0,8,-48*e,96*e^2+16,-64*e^3-48*e,0,64*e^3+48*e,-96*e^2-16,48*e,-8,0].';
+            
+            %% matrices by aop
+            C = [6*(3*sin(i)^2*cos(aop).^2-1)/(1-e^2)^2;
+                (9*e^2*sin(i)^2*cos(aop).^2+3*sin(i)^2*(sin(aop).^2-cos(aop).^2)-3*e^2)/2/(1-e^2)^3.5;
+                (3*e^3*sin(i)^2*cos(aop).^2+9*e*sin(i)^2*(sin(aop).^2-cos(aop).^2)-e^3)/4/(1-e^2)^4;
+                (9*e^2*sin(i)^2*(sin(aop).^2-cos(aop).^2))/8/(1-e^2)^4.5;
+                (3*e^3*sin(i)^2*(sin(aop).^2-cos(aop).^2))/16/(1-e^2)^5];
+            
+            dCdi_si = [36*cos(aop).^2*cos(i)/(1-e^2)^2; % all pre-divided by sin(i)
+                3*cos(i)*(3*e^2*cos(aop).^2-2*cos(aop).^2+1)/(1-e^2)^3.5;
+                3*e*cos(i)*(3+(e^2-6)*cos(aop).^2)/2/(1-e^2)^4;
+                -9*e^2*cos(i)*(2*cos(aop).^2-1)/4/(1-e^2)^4.5;
+                -3*e^3*cos(i)*(2*cos(aop).^2-1)/8/(1-e^2)^5];
+            
+            dCdo = [-36*sin(i)^2*sin(aop).*cos(aop)/(1-e^2)^2;
+                3*(-3*e^2+2)*sin(i)^2*sin(aop).*cos(aop)/(1-e^2)^3.5;
+                -3*e*(e^2-6)*sin(i)^2*sin(aop).*cos(aop)/2/(1-e^2)^4;
+                9*e^2*sin(i)^2*sin(aop).*cos(aop)/2/(1-e^2)^4.5;
+                3*e^3*sin(i)^2*sin(aop).*cos(aop)/4/(1-e^2)^5];
+            
+            dCdo_si = [-36*sin(i)*sin(aop).*cos(aop)/(1-e^2)^2;
+                3*(-3*e^2+2)*sin(i)*sin(aop).*cos(aop)/(1-e^2)^3.5;
+                -3*e*(e^2-6)*sin(i)*sin(aop).*cos(aop)/2/(1-e^2)^4;
+                9*e^2*sin(i)*sin(aop).*cos(aop)/2/(1-e^2)^4.5;
+                3*e^3*sin(i)*sin(aop).*cos(aop)/4/(1-e^2)^5];
+            
+            dCde = [24*e*(3*sin(i)^2*cos(aop).^2-1)/(1-e^2)^3;
+                3*e*(15*e^2*sin(i)^2*cos(aop).^2 +7*sin(i)^2*sin(aop).^2 -sin(i)^2*cos(aop).^2 -5*e^2 -2)/2/(1-e^2)^4.5;
+                ((15*e^4-54*e^2-9)*sin(i)^2*cos(aop).^2 + (63*e^2+9)*sin(i)^2*sin(aop).^2 -5*e^4 -3*e^2)/4/(1-e^2)^5;
+                -9*e*sin(i)^2*(cos(aop).^2-sin(aop).^2)*(7*e^2+2)/8/(1-e^2)^5.5;
+                -3*e^2*sin(i)^2*(cos(aop).^2-sin(aop).^2)*(7*e^2+3)/16/(1-e^2)^6];
+            
+            S = -[6*sin(i)^2*sin(aop).*cos(aop)/2/(1-e^2)^3;
+                18*e*sin(i)^2*sin(aop).*cos(aop)/4/(1-e^2)^3.5;
+                18*e^2*sin(i)^2*sin(aop).*cos(aop)/8/(1-e^2)^4;
+                6*e^3*sin(i)^2*sin(aop).*cos(aop)/16/(1-e^2)^4.5];
+            
+            dSdi_si = -[6*cos(i)*sin(aop).*cos(aop)/(1-e^2)^3;
+                9*e*cos(i)*sin(aop).*cos(aop)/(1-e^2)^3.5;
+                9*e^2*cos(i)*sin(aop).*cos(aop)/2/(1-e^2)^4;
+                3*e^3*cos(i)*sin(aop).*cos(aop)/4/(1-e^2)^4.5];
+            
+            dSdo = -[6*sin(i)^2*(2*cos(aop).^2-1)/2/(1-e^2)^3;
+                18*e*sin(i)^2*(2*cos(aop).^2-1)/4/(1-e^2)^3.5;
+                18*e^2*sin(i)^2*(2*cos(aop).^2-1)/8/(1-e^2)^4;
+                6*e^3*sin(i)^2*(2*cos(aop).^2-1)/16/(1-e^2)^4.5];
+            
+            dSdo_si = -[6*sin(i)*(2*cos(aop).^2-1)/2/(1-e^2)^3;
+                18*e*sin(i)*(2*cos(aop).^2-1)/4/(1-e^2)^3.5;
+                18*e^2*sin(i)*(2*cos(aop).^2-1)/8/(1-e^2)^4;
+                6*e^3*sin(i)*(2*cos(aop).^2-1)/16/(1-e^2)^4.5];
+            
+            dSde = [-18*e*sin(i)^2*sin(aop).*cos(aop)/(1-e^2)^4;
+                -9*sin(i)^2*sin(aop).*cos(aop)*(6*e^2+1)/2/(1-e^2)^4.5;
+                -9*e*sin(i)^2*sin(aop).*cos(aop)*(3*e^2+1)/2/(1-e^2)^5;
+                -9*e^2*sin(i)^2*sin(aop).*cos(aop)*(2*e^2+1)/8/(1-e^2)^5.5];
+            
+            %% Second Order
+            
+            d2Cdo2 = [-36*sin(i)^2*(2*cos(aop).^2-1)/(1-e^2)^2;
+                -3*(3*e^2-2)*sin(i)^2*(2*cos(aop).^2-1)/(1-e^2)^3.5;
+                -3*(e^2-6)*e*sin(i)^2*(2*cos(aop).^2-1)/2/(1-e^2)^4;
+                9*e^2*sin(i)^2*(2*cos(aop).^2-1)/2/(1-e^2)^4.5;
+                3*e^3*sin(i)^2*(2*cos(aop).^2-1)/4/(1-e^2)^5];
+            
+            d2Cdo2_si = [-36*sin(i)*(2*cos(aop).^2-1)/(1-e^2)^2;
+                -3*(3*e^2-2)*sin(i)*(2*cos(aop).^2-1)/(1-e^2)^3.5;
+                -3*(e^2-6)*e*sin(i)*(2*cos(aop).^2-1)/2/(1-e^2)^4;
+                9*e^2*sin(i)*(2*cos(aop).^2-1)/2/(1-e^2)^4.5;
+                3*e^3*sin(i)*(2*cos(aop).^2-1)/4/(1-e^2)^5];
+            
+            d2Cdido_si = [-72*cos(i)*sin(aop).*cos(aop)/(1-e^2)^2;
+                (12-18*e^2)*cos(i)*sin(aop).*cos(aop)/(1-e^2)^3.5;
+                3*e*(6-e^2)*cos(i)*sin(aop).*cos(aop)/(1-e^2)^4;
+                9*e^2*cos(i)*sin(aop).*cos(aop)/(1-e^2)^4.5;
+                3*e^3*cos(i)*sin(aop).*cos(aop)/2/(1-e^2)^5];
+            
+            d2Cdedo = [-144*e*sin(i)^2*sin(aop).*cos(aop)/(1-e^2)^3;
+                -(45*e^2-24)*e*sin(i)^2*sin(aop).*cos(aop)/(1-e^2)^4.5;
+                -3*(5*e^4-39*e^2-6)*sin(i)^2*sin(aop).*cos(aop)/2/(1-e^2)^5;
+                (63*e^2+18)*e*sin(i)^2*sin(aop).*cos(aop)/2/(1-e^2)^5.5;
+                -3*e^2*(7*e^2+3)*sin(i)^2*sin(aop).*cos(aop)/4/(1-e^2)^6];
+            
+            d2Sdo2 = [12*sin(i)^2*sin(aop).*cos(aop)/(1-e^2)^3;
+                18*e*sin(i)^2*sin(aop).*cos(aop)/(1-e^2)^3.5;
+                9*e^2*sin(i)^2*sin(aop).*cos(aop)/(1-e^2)^4;
+                3*e^3*sin(i)^2*sin(aop).*cos(aop)/2/(1-e^2)^4.5];
+            
+            d2Sdo2_si = [12*sin(i)*sin(aop).*cos(aop)/(1-e^2)^3;
+                18*e*sin(i)*sin(aop).*cos(aop)/(1-e^2)^3.5;
+                9*e^2*sin(i)*sin(aop).*cos(aop)/(1-e^2)^4;
+                3*e^3*sin(i)*sin(aop).*cos(aop)/2/(1-e^2)^4.5];
+            
+            d2Sdido_si = [-6*cos(i)*(2*cos(aop).^2-1)/(1-e^2)^3;
+                -9*e*cos(i)*(2*cos(aop).^2-1)/(1-e^2)^3.5;
+                -9*e^2*cos(i)*(2*cos(aop).^2-1)/2/(1-e^2)^4;
+                -3*e^3*cos(i)*(2*cos(aop).^2-1)/4/(1-e^2)^4.5];
+            
+            d2Sdedo = [-18*e*sin(i)^2*(2*cos(aop).^2-1)/(1-e^2)^4;
+                -9*(6*e^2+1)*sin(i)^2*(2*cos(aop).^2-1)/2/(1-e^2)^4.5;
+                -9*e*(3*e^2+1)*sin(i)^2*(2*cos(aop).^2-1)/2/(1-e^2)^5;
+                -9*e^2*(2*e^2+1)*sin(i)^2*(2*cos(aop).^2-1)/8/(1-e^2)^5.5];
+            %% Loop for A,B
+            AkM = nan(5,kMax);
+            Ak_eM = nan(5,kMax);
+            Akde_eM = nan(5,kMax);
+            
+            BkM = nan(4,kMax);
+            Bk_eM = nan(4,kMax);
+            Bkde_eM = nan(4,kMax);
+            
+            k = 1;
+            
+            while k <= kMax
+                n = 0;
+                
+                g2 = b.^abs(m2+n+k-2);
+                g3 = abs(m3+n+k-2).*b.^abs(m3+n+k-3) + e/sqrt(1-e^2)*b.^abs(m3+n+k-2);
+                g4 = abs(m4+n+k-3).*abs(m4+n+k-2)/2.*b.^abs(m4+n+k-4) + ...
+                    3*e*abs(m4+n+k-2)/2/sqrt(1-e^2).*b.^abs(m4+n+k-3) + ...
+                    3*e^2/2/(1-e^2)*b.^abs(m4+n+k-2);
+                g5 = abs(m5+n+k-4).*abs(m5+n+k-3).*abs(m5+n+k-2)/6.*b.^abs(m5+n+k-5) + ...
+                    e*abs(m5+n+k-3).*abs(m5+n+k-2)/sqrt(1-e^2).*b.^abs(m5+n+k-4) + ...
+                    5*e^2*abs(m5+n+k-2)/2/(1-e^2).*b.^abs(m5+n+k-3) + ...
+                    5*e^3/2/(1-e^2)^(3/2).*b.^abs(m5+n+k-2);
+                
+                dg2deXe = abs(m2+n+k-2).*b.^(abs(m2+n+k-2))/sqrt(1-e^2);
+                dg3deXe = abs(m3+n+k-2).*(abs(m3+n+k-3).*b.^(abs(m3+n+k-3)) + ...
+                    e/sqrt(1-e^2)*b.^(abs(m3+n+k-2)))/sqrt(1-e^2) + ...
+                    e*b.^abs(m3+n+k-2)/(1-e^2)^(3/2);
+                dg4deXe = abs(m4+n+k-2).*(3*e^2/2/(1-e^2)*b.^abs(m4+n+k-2) +...
+                    abs(m4+n+k-3).*(3*e/2/sqrt(1-e^2)*b.^abs(m4+n+k-3) +...
+                    abs(m4+n+k-4)/2.*b.^abs(m4+n+k-4)))/sqrt(1-e^2) +...
+                    3/2*e*abs(m4+n+k-2)/(1-e^2)^(3/2).*b.^abs(m4+n+k-3) +...
+                    3*e^2/(1-e^2)^2*b.^abs(m4+n+k-2);
+                dg5deXe = abs(m5+n+k-2).*(5*e^3/2/(1-e^2)^(3/2)*b.^abs(m5+n+k-2) + ...
+                    abs(m5+n+k-3).*(5*e^2/2/(1-e^2)*b.^abs(m5+n+k-3) + ...
+                    abs(m5+n+k-4).*(e/sqrt(1-e^2)*b.^abs(m5+n+k-4) + ...
+                    abs(m5+n+k-5)/6.*b.^abs(m5+n+k-5))))/sqrt(1-e^2) + ...
+                    abs(m5+n+k-3).*abs(m5+n+k-2)*e/(1-e^2)^(3/2).*b.^abs(m5+n+k-4) +...
+                    5*abs(m5+n+k-2)*e^2/(1-e^2)^2.*b.^abs(m5+n+k-3) +...
+                    15*e^3/2/(1-e^2)^(5/2)*b.^abs(m5+n+k-2);
+                
+                Jk = besselj(k,k*e);
+                % Jk/e nonsingular
+                Jk_e = 0.5*(besselj(k+1,k*e) + besselj(k-1,k*e));
+                % dJkde/e nonsingular
+                if k~=1
+                    % use expression with no /e
+                    dJkde_e = k^2/4/(k^2-1)*(2*Jk + (k+1)*besselj(k-2,k*e) - (k-1)*besselj(k+2,k*e));
+                else
+                    % elimination of /e not possible
+                    dJkde_e = 0.5*k/e*(besselj(k-1,k*e) - besselj(k+1,k*e));
+                end
+                
+                Jn = besselj(n,-k*e);
+                % Jn/e nonsingular
+                if n~=0
+                    Jn_e = -k/2/n*(besselj(n+1,-k*e)+besselj(n-1,-k*e));
+                else
+                    Jn_e = Jn/e;
+                end
+                % dJnde/e nonsingular
+                if abs(n)~=1
+                    dJnde_e = k^2/4/(n^2-1)*(2*Jn + (n+1)*besselj(n-2,-k*e) - (n-1)*besselj(n+2,-k*e));
+                else
+                    dJnde_e = -0.5*k/e*(besselj(n-1,-k*e) - besselj(n+1,-k*e));
+                end
+                % Jn/e^2 nonsingular
+                if abs(n)>1
+                    Jn_e2 = k^2/4/n/(n^2-1)*(2*n*Jn + (n+1)*besselj(n-2,-k*e) + (n-1)*besselj(n+2,-k*e));
+                else
+                    Jn_e2 = Jn/e^2;
+                end
+                
+                Ak = [Jk; Jn*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5]];
+                Ak_e = [Jk_e; Jn_e*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5]];
+                Akde_e = [dJkde_e; dJnde_e*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5] +...
+                    Jn_e*[da2de.'*g2; da3de.'*g3; da4de.'*g4; da5de.'*g5] +...
+                    Jn_e2*[a2.'*dg2deXe; a3.'*dg3deXe; a4.'*dg4deXe; a5.'*dg5deXe]];
+                
+                Bk = Jn*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5];
+                Bk_e = Jn_e*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5];
+                Bkde_e = dJnde_e*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5] +...
+                    Jn_e*[db1de.'*g2; db2de.'*g3; db3de.'*g4; db4de.'*g5] +...
+                    Jn_e2*[b1.'*dg2deXe; b2.'*dg3deXe; b3.'*dg4deXe; b4.'*dg5deXe];
+                
+                n = 1;
+                while n <= k + 5
+                    % positive n
+                    g2 = b.^abs(m2+n+k-2);
+                    g3 = abs(m3+n+k-2).*b.^abs(m3+n+k-3) + e/sqrt(1-e^2)*b.^abs(m3+n+k-2);
+                    g4 = abs(m4+n+k-3).*abs(m4+n+k-2)/2.*b.^abs(m4+n+k-4) + ...
+                        3*e*abs(m4+n+k-2)/2/sqrt(1-e^2).*b.^abs(m4+n+k-3) + ...
+                        3*e^2/2/(1-e^2)*b.^abs(m4+n+k-2);
+                    g5 = abs(m5+n+k-4).*abs(m5+n+k-3).*abs(m5+n+k-2)/6.*b.^abs(m5+n+k-5) + ...
+                        e*abs(m5+n+k-3).*abs(m5+n+k-2)/sqrt(1-e^2).*b.^abs(m5+n+k-4) + ...
+                        5*e^2*abs(m5+n+k-2)/2/(1-e^2).*b.^abs(m5+n+k-3) + ...
+                        5*e^3/2/(1-e^2)^(3/2).*b.^abs(m5+n+k-2);
+                    
+                    dg2deXe = abs(m2+n+k-2).*b.^(abs(m2+n+k-2))/sqrt(1-e^2);
+                    dg3deXe = abs(m3+n+k-2).*(abs(m3+n+k-3).*b.^(abs(m3+n+k-3)) + ...
+                        e/sqrt(1-e^2)*b.^(abs(m3+n+k-2)))/sqrt(1-e^2) + ...
+                        e*b.^abs(m3+n+k-2)/(1-e^2)^(3/2);
+                    dg4deXe = abs(m4+n+k-2).*(3*e^2/2/(1-e^2)*b.^abs(m4+n+k-2) +...
+                        abs(m4+n+k-3).*(3*e/2/sqrt(1-e^2)*b.^abs(m4+n+k-3) +...
+                        abs(m4+n+k-4)/2.*b.^abs(m4+n+k-4)))/sqrt(1-e^2) +...
+                        3/2*e*abs(m4+n+k-2)/(1-e^2)^(3/2).*b.^abs(m4+n+k-3) +...
+                        3*e^2/(1-e^2)^2*b.^abs(m4+n+k-2);
+                    dg5deXe = abs(m5+n+k-2).*(5*e^3/2/(1-e^2)^(3/2)*b.^abs(m5+n+k-2) + ...
+                        abs(m5+n+k-3).*(5*e^2/2/(1-e^2)*b.^abs(m5+n+k-3) + ...
+                        abs(m5+n+k-4).*(e/sqrt(1-e^2)*b.^abs(m5+n+k-4) + ...
+                        abs(m5+n+k-5)/6.*b.^abs(m5+n+k-5))))/sqrt(1-e^2) + ...
+                        abs(m5+n+k-3).*abs(m5+n+k-2)*e/(1-e^2)^(3/2).*b.^abs(m5+n+k-4) +...
+                        5*abs(m5+n+k-2)*e^2/(1-e^2)^2.*b.^abs(m5+n+k-3) +...
+                        15*e^3/2/(1-e^2)^(5/2)*b.^abs(m5+n+k-2);
+                    
+                    Jn = besselj(n,-k*e);
+                    % Jn/e nonsingular
+                    if n~=0
+                        Jn_e = -k/2/n*(besselj(n+1,-k*e)+besselj(n-1,-k*e));
+                    else
+                        Jn_e = Jn/e;
+                    end
+                    % dJnde/e nonsingular
+                    if abs(n)~=1
+                        dJnde_e = k^2/4/(n^2-1)*(2*Jn + (n+1)*besselj(n-2,-k*e) - (n-1)*besselj(n+2,-k*e));
+                    else
+                        dJnde_e = -0.5*k/e*(besselj(n-1,-k*e) - besselj(n+1,-k*e));
+                    end
+                    % Jn/e^2 nonsingular
+                    if abs(n)>1
+                        Jn_e2 = k^2/4/n/(n^2-1)*(2*n*Jn + (n+1)*besselj(n-2,-k*e) + (n-1)*besselj(n+2,-k*e));
+                    else
+                        Jn_e2 = Jn/e^2;
+                    end
+                    
+                    dAk = [0; Jn*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5]];
+                    dAk_e = [0; Jn_e*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5]];
+                    dAkde_e = [0; dJnde_e*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5] +...
+                        Jn_e*[da2de.'*g2; da3de.'*g3; da4de.'*g4; da5de.'*g5] +...
+                        Jn_e2*[a2.'*dg2deXe; a3.'*dg3deXe; a4.'*dg4deXe; a5.'*dg5deXe]];
+                    
+                    dBk = Jn*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5];
+                    dBk_e = Jn_e*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5];
+                    dBkde_e = dJnde_e*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5] +...
+                        Jn_e*[db1de.'*g2; db2de.'*g3; db3de.'*g4; db4de.'*g5] +...
+                        Jn_e2*[b1.'*dg2deXe; b2.'*dg3deXe; b3.'*dg4deXe; b4.'*dg5deXe];
+                    
+                    
+                    % negative n
+                    n = -n;
+                    g2 = b.^abs(m2+n+k-2);
+                    g3 = abs(m3+n+k-2).*b.^abs(m3+n+k-3) + e/sqrt(1-e^2)*b.^abs(m3+n+k-2);
+                    g4 = abs(m4+n+k-3).*abs(m4+n+k-2)/2.*b.^abs(m4+n+k-4) + ...
+                        3*e*abs(m4+n+k-2)/2/sqrt(1-e^2).*b.^abs(m4+n+k-3) + ...
+                        3*e^2/2/(1-e^2)*b.^abs(m4+n+k-2);
+                    g5 = abs(m5+n+k-4).*abs(m5+n+k-3).*abs(m5+n+k-2)/6.*b.^abs(m5+n+k-5) + ...
+                        e*abs(m5+n+k-3).*abs(m5+n+k-2)/sqrt(1-e^2).*b.^abs(m5+n+k-4) + ...
+                        5*e^2*abs(m5+n+k-2)/2/(1-e^2).*b.^abs(m5+n+k-3) + ...
+                        5*e^3/2/(1-e^2)^(3/2).*b.^abs(m5+n+k-2);
+                    
+                    dg2deXe = abs(m2+n+k-2).*b.^(abs(m2+n+k-2))/sqrt(1-e^2);
+                    dg3deXe = abs(m3+n+k-2).*(abs(m3+n+k-3).*b.^(abs(m3+n+k-3)) + ...
+                        e/sqrt(1-e^2)*b.^(abs(m3+n+k-2)))/sqrt(1-e^2) + ...
+                        e*b.^abs(m3+n+k-2)/(1-e^2)^(3/2);
+                    dg4deXe = abs(m4+n+k-2).*(3*e^2/2/(1-e^2)*b.^abs(m4+n+k-2) +...
+                        abs(m4+n+k-3).*(3*e/2/sqrt(1-e^2)*b.^abs(m4+n+k-3) +...
+                        abs(m4+n+k-4)/2.*b.^abs(m4+n+k-4)))/sqrt(1-e^2) +...
+                        3/2*e*abs(m4+n+k-2)/(1-e^2)^(3/2).*b.^abs(m4+n+k-3) +...
+                        3*e^2/(1-e^2)^2*b.^abs(m4+n+k-2);
+                    dg5deXe = abs(m5+n+k-2).*(5*e^3/2/(1-e^2)^(3/2)*b.^abs(m5+n+k-2) + ...
+                        abs(m5+n+k-3).*(5*e^2/2/(1-e^2)*b.^abs(m5+n+k-3) + ...
+                        abs(m5+n+k-4).*(e/sqrt(1-e^2)*b.^abs(m5+n+k-4) + ...
+                        abs(m5+n+k-5)/6.*b.^abs(m5+n+k-5))))/sqrt(1-e^2) + ...
+                        abs(m5+n+k-3).*abs(m5+n+k-2)*e/(1-e^2)^(3/2).*b.^abs(m5+n+k-4) +...
+                        5*abs(m5+n+k-2)*e^2/(1-e^2)^2.*b.^abs(m5+n+k-3) +...
+                        15*e^3/2/(1-e^2)^(5/2)*b.^abs(m5+n+k-2);
+                    
+                    Jn = besselj(n,-k*e);
+                    % Jn/e nonsingular
+                    if n~=0
+                        Jn_e = -k/2/n*(besselj(n+1,-k*e)+besselj(n-1,-k*e));
+                    else
+                        Jn_e = Jn/e;
+                    end
+                    % dJnde/e nonsingular
+                    if abs(n)~=1
+                        dJnde_e = k^2/4/(n^2-1)*(2*Jn + (n+1)*besselj(n-2,-k*e) - (n-1)*besselj(n+2,-k*e));
+                    else
+                        dJnde_e = -0.5*k/e*(besselj(n-1,-k*e) - besselj(n+1,-k*e));
+                    end
+                    % Jn/e^2 nonsingular
+                    if abs(n)>1
+                        Jn_e2 = k^2/4/n/(n^2-1)*(2*n*Jn + (n+1)*besselj(n-2,-k*e) + (n-1)*besselj(n+2,-k*e));
+                    else
+                        Jn_e2 = Jn/e^2;
+                    end
+                    
+                    dAk = dAk + [0; Jn*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5]];
+                    dAk_e = dAk_e + [0; Jn_e*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5]];
+                    dAkde_e = dAkde_e + [0; dJnde_e*[a2.'*g2; a3.'*g3; a4.'*g4; a5.'*g5] +...
+                        Jn_e*[da2de.'*g2; da3de.'*g3; da4de.'*g4; da5de.'*g5] +...
+                        Jn_e2*[a2.'*dg2deXe; a3.'*dg3deXe; a4.'*dg4deXe; a5.'*dg5deXe]];
+                    
+                    dBk = dBk + Jn*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5];
+                    dBk_e = dBk_e + Jn_e*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5];
+                    dBkde_e = dBkde_e + dJnde_e*[b1.'*g2; b2.'*g3; b3.'*g4; b4.'*g5] +...
+                        Jn_e*[db1de.'*g2; db2de.'*g3; db3de.'*g4; db4de.'*g5] +...
+                        Jn_e2*[b1.'*dg2deXe; b2.'*dg3deXe; b3.'*dg4deXe; b4.'*dg5deXe];
+                    
+                    Ak = Ak + dAk;
+                    Ak_e = Ak_e + dAk_e;
+                    Akde_e = Akde_e + dAkde_e;
+                    
+                    Bk = Bk + dBk;
+                    Bk_e = Bk_e + dBk_e;
+                    Bkde_e = Bkde_e + dBkde_e;
+                    
+                    n = abs(n); % return n to positive value
+                    n = n+1;
+                end
+                
+                AkM(:,k) = Ak;
+                Ak_eM(:,k) = Ak_e;
+                Akde_eM(:,k) = Akde_e;
+                
+                BkM(:,k) = Bk;
+                Bk_eM(:,k) = Bk_e;
+                Bkde_eM(:,k) = Bkde_e;
+                
+                k = k+1;
+            end
+            %% Define Final constants
+            eta = sqrt(1-e^2);
+            % constant potential values
+            R = -nMo^2*Re^2/2; % common factor
+            Rsma = -nMo*J2*Re^2/a;
+            Recc = -nMo*eta*J2*Re^2/2/a^2;
+            Rinc = -nMo*J2*Re^2*cos(i)/2/a^2/eta;
+            Rran = -nMo*J2*Re^2/2/a^2/eta;
+            Raop = -nMo*J2*Re^2/2/a^2;
+            Rman = Raop;
+            
+            % Freq 0 elements without common factor
+            ran0 = 3*cos(i)/eta^3;
+            aop0 = -1.5*(5*cos(i)^2-1)/eta^4;
+            man0 = -1.5*(3*cos(i)^2-1)/eta^3;
+            
+            % Calculate Spectrum of Elements
+            k = 1:kMax;
+            lpeSpec = nan(6*2*kMax,nT);
+            
+            % first order stuff
+            
+%             lpeSpec(1:2,:) = Rsma*[0, S.'*(BkM.*k);
+%                 0, -C.'*(AkM.*k)];
+%             lpeSpec(3:4,:) = Recc*[0, eta*S.'*(Bk_eM.*k) - dCdo.'*Ak_eM;
+%                 0, -eta*C.'*(Ak_eM.*k) - dSdo.'*Bk_eM];
+%             lpeSpec(5:6,:) = Rinc*[0, dCdo_si.'*AkM;
+%                 0, dSdo_si.'*BkM];
+%             lpeSpec(7:8,:) = Rran*[ran0, dCdi_si.'*AkM;
+%                 0, dSdi_si.'*BkM];
+%             lpeSpec(9:10,:) = Raop*[aop0, eta*(dCde.'*Ak_eM + C.'*Akde_eM) - cos(i)/eta*dCdi_si.'*AkM;
+%                 0, eta*(dSde.'*Bk_eM + S.'*Bkde_eM) - cos(i)/eta*dSdi_si.'*BkM];
+%             lpeSpec(11:12,:) = Rman*[man0, -eta^2*(dCde.'*Ak_eM + C.'*Akde_eM) + 6*C.'*AkM;
+%                 0, -eta^2*(dSde.'*Bk_eM + S.'*Bkde_eM) + 6*S.'*BkM];
+%             
+            %% Integrate 2nd Order components
+            dAop = 0.75*J2*Re^2/p^2*(5*cos(i)^2-1); % divided be n
+            
+            dSmaSpec = Rsma*[(S.'*(BkM.*k) + dAop*(-dCdo.'*AkM)),...
+                (-C.'*(AkM.*k) -dAop*(dSdo.'*BkM))].';
+            
+            dEccSpec = Recc*[eta*S.'*(Bk_eM.*k) - dCdo.'*Ak_eM ...
+                + dAop*(-eta*dCdo.'*Ak_eM - d2Sdo2.'*Bk_eM./k),...
+                -eta*C.'*(Ak_eM.*k) - dSdo.'*Bk_eM ...
+                - dAop*(eta*dSdo.'*Bk_eM - d2Cdo2.'*Ak_eM./k)].';
+            
+            dIncSpec = Rinc*[dCdo_si.'*AkM + dAop*(d2Sdo2_si.'*BkM./k),...
+                dSdo_si.'*BkM - dAop*(d2Cdo2_si.'*AkM./k)].';
+            
+            dRanSpec = Rran*[dCdi_si.'*AkM + dAop*(d2Sdido_si.'*BkM./k),...
+                dSdi_si.'*BkM - dAop*(d2Cdido_si.'*AkM./k)].';
+            
+            
+            dAopSpec = Raop*[eta*(dCde.'*Ak_eM + C.'*Akde_eM) - cos(i)/eta*dCdi_si.'*AkM + ...
+                dAop*(eta*(d2Sdedo.'*Bk_eM + dSdo.'*Bkde_eM) - cos(i)/eta*d2Sdido_si.'*BkM)./k,...
+                eta*(dSde.'*Bk_eM + S.'*Bkde_eM) - cos(i)/eta*dSdi_si.'*BkM - ...
+                dAop*(eta*(d2Cdedo.'*Ak_eM + dCdo.'*Akde_eM) - cos(i)/eta*d2Cdido_si.'*AkM)./k].';
+            
+            dManSpec = Rman*[-eta^2*(dCde.'*Ak_eM + C.'*Akde_eM) + 6*C.'*AkM + ...
+                dAop*(-eta^2*(d2Sdedo.'*Bk_eM + dSdo.'*Bkde_eM) + 6*dSdo.'*BkM)./k,...
+                -eta^2*(dSde.'*Bk_eM + S.'*Bkde_eM) + 6*S.'*BkM - ...
+                dAop*(-eta^2*(dCde.'*Ak_eM + C.'*Akde_eM) + 6*C.'*AkM)./k].';
+            
+            lpeSpec = [dSmaSpec;
+                dEccSpec;
+                dIncSpec;
+                dRanSpec;
+                dAopSpec;
+                dManSpec];
+            
+            %% Zero Frequency Components
+            freq0 = [0; 0; 0; Rran*ran0; Raop*aop0; Rman*man0];
+            
             
         end
         

@@ -15,8 +15,8 @@ dataFolder = 'C:\Users\User\Dropbox\Doc Fourier Data\Error Mapping'; % ASRI
 % Added mean sma to all of Fourier
 % load([dataFolder '\ErrMaps_6-9-2022_13-30.mat']); % SP + Deprit + k4
 % load([dataFolder '\ErrMaps_23-9-2022_14-27.mat']); % Cancellations, SP + Deprit + k4
-% load([dataFolder '\ErrMaps_25-10-2022_12-28.mat']); % Cancellations, SP + Deprit + k4SP w/ errors
-load([dataFolder '\ErrMaps_27-10-2022_11-36.mat']); % Cancellations, SP + Deprit + k4SP w/ error in M
+% Use mean elements for all IC
+load([dataFolder '\ErrMaps_28-10-2022_12-17.mat']); % Cancellations, SP + Deprit + k4SP
 
 incRange = MapData.incRange;
 eccRange = MapData.eccRange;
