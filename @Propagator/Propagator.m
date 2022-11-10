@@ -283,13 +283,17 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             
             
             % Calculate all elements
-            Sk = sin(k.'*M2)./k.'/n;
-            Ck = -cos(k.'*M2)./k.'/n;
-            Ak = lpeSpec(1:2:11,2:end);
-            Bk = lpeSpec(2:2:12,2:end);
+            Sk = repmat(sin(k.'*M2)./k.'/n,6,1);
+            Ck = repmat(-cos(k.'*M2)./k.'/n,6,1);
+            iAk = (1:(6*kMax)) + reshape(repmat((0:5)*kMax,kMax,1),1,kMax*6);
+            iBk = (1:(6*kMax)) + reshape(repmat((1:6)*kMax,kMax,1),1,kMax*6);
+            Ak = lpeSpec(iAk,:);
+            Bk = lpeSpec(iBk,:);
+            sumMat = blkdiag(ones(1,kMax),ones(1,kMax),ones(1,kMax),ones(1,kMax),ones(1,kMax),ones(1,kMax));
             
-            X = icOsc + lpeSpec(1:2:11,1)*T + Ak*Sk + Bk*Ck -InitVal;
-            X(6,:) = M2;
+            X = icOsc + freq0*T + sumMat*(Ak.*Sk + Bk.*Ck) - InitVal;
+%             X(6,:) = M2;
+            X(6,:) = X(6,:) + M;
             
             
             X(3:5,:) = wrapTo360(X(3:5,:)*180/pi);

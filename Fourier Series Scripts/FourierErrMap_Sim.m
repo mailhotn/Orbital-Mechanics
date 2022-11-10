@@ -11,22 +11,24 @@ nT = 80;
 % Region Params
 nInc = 360;
 nEcc = 100;
-nMonte = 1000; % 6000 trials is about 1 minute (not parallel)
+nMonte = 1000; % 6000 trials is about 1.3 minute (not parallel)
 incRange = linspace(0.1,90,nInc);
 eccRange = linspace(0.01,0.5,nEcc);
 maxSma = 25000;
 
 %% Initialize Error Tensors
 errTenF = inf(nEcc,nInc,6);
+errTenF2 = inf(nEcc,nInc,6);
 errTenB = inf(nEcc,nInc,6);
 errTenD = inf(nEcc,nInc,6);
 
 bTime = 0;
 cTime = 0;
 fTime = 0;
+f2Time = 0;
 dTime = 0;
 %% Loops
-disp(['Starting Mapping' newline 'Estimated runtime: ' num2str(nInc*nEcc*nMonte/6000/4/60) 'h'])
+disp(['Starting Mapping' newline 'Estimated runtime: ' num2str(nInc*nEcc*nMonte/4500/4/60) 'h'])
 totalTime = tic;
 parfor iEcc = 1:nEcc
     ecc = eccRange(iEcc);
@@ -36,6 +38,7 @@ parfor iEcc = 1:nEcc
         % Average Error Vectors
         errVecB = zeros(6,1);
         errVecF = zeros(6,1);
+        errVecF2 = zeros(6,1);
         errVecD = zeros(6,1);
         for iTry = 1:nMonte
             % Get OE
@@ -103,10 +106,22 @@ parfor iEcc = 1:nEcc
             fTime = fTime + testT;
             oeF = oeF.';
             
+            % Prop Fourier 2nd order
+            tic
+            [~,oeF2] = Prop.PropOeFourier2Ord(t,kMax);
+            testT = toc;
+            f2Time = f2Time + testT;
+            oeF2 = oeF2.';
+            
             % Fourier Error
             errF = abs(oeC-oeF);
             errF = [errF(1,:)/oe(1);errF(2,:)/oe(2);errF(3:end,:)*pi/180];
             errVecF = errVecF + trapz(t.',errF,2)/t(end);
+            
+            % Fourier Error 2nd order
+            errF2 = abs(oeC-oeF2);
+            errF2 = [errF2(1,:)/oe(1);errF2(2,:)/oe(2);errF2(3:end,:)*pi/180];
+            errVecF2 = errVecF2 + trapz(t.',errF2,2)/t(end);
             
             % Deprit Error
             errD = abs(oeC-oeD);
@@ -117,10 +132,12 @@ parfor iEcc = 1:nEcc
         % Average
         errVecB = errVecB/nMonte;
         errVecF = errVecF/nMonte;
+        errVecF2 = errVecF2/nMonte;
         errVecD = errVecD/nMonte;
         % Assign errors
         errTenB(iEcc,iInc,:) = errVecB;
         errTenF(iEcc,iInc,:) = errVecF;
+        errTenF2(iEcc,iInc,:) = errVecF2;
         errTenD(iEcc,iInc,:) = errVecD;
     end
 end
@@ -141,10 +158,12 @@ MapData.eTime = eTime;
 MapData.cTime = cTime;
 MapData.dTime = dTime;
 MapData.fTime = fTime;
+MapData.f2Time = f2Time;
 MapData.bTime = bTime;
 
 
 MapData.errTenF = errTenF;
+MapData.errTenF2 = errTenF2;
 MapData.errTenB = errTenB;
 MapData.errTenD = errTenD;
 

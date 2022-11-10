@@ -1,10 +1,10 @@
 clear
-oe = [10000, 0.01, 45, 40, 10, 0];
+oe = [10000, 0.01, 63.4, 40, 10, 0];
 
 Sat = SingleSat(oe,earth());
 Prop = Propagator(Sat);
 T = 2*pi*sqrt(oe(1)^3/Sat.primary.mu);
-nOrb = 10;
+nOrb = 200;
 t = 0:60:nOrb*T;
 kLow = 4;
 kHigh = 4;
@@ -34,7 +34,7 @@ oeS = me2oscSP(OeS.');
 % F10Time = toc
 
 tic
-[~,oeFHigh] = Prop.PropOeFourier(t,kHigh);
+[~,oeFHigh] = Prop.PropOeFourier2Ord(t,kHigh);
 oeFHigh = oeFHigh.';
 F15Time = toc
 t = t/T;
