@@ -277,6 +277,8 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             % Initial time - With fixed M
             trigMat = repmat([sin(k.'*M2(1))./k.'/n;-cos(k.'*M2(1))./k.'/n],6,1);
             trigsum1 = lpeSpec(:,1).*trigMat;
+            % CHANGE TO MATRIX
+            % MULTIPLICATION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             InitVal = [sum(trigsum1(1:2*kMax)); sum(trigsum1((2*kMax+1):4*kMax));...
                 sum(trigsum1((4*kMax+1):6*kMax)); sum(trigsum1((6*kMax+1):8*kMax));...
                 sum(trigsum1((8*kMax+1):10*kMax)); sum(trigsum1((10*kMax+1):12*kMax))];
@@ -293,7 +295,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             
             X = icOsc + freq0*T + sumMat*(Ak.*Sk + Bk.*Ck) - InitVal;
 %             X(6,:) = M2;
-            X(6,:) = X(6,:) + M;
+            X(6,:) = X(6,:) + M; % subtract M(0)? test with nonzero IC
             
             
             X(3:5,:) = wrapTo360(X(3:5,:)*180/pi);
