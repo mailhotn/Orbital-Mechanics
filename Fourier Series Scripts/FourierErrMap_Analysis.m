@@ -21,7 +21,8 @@ dataFolder = 'C:\Users\User\Dropbox\Doc Fourier Data\Error Mapping'; % ASRI
 % Use mean elements for all IC
 % load([dataFolder '\ErrMaps_28-10-2022_12-17.mat']); % Cancellations, SP + Deprit + k4SP
 % Variation of AOP
-load([dataFolder '\ErrMaps_12-11-2022_1-54.mat']); % Cancellations, SP + Deprit + k4SP
+% load([dataFolder '\ErrMaps_12-11-2022_1-54.mat']); % SP + Deprit + 2Ord
+load([dataFolder '\ErrMaps_16-11-2022_1-35.mat']); % SP + Deprit + 2Ord w/o dAop
 
 
 
@@ -58,3 +59,5 @@ plotPropErrMap(eccRange,incRange,errTenF2,errTenF,'Fourier2','Fourier',2)
 
 %% Plot Absolute Errors
 plotPropErrMap(eccRange,incRange,errTenF2,[],'Fourier2',[],10)
+
+plotPropErrMap(eccRange,incRange,errTenF,[],'Fourier',[],20)

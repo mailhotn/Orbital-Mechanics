@@ -27,7 +27,7 @@ aop0 = (pi/180*oeOsc(5,:));
 man0 = (oeOsc(6,:));
 f = me2ta(man0,ecc0);
 man0 = pi/180*man0;
-f = pi/180*f;
+f = unwrap(pi/180*f);
 
 A2 = -J2*Re^2*1.5; % negative A2: osc2me
 

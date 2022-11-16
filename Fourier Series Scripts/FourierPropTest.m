@@ -1,5 +1,5 @@
 clear
-oe = [10000, 0.01, 63.4, 40, 10, 0];
+oe = [10000, 0.01, 40, 40, 10, 0];
 
 Sat = SingleSat(oe,earth());
 Prop = Propagator(Sat);

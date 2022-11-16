@@ -27,7 +27,7 @@ aop0 = (pi/180*oeM(5,:));
 man0 = (oeM(6,:));
 f = me2ta(man0,ecc0);
 man0 = pi/180*man0;
-f = pi/180*f;
+f = unwrap(pi/180*f);
 
 A2 = J2*Re^2*1.5; % positive A2: Me 2 Osc
 
@@ -88,4 +88,4 @@ aop1 = aop0 + dAopS - dAopM;
 man1 = man0 + dManS - dManM;
 
 oeOsc = [sma1;ecc1;180/pi*inc1;180/pi*ran1;180/pi*aop1;180/pi*man1];
-oeOsc(3:end,:) = wrapTo360(oeOsc(3:end,:));
+oeOsc(3:end,:) = (oeOsc(3:end,:));
