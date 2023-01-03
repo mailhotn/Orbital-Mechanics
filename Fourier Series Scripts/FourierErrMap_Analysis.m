@@ -20,9 +20,17 @@ dataFolder = 'C:\Users\User\Dropbox\Doc Fourier Data\Error Mapping'; % ASRI
 
 % Use mean elements for all IC
 % load([dataFolder '\ErrMaps_28-10-2022_12-17.mat']); % Cancellations, SP + Deprit + k4SP
+
 % Variation of AOP
 % load([dataFolder '\ErrMaps_12-11-2022_1-54.mat']); % SP + Deprit + 2Ord
-load([dataFolder '\ErrMaps_16-11-2022_1-35.mat']); % SP + Deprit + 2Ord w/o dAop
+% load([dataFolder '\ErrMaps_16-11-2022_1-35.mat']); % SP + Deprit + 2Ord w/o dAop
+
+% Wrapping SP change
+% load([dataFolder '\ErrMaps_18-11-2022_2-6.mat']); % SP + Deprit + 2Ord
+% load([dataFolder '\ErrMaps_23-11-2022_2-45.mat']); % SP + Deprit + 2Ord w/o dAop
+load([dataFolder '\ErrMaps_3-12-2022_4-37.mat']); % SP + Deprit + 2Ord w/o dAop Low ECC
+% load([dataFolder '\ErrMaps_20-12-2022_9-33.mat']); % SP + Deprit + 2Ord w/o dAop Lower left
+load([dataFolder '\ErrMaps_27-12-2022_10-19.mat']); % SP + Deprit + 2OrdK5 w/o dAop Lower ecc 
 
 
 
@@ -61,3 +69,5 @@ plotPropErrMap(eccRange,incRange,errTenF2,errTenF,'Fourier2','Fourier',2)
 plotPropErrMap(eccRange,incRange,errTenF2,[],'Fourier2',[],10)
 
 plotPropErrMap(eccRange,incRange,errTenF,[],'Fourier',[],20)
+
+plotPropErrMap(eccRange,incRange,errTenB,[],'Brouwer',[],30)

@@ -3,7 +3,7 @@ clear
 dataFolder = 'C:\Users\User\Dropbox\Doc Fourier Data\Error Mapping';
 dbPath = 'C:\Users\User\Dropbox'; % ASRI
 primary = earth();
-kMax = 4;
+kMax = 5;
 nOrb = 1;
 dT = 100; % sec
 depritFlag = 1;
@@ -12,8 +12,9 @@ nT = 80;
 nInc = 360;
 nEcc = 100;
 nMonte = 1000; % 6000 trials is about 1.3 minute (not parallel)
-incRange = linspace(0.1,90,nInc);
-eccRange = linspace(0.01,0.5,nEcc);
+incRange = linspace(0,90,nInc);
+% eccRange = linspace(0.01,0.5,nEcc);
+eccRange = logspace(-2,-1,nEcc);
 maxSma = 25000;
 
 %% Initialize Error Tensors

@@ -1,5 +1,5 @@
 clear
-oe = [10000, 0.01, 40, 40, 10, 0];
+oe = [10000, 0.05, 40, 40, 10, 0];
 
 Sat = SingleSat(oe,earth());
 Prop = Propagator(Sat);
@@ -34,11 +34,12 @@ oeS = me2oscSP(OeS.');
 % F10Time = toc
 
 tic
-[~,oeFHigh] = Prop.PropOeFourier2Ord(t,kHigh);
+[~,oeFHigh] = Prop.PropOeFourier(t,kHigh);
 oeFHigh = oeFHigh.';
 F15Time = toc
 t = t/T;
 %% Plot
+% oeFHigh = oeS;
 % semimajor axis
 f = figure(1);
 % f.Position(3:4) = [500,250];
@@ -47,7 +48,7 @@ legend('Conventional','Fourier')
 ylabel('$\frac{a_x\left(t\right)}{a\left(0\right)}$','fontsize',18,'interpreter','latex')
 xlabel('$Orbit$','interpreter','latex','fontsize',16)
 grid on
-xlim([0,nOrb])
+xlim([0,10])
 xticks(1:nOrb)
 
 % % eccentricity
@@ -58,7 +59,7 @@ legend('Conventional','Fourier')
 ylabel('$e_x$','fontsize',16,'interpreter','latex')
 xlabel('$Orbit$','interpreter','latex','fontsize',16)
 grid on
-xlim([0,nOrb])
+xlim([0,10])
 xticks(1:nOrb)
 
 % inclination

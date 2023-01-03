@@ -1498,7 +1498,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
 %                 0, -eta^2*(dSde.'*Bk_eM + S.'*Bkde_eM) + 6*S.'*BkM];
 %             
             %% Integrate 2nd Order components
-            dAop = 0.75*J2*Re^2/p^2*(5*cos(i)^2-1); % divided be n
+            dAop = 0*0.75*J2*Re^2/p^2*(5*cos(i)^2-1); % divided be n
             
             dSmaSpec = Rsma*[(S.'*(BkM.*k) + dAop*(-dCdo.'*AkM)),...
                 (-C.'*(AkM.*k) -dAop*(dSdo.'*BkM))].';
