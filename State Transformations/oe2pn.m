@@ -12,7 +12,7 @@ function [pn] = oe2pn (oe, primary)
 % i  - inclination relative to equatorial plane (deg)
 % O  - right ascension of ascending node (deg)
 % w  - argument of periapsis (deg)
-% th - true anomaly (deg)
+% f  - true anomaly (deg)
 %
 %  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % 

@@ -24,7 +24,7 @@ classdef SingleSat < Constellation
                 case 2
                     
                 otherwise
-                    error('Wrong numnber of input arguments')
+                    error('Wrong number of input arguments')
             end
             %%%% Object Initialization %%%%
             % Call superclass constructor before accessing object
@@ -51,6 +51,7 @@ classdef SingleSat < Constellation
         
         function X = InitialStateEci(Sat)
             oeOsc = Sat.InitialOeOsc;
+            oeOsc(6) = me2ta(oeOsc(6),oeOsc(2));
             [R, V] = oe2eci(oeOsc,Sat.primary);
             X = [R; V];
         end
