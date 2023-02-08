@@ -28,10 +28,11 @@ dataFolder = 'C:\Users\User\Dropbox\Doc Fourier Data\Error Mapping'; % ASRI
 % Wrapping SP change
 % load([dataFolder '\ErrMaps_18-11-2022_2-6.mat']); % SP + Deprit + 2Ord
 % load([dataFolder '\ErrMaps_23-11-2022_2-45.mat']); % SP + Deprit + 2Ord w/o dAop
-load([dataFolder '\ErrMaps_3-12-2022_4-37.mat']); % SP + Deprit + 2Ord w/o dAop Low ECC
+% load([dataFolder '\ErrMaps_3-12-2022_4-37.mat']); % SP + Deprit + 2Ord w/o dAop Low ECC
 % load([dataFolder '\ErrMaps_20-12-2022_9-33.mat']); % SP + Deprit + 2Ord w/o dAop Lower left
-load([dataFolder '\ErrMaps_27-12-2022_10-19.mat']); % SP + Deprit + 2OrdK5 w/o dAop Lower ecc 
-
+% load([dataFolder '\ErrMaps_27-12-2022_10-19.mat']); % SP + Deprit + 2OrdK5 w/o dAop Low ecc 
+% load([dataFolder '\ErrMaps_5-1-2023_7-47.mat']); % 2Ord: K5vK4 w/o dAop Low ecc 
+load([dataFolder '\ErrMaps_10-1-2023_16-35.mat']); % 2Ord: K5vK6 w/o dAop Low ecc 
 
 
 incRange = MapData.incRange;

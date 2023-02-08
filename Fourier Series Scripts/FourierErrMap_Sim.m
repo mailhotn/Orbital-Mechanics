@@ -3,13 +3,14 @@ clear
 dataFolder = 'C:\Users\User\Dropbox\Doc Fourier Data\Error Mapping';
 dbPath = 'C:\Users\User\Dropbox'; % ASRI
 primary = earth();
-kMax = 5;
+k1 = 5;
+k2 = 6;
 nOrb = 1;
 dT = 100; % sec
 depritFlag = 1;
 nT = 80;
 % Region Params
-nInc = 360;
+nInc = 361;
 nEcc = 100;
 nMonte = 1000; % 6000 trials is about 1.3 minute (not parallel)
 incRange = linspace(0,90,nInc);
@@ -100,29 +101,33 @@ parfor iEcc = 1:nEcc
                 % Error remains infinite
                 errVecB = errVecB + inf(6,1);
             end
-            % Prop Fourier
+            % Prop Fourier - k1
             tic
-            [~,oeF] = Prop.PropOeFourier(t,kMax);
+            [~,oeF] = Prop.PropOeFourier2Ord(t,k1);
             testT = toc;
             fTime = fTime + testT;
             oeF = oeF.';
             
-            % Prop Fourier 2nd order
-            tic
-            [~,oeF2] = Prop.PropOeFourier2Ord(t,kMax);
-            testT = toc;
-            f2Time = f2Time + testT;
-            oeF2 = oeF2.';
+            if k1~=k2
+                % Prop Fourier - k2
+                tic
+                [~,oeF2] = Prop.PropOeFourier2Ord(t,k2);
+                testT = toc;
+                f2Time = f2Time + testT;
+                oeF2 = oeF2.';
+                % Fourier Error k2
+                
+                errF2 = abs(oeC-oeF2);
+                errF2 = [errF2(1,:)/oe(1);errF2(2,:)/oe(2);errF2(3:end,:)*pi/180];
+                errVecF2 = errVecF2 + trapz(t.',errF2,2)/t(end);
+            end
             
             % Fourier Error
             errF = abs(oeC-oeF);
             errF = [errF(1,:)/oe(1);errF(2,:)/oe(2);errF(3:end,:)*pi/180];
             errVecF = errVecF + trapz(t.',errF,2)/t(end);
             
-            % Fourier Error 2nd order
-            errF2 = abs(oeC-oeF2);
-            errF2 = [errF2(1,:)/oe(1);errF2(2,:)/oe(2);errF2(3:end,:)*pi/180];
-            errVecF2 = errVecF2 + trapz(t.',errF2,2)/t(end);
+
             
             % Deprit Error
             errD = abs(oeC-oeD);
@@ -149,7 +154,8 @@ MapData = struct();
 MapData.eccRange = eccRange;
 MapData.incRange = incRange;
 MapData.maxSma = maxSma;
-MapData.kMax = kMax;
+MapData.k1 = k1;
+MapData.k2 = k2;
 MapData.nOrb = nOrb;
 MapData.dT = dT;
 MapData.nT = nT;
