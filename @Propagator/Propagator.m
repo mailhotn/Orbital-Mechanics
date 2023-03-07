@@ -120,6 +120,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         
         function [Time, X] = PropOeOsc(P,T)
             % Numerically propagate GVE for oscullating elements
+            % Singular in e, not i
             % Use this I think
             opts = odeset('reltol',P.relTol,'abstol',P.absTol);
             OE = P.Con.InitialOeOsc;
@@ -133,7 +134,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         end
         
         function [Time, X] = PropOeOsc2(P,T)
-            % Numerically propagate LPE for oscullating elements
+            % Numerically propagate GVE for oscullating elements
             % Tried different way of writing equations, didnt work well
             % probably worse?
             opts = odeset('reltol',P.relTol,'abstol',P.absTol);
@@ -653,17 +654,17 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             % Forces
             fR = MJ2/2.*(1-3*sin(inc).^2.*sin(aol).^2);
             fTh = MJ2.*sin(inc).^2.*sin(aol).*cos(aol);
-            fH = MJ2.*sin(inc).*cos(inc).*sin(aol);
+            fH_si = MJ2.*cos(inc).*sin(aol); % sin(inc) taken out to avoid singularity
             % Element Rates
             da = 2*a.^2./h.*e.*sin(th).*fR +...
                 2*a.^2./h.*(1 + e.*cos(th)).*fTh;
             de = p./h.*sin(th).*fR +...
                 r./h.*(e + 2*cos(th) + e.*cos(th).^2).*fTh;
-            di = r./h.*cos(aol).*fH;
-            dO = r.*sin(aol)./(h.*sin(inc)).*fH;
+            di = r./h.*cos(aol).*sin(inc).*fH_si;
+            dO = r.*sin(aol)./(h).*fH_si;
             dw = -p./(h.*e).*cos(th).*fR +...
                 r./(h.*e).*(2+e.*cos(th)).*sin(th).*fTh +...
-                -r./h.*sin(aol).*cos(inc)./sin(inc).*fH;
+                -r./h.*sin(aol).*cos(inc).*fH_si;
             dM = (p.*cos(th)-2*r.*e)./(n.*a.^2.*e).*fR +...
                 -(p+r).*sin(th)./(n.*a.^2.*e).*fTh;
             
