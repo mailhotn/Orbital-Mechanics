@@ -32,7 +32,9 @@ dataFolder = 'C:\Users\User\Dropbox\Doc Fourier Data\Error Mapping'; % ASRI
 % load([dataFolder '\ErrMaps_20-12-2022_9-33.mat']); % SP + Deprit + 2Ord w/o dAop Lower left
 % load([dataFolder '\ErrMaps_27-12-2022_10-19.mat']); % SP + Deprit + 2OrdK5 w/o dAop Low ecc 
 % load([dataFolder '\ErrMaps_5-1-2023_7-47.mat']); % 2Ord: K5vK4 w/o dAop Low ecc 
-load([dataFolder '\ErrMaps_10-1-2023_16-35.mat']); % 2Ord: K5vK6 w/o dAop Low ecc 
+% load([dataFolder '\ErrMaps_10-1-2023_16-35.mat']); % 2Ord: K5vK6 w/o dAop Low ecc
+load([dataFolder '\ErrMaps_15-3-2023_21-25.mat']); % 2Ord: K5 w/o dAop Low ecc, no Inc singularity in OeOsc 
+
 
 
 incRange = MapData.incRange;
@@ -59,7 +61,6 @@ errTenB(errTenB==inf) = nan;
 % errTenB = errTenB(:,1:length(incRange),:);
 % errTenD = errTenD(:,1:length(incRange),:);
 %% Plot Relative Errors
-
 plotPropErrMap(eccRange,incRange,errTenF,errTenB,'Fourier','Brouwer SP',0)
 
 plotPropErrMap(eccRange,incRange,errTenF2,errTenB,'Fourier2','Brouwer SP',1)
