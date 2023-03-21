@@ -67,4 +67,7 @@ V(3,:) = (sind(i).*sind(w)).*v(1,:) + ...
 %                                   sind(i).*sind(w),                             cosd(w).*sind(i),         cosd(i)];                      
 % R = Rot*r;  
 % V = Rot*v;
+if nargout == 1
+    R = [R;V];
+end
 end

@@ -20,9 +20,9 @@ classdef LatticeConstellation < Constellation
 %         nDays       % N_d
         
         % Phasing
-        nC1
-        nC2
-        nC3
+        nC1     % 1-N_o
+        nC2     % 1-N_w
+        nC3     % 1-N_o
         
         % Orbits
         inc
