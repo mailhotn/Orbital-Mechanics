@@ -126,7 +126,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             OE = P.Con.InitialOeOsc;
             OE(3:end,:) = OE(3:end,:)*pi/180;
             IC = reshape(OE,[6*P.Con.nSats,1]);
-            [Time, X] = ode45(@P.DynOeOsc,T,IC,opts);
+            [Time, X] = ode45(@P.DynOeOsc3,T,IC,opts);
             inddeg = reshape((3:6).'+(0:P.Con.nSats-1)*6,4*P.Con.nSats,1);
             indWrap = reshape((3:5).'+(0:P.Con.nSats-1)*6,3*P.Con.nSats,1);
             X(:,inddeg) = (180/pi*X(:,inddeg));
@@ -689,7 +689,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             r = p./(1+e.*cos(f));
             k2 = -3*P.Con.mu./r.^3.*P.Con.J2.*P.Con.Re.^2;
             n = sqrt(P.Con.mu./a.^3);
-            eta = sqrt(1-e^2);
+            eta = sqrt(1-e.^2);
             aol = f + w;
             dRde = ((e.^2.*cos(f)+cos(f)+2*e).*(3.*sin(inc).^2.*sin(aol).^2-1) ...
                 - sin(f).*(2+e.*cos(f)).*(e.*sin(f).*(3*sin(inc).^2.*sin(aol).^2-1) ...
