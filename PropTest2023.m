@@ -1,10 +1,11 @@
+clear
 primary = earth();
 mu = primary.mu;
 J2 = primary.J2;
 Re = primary.Re;
 
 %% Define Large Constellation
-Arch.nPlanes = 20;
+Arch.nPlanes = 10;
 Arch.nAops = 4;
 Arch.nSatsPerAop = 6;
 
@@ -22,19 +23,22 @@ Prop = Propagator(Con);
 %% Propagate
 t = 0:100:86400;
 tic
-[~,eci] = Prop.PropEciJ2(t);
+[~,eci0] = Prop.PropEciJ2(t);
 toc
-oe0 = eci2oe(reshape(eci.',6,numel(eci)/6));
+eci0 = reshape(eci0.',6,numel(eci0)/6);
+oe0 = eci2oe(eci0);
 tic
 [~,oe1] = Prop.PropOeOsc(t);
 toc
 oe1 = reshape(oe1.',6,numel(oe1)/6);
 oe1(6,:) = wrapTo360(me2ta(oe1(6,:),oe1(2,:)));
+eci1 = oe2eci(oe1);
 tic
 [~,oe2] = Prop.PropOeOsc3(t);
 toc
 oe2 = reshape(oe2.',6,numel(oe2)/6);
 oe2(6,:) = wrapTo360(me2ta(oe2(6,:),oe2(2,:)));
+eci2 = oe2eci(oe2);
 %% Error Analysis
 errMax1 = max(abs(oe1-oe0),[],2)
 errMen1 = mean(abs(oe1-oe0),2)
@@ -62,3 +66,10 @@ H1 = reshape(H1,Con.nSats,length(t));
 N1 = cosd(oe1(3,:)).*sqrt(mu*oe1(1,:).*(1-oe1(2,:).^2));
 N1 = reshape(N1,Con.nSats,length(t));
 
+H2 = -mu./(2*oe2(1,:))+mu*J2*Re^2./(2*oe2(1,:).^3.*(1-oe2(2,:).^2).^3).*...
+    (1+oe2(2,:).*cosd(oe2(6,:))).^3.*...
+    (3*sind(oe2(3,:)).^2.*sind(oe2(6,:)+oe2(5,:)).^2-1);
+H2 = reshape(H2,Con.nSats,length(t));
+
+N2 = cosd(oe2(3,:)).*sqrt(mu*oe2(1,:).*(1-oe2(2,:).^2));
+N2 = reshape(N2,Con.nSats,length(t));
