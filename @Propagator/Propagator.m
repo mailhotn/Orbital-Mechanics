@@ -41,7 +41,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             % Complexity ~O(T)
             opts = odeset('reltol',P.relTol,'abstol',P.absTol);
             IC = reshape(P.Con.InitialStateEci,[6*P.Con.nSats,1]);
-            [Time, X] = ode45(@P.DynEciJ2,T,IC,opts);
+            [Time, X] = ode78(@P.DynEciJ2,T,IC,opts);
         end
         
         function [Time, X] = PropOeMean(P,T)
@@ -126,7 +126,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             OE = P.Con.InitialOeOsc;
             OE(3:end,:) = OE(3:end,:)*pi/180;
             IC = reshape(OE,[6*P.Con.nSats,1]);
-            [Time, X] = ode45(@P.DynOeOsc,T,IC,opts);
+            [Time, X] = ode78(@P.DynOeOsc,T,IC,opts);
             inddeg = reshape((3:6).'+(0:P.Con.nSats-1)*6,4*P.Con.nSats,1);
             indWrap = reshape((3:5).'+(0:P.Con.nSats-1)*6,3*P.Con.nSats,1);
             X(:,inddeg) = (180/pi*X(:,inddeg));
@@ -141,7 +141,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             OE = P.Con.InitialOeOsc;
             OE(3:end,:) = OE(3:end,:)*pi/180;
             IC = reshape(OE,[6*P.Con.nSats,1]);
-            [Time, X] = ode45(@P.DynOeOsc2,T,IC,opts);
+            [Time, X] = ode78(@P.DynOeOsc2,T,IC,opts);
             inddeg = reshape((3:6).'+(0:P.Con.nSats-1)*6,4*P.Con.nSats,1);
             X(:,inddeg) = wrapTo360(180/pi*X(:,inddeg));
         end
@@ -154,7 +154,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             OE = P.Con.InitialOeOsc;
             OE(3:end,:) = OE(3:end,:)*pi/180;
             IC = reshape(OE,[6*P.Con.nSats,1]);
-            [Time, X] = ode45(@P.DynOeOsc3,T,IC,opts);
+            [Time, X] = ode78(@P.DynOeOsc3,T,IC,opts);
             inddeg = reshape((3:6).'+(0:P.Con.nSats-1)*6,4*P.Con.nSats,1);
             indWrap = reshape((3:5).'+(0:P.Con.nSats-1)*6,3*P.Con.nSats,1);
             X(:,inddeg) = (180/pi*X(:,inddeg));
@@ -222,6 +222,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             %                         n = n + lpeSpec(11,1); % <-------------------  Work on this
             M = n*T+icOsc(6);
             k = 1:kMax;
+            
             X = nan(6*P.Con.nSats,length(T));
             
             % Initial time
@@ -576,8 +577,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             R2 = reshape(Rv,order,1);
             V2 = reshape([zeros(3,6);zeros(3),eye(3)]*X2,order,1);
             Z  = repmat([0 0 1 0 0 0].',P.Con.nSats,1).*R2;
-            Z2 = [zeros(3,2),ones(3,1),zeros(3);zeros(3,6)]*X2;
-            Z2 = reshape(Z2,order,1);
+            Z2 = reshape([zeros(3,2),ones(3,1),zeros(3);zeros(3,6)]*X2,order,1);
             % equation of motion
             f_J2 = -P.Con.mu*P.Con.J2*P.Con.Re^2./r.^4.*...
                 (3*Z./r + (-7.5*(Z2./r).^2 + 1.5).*R2./r);

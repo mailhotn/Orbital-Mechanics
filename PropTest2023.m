@@ -15,7 +15,7 @@ Phase.nC3 = 6;
 
 Orbit.sma = 7000+rand*10000;
 Orbit.ecc = 0.001 + rand*0.5;
-Orbit.inc = 180*rand;
+Orbit.inc = 90*rand;
 
 Con = LatticeConstellation(Arch,Phase,Orbit);
 Prop = Propagator(Con);
@@ -48,6 +48,8 @@ errMen2 = mean(abs(oe2-oe0),2)
 
 errMax12 = max(abs(oe1-oe2),[],2)
 errMen12 = mean(abs(oe1-oe2),2)
+
+%% Error by Satellite
 
 %% Hamiltonian Analysis
 H0 = -mu./(2*oe0(1,:))+mu*J2*Re^2./(2*oe0(1,:).^3.*(1-oe0(2,:).^2).^3).*...

@@ -58,7 +58,7 @@ th = (vr>=0).*acosd(dot(E./e,R./r,1)) + ...
 
 a = h.^2./(mu*(1-e.^2));
 OE = real([a; e; i; O; w; th]);
-% Just get rid of imaginary stuff. For some reason matlab gets and error of
+% Just get rid of imaginary stuff. For some reason matlab gets an error of
 % O(eps) when calculating the product of two normalized vectors, there is
 % no reason to get imaginary numbers from the acos
 end
