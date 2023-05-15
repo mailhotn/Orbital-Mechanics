@@ -161,6 +161,22 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             X(:,indWrap) = wrapTo360(X(:,indWrap));
         end
         
+        function [Time, X, PNS] = PropOePns(P,T)
+            % Numerically propagate GVE for oscullating elements
+            % Uses non-singular Polar-Nodal elements
+            opts = odeset('reltol',P.relTol,'abstol',P.absTol);
+            OE = P.Con.InitialOeOsc;
+            OE(6,:) = me2ta(OE(6,:),OE(2,:));
+            PNS = oe2pns(OE,P.Con.primary);
+            IC = reshape(PNS,[6*P.Con.nSats,1]);
+            [Time, X] = ode78(@P.DynOePns,T,IC,opts);
+            PNS = X;
+            X = reshape(X.',6, P.Con.nSats*length(Time));
+            X = pns2oe(X,P.Con.primary);
+            X = ta2me(X);
+            X = reshape(X,6*P.Con.nSats,length(Time)).';
+        end
+
         function [Time, X] = PropEciJ3(P,T)
             % Propagate for time T in ECI frame with J2 & J3 perturbations
             % Complexity ~O(T)
@@ -742,6 +758,44 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 - k2.*eta.^2.*dRde./(n.*a.^2.*e);
             
             dOe = reshape([da;de;di;dO;dw;dM + n],6*P.Con.nSats,1);
+            % Equations of Motion
+            dX = dOe;
+        end
+
+        function dX = DynOePns(P,t,X)  %#ok<INUSL>
+            % Dynamics for Nonsingular polar-nodal propagation
+            mu = P.Con.mu;
+            J2 = P.Con.J2;
+            Re = P.Con.Re;
+            PNS  = reshape(X,6,P.Con.nSats);
+            % Element vectors (angles already in radians)
+            r   = PNS(1,:); % radius
+            th  = PNS(2,:); % mod. argument of latitude
+            n   = PNS(3,:); % mod. right ascension
+            R   = PNS(4,:); % Radial velocity
+            TH  = PNS(5,:); % specific angular momentum
+            N   = PNS(6,:); % mod. angular momentum in z
+            
+            % remove singularities n/N = nan iff N=0 i.e. orbit is equatorial
+            nbyN = n./N;
+            nbyN(isnan(nbyN)) = 0;
+            k2 = J2*Re^2/2;
+            
+            % Keplerian Motion
+            dKep = [R;
+                    TH./r.^2;
+                    zeros(1,P.Con.nSats);
+                    TH.^2./r.^3-mu./r.^2;
+                    zeros(1,P.Con.nSats);
+                    zeros(1,P.Con.nSats)];
+            den = (2*r.^3.*TH.^2);
+            dJ2 = 3*mu*k2*[zeros(1,P.Con.nSats);
+                 (N.^4-2*TH.*N.^2).*sin(th+nbyN).^2./(den.*TH);
+                  -sin(th+nbyN).*((2*N.^3-4*TH.*N).*sin(th+nbyN) -cos(th+nbyN).*n.*(N.^2-4*TH))./(den);
+                  -3*((N.^4-4*TH.*N.^2).*sin(th+nbyN).^2 +4*TH.^2/3)./(2*r.*den);
+                  (N.^4-4*TH.*N.^2).*sin(th+nbyN).*cos(th+nbyN)./(den);
+                  (N.^3-4*TH.*N).*sin(th+nbyN).*cos(th+nbyN)./(den)];
+            dOe = reshape(dKep + dJ2,6*P.Con.nSats,1);
             % Equations of Motion
             dX = dOe;
         end

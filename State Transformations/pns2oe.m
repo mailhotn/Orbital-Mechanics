@@ -45,7 +45,7 @@ N = pns(6,:);
 k = TH.^2./(mu*r)-1;
 s = TH.*R/mu;
 f = 180/pi*unwrap(atan2(s,k));
-% remove singularities n/N = nan only if N=0 i.e. 
+% remove singularities n/N = nan only if N=0 i.e. orbit is equatorial
 nbyN = n./N;
 nbyN(isnan(nbyN)) = 0;
 
