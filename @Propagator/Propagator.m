@@ -11,12 +11,12 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         function P = Propagator(Constellation, relTol, absTol)
             switch nargin
                 case 0 % default tolerances, GPS constellation
-                    relTol     = 1e-8;
-                    absTol     = 1e-9;
+                    relTol     = 1e-11;
+                    absTol     = 1e-12;
                     Constellation = WalkerConstellation;
                 case 1 % default tolerances
-                    relTol     = 1e-8;
-                    absTol     = 1e-9;
+                    relTol     = 1e-11;
+                    absTol     = 1e-12;
                 case 3 % arbitrary orbit & tolerances
                     
                 otherwise
@@ -40,8 +40,18 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             % Propagate for time T in ECI frame with J2 perturbation
             % Complexity ~O(T)
             opts = odeset('reltol',P.relTol,'abstol',P.absTol);
-            IC = reshape(P.Con.InitialStateEci,[6*P.Con.nSats,1]);
+            % Normalize
+            dScale = P.Con.Re;
+            tScale = sqrt(P.Con.Re^3/P.Con.mu);
+            eciScale = repmat([dScale*ones(3,1);dScale/tScale*ones(3,1)],P.Con.nSats,1);
+
+            IC = reshape(P.Con.InitialStateEci,[6*P.Con.nSats,1])./eciScale;
+            T = T/tScale;
+            % Prop Normalized
             [Time, X] = ode78(@P.DynEciJ2,T,IC,opts);
+            % De-Normalize
+            Time = Time*tScale;
+            X = X.*eciScale.';
         end
         
         function [Time, X] = PropOeMean(P,T)
@@ -123,14 +133,24 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             % Singular in e, not i
             % Use this I think
             opts = odeset('reltol',P.relTol,'abstol',P.absTol);
+            % Normalize
+            dScale = P.Con.Re;
+            tScale = sqrt(P.Con.Re^3/P.Con.mu);
+            oeScale = repmat([dScale;ones(5,1)],P.Con.nSats,1);
+
             OE = P.Con.InitialOeOsc;
             OE(3:end,:) = OE(3:end,:)*pi/180;
-            IC = reshape(OE,[6*P.Con.nSats,1]);
+            IC = reshape(OE,[6*P.Con.nSats,1])./oeScale;
+            T = T/tScale;
+            % Prop Normalized
             [Time, X] = ode78(@P.DynOeOsc,T,IC,opts);
             inddeg = reshape((3:6).'+(0:P.Con.nSats-1)*6,4*P.Con.nSats,1);
             indWrap = reshape((3:5).'+(0:P.Con.nSats-1)*6,3*P.Con.nSats,1);
             X(:,inddeg) = (180/pi*X(:,inddeg));
             X(:,indWrap) = wrapTo360(X(:,indWrap));
+            % De-Normalize
+            Time = Time*tScale;
+            X = X.*oeScale.';
         end
         
         function [Time, X] = PropOeOsc2(P,T)
@@ -151,25 +171,44 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             % Singular in e, not i
             % Use this I think
             opts = odeset('reltol',P.relTol,'abstol',P.absTol);
+            % Normalize
+            dScale = P.Con.Re;
+            tScale = sqrt(P.Con.Re^3/P.Con.mu);
+            oeScale = repmat([dScale;ones(5,1)],P.Con.nSats,1);
+
             OE = P.Con.InitialOeOsc;
             OE(3:end,:) = OE(3:end,:)*pi/180;
-            IC = reshape(OE,[6*P.Con.nSats,1]);
+            IC = reshape(OE,[6*P.Con.nSats,1])./oeScale;
+            T = T/tScale;
+            % Prop Normalized
             [Time, X] = ode78(@P.DynOeOsc3,T,IC,opts);
             inddeg = reshape((3:6).'+(0:P.Con.nSats-1)*6,4*P.Con.nSats,1);
             indWrap = reshape((3:5).'+(0:P.Con.nSats-1)*6,3*P.Con.nSats,1);
             X(:,inddeg) = (180/pi*X(:,inddeg));
             X(:,indWrap) = wrapTo360(X(:,indWrap));
+            % De-Normalize
+            Time = Time*tScale;
+            X = X.*oeScale.';
         end
         
         function [Time, X, PNS] = PropOePns(P,T)
             % Numerically propagate GVE for oscullating elements
             % Uses non-singular Polar-Nodal elements
             opts = odeset('reltol',P.relTol,'abstol',P.absTol);
+            % Normalize
+            dScale = P.Con.Re;
+            tScale = sqrt(P.Con.Re^3/P.Con.mu);
+            pnsScale = repmat([dScale;1;dScale/sqrt(tScale);...
+                dScale/tScale;dScale^2/tScale;dScale/sqrt(tScale)],P.Con.nSats,1);
+
             OE = P.Con.InitialOeOsc;
             OE(6,:) = me2ta(OE(6,:),OE(2,:));
             PNS = oe2pns(OE,P.Con.primary);
-            IC = reshape(PNS,[6*P.Con.nSats,1]);
+            IC = reshape(PNS,[6*P.Con.nSats,1])./pnsScale;
+            T = T/tScale;
             [Time, X] = ode78(@P.DynOePns,T,IC,opts);
+            Time = Time*tScale;
+            X = X.*pnsScale.';
             PNS = X;
             X = reshape(X.',6, P.Con.nSats*length(Time));
             X = pns2oe(X,P.Con.primary);
@@ -580,6 +619,9 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         end
         
         function dX = DynEciJ2(P,t,X) %#ok<INUSL>
+            % Normalized Parameters
+            mu = 1;
+            Re = 1;
             % move stuff around
             order = 6*P.Con.nSats;
             X2 = reshape(X,[6,P.Con.nSats]);
@@ -595,9 +637,9 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             Z  = repmat([0 0 1 0 0 0].',P.Con.nSats,1).*R2;
             Z2 = reshape([zeros(3,2),ones(3,1),zeros(3);zeros(3,6)]*X2,order,1);
             % equation of motion
-            f_J2 = -P.Con.mu*P.Con.J2*P.Con.Re^2./r.^4.*...
+            f_J2 = -mu*P.Con.J2*Re^2./r.^4.*...
                 (3*Z./r + (-7.5*(Z2./r).^2 + 1.5).*R2./r);
-            dX = circshift(V2,-3) + circshift(-P.Con.mu*R2./r.^3 + f_J2,3);
+            dX = circshift(V2,-3) + circshift(-mu*R2./r.^3 + f_J2,3);
         end
         
         function dX = DynOeMean(P,t,X) %#ok<INUSL>
@@ -626,6 +668,9 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         
         function dX = DynOeOsc(P,t,X)  %#ok<INUSL>
             OE  = reshape(X,6,P.Con.nSats);
+            % Normalized Parameters
+            mu = 1;
+            Re = 1;
             % Element vectors (angles already in radians)
             a   = OE(1,:);
             e   = OE(2,:);
@@ -635,10 +680,10 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             th  = pi/180*me2ta(Me*180/pi,e);
             % Secondary definitions
             p = a.*(1-e.^2);
-            h = sqrt(P.Con.mu*p);
+            h = sqrt(mu*p);
             r = p./(1+e.*cos(th));
-            MJ2 = -3*P.Con.mu./r.^4.*P.Con.J2.*P.Con.Re.^2;
-            n = sqrt(P.Con.mu./a.^3);
+            MJ2 = -3*mu./r.^4.*P.Con.J2.*Re.^2;
+            n = sqrt(mu./a.^3);
             aol = th + w;
             % Forces
             fR = MJ2/2.*(1-3*sin(inc).^2.*sin(aol).^2);
@@ -708,6 +753,9 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         function dX = DynOeOsc3(P,t,X)  %#ok<INUSL>
             % rewrite with LPE
             OE  = reshape(X,6,P.Con.nSats);
+            % Normalized Parameters
+            mu = 1;
+            Re = 1;
             % Element vectors (angles already in radians)
             a   = OE(1,:);
             e   = OE(2,:);
@@ -717,10 +765,10 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             f  = pi/180*me2ta(Me*180/pi,e);
             % Secondary definitions
             p = a.*(1-e.^2);
-            h = sqrt(P.Con.mu*p);
+            h = sqrt(mu*p);
             r = p./(1+e.*cos(f));
-            k2 = -3*P.Con.mu./r.^3.*P.Con.J2.*P.Con.Re.^2;
-            n = sqrt(P.Con.mu./a.^3);
+            k2 = -3*mu./r.^3.*P.Con.J2.*Re.^2;
+            n = sqrt(mu./a.^3);
             eta = sqrt(1-e.^2);
             aol = f + w;
             % Test vs. GVE
@@ -764,9 +812,9 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
 
         function dX = DynOePns(P,t,X)  %#ok<INUSL>
             % Dynamics for Nonsingular polar-nodal propagation
-            mu = P.Con.mu;
+            mu = 1;
             J2 = P.Con.J2;
-            Re = P.Con.Re;
+            Re = 1;
             PNS  = reshape(X,6,P.Con.nSats);
             % Element vectors (angles already in radians)
             r   = PNS(1,:); % radius
