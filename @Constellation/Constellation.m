@@ -8,7 +8,6 @@ classdef Constellation < handle  &  matlab.mixin.CustomDisplay
         mu % gravitational constant [km^3/s^2]
         Re % primary radius [km]
         J2 % primary J2 harmonic
-        J3 % primary J3 harmonic
         primary % More general - should use this
     end
     
@@ -32,7 +31,6 @@ classdef Constellation < handle  &  matlab.mixin.CustomDisplay
             C.mu       = primary.mu;
             C.Re       = primary.Re;
             C.J2       = primary.J2;
-            C.J3       = primary.J3;
             C.primary  = primary;
         end
     end

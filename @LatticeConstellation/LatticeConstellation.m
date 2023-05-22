@@ -37,7 +37,7 @@ classdef LatticeConstellation < Constellation
     end
     
     methods
-        function LC = LatticeConstellation(Arch,Phase,Orbit,InitCon)
+        function LC = LatticeConstellation(Arch,Phase,Orbit,InitCon,primary)
             %%%% Pre Initialization %%%%
             switch nargin
                 case 0
@@ -65,6 +65,7 @@ classdef LatticeConstellation < Constellation
                     InitCon.aop1  = 0;
                 case 4
                     primary = earth();
+                case 5
             end
             Arch.nSats = Arch.nPlanes*Arch.nAops*Arch.nSatsPerAop;
                         

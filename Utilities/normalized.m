@@ -1,6 +1,6 @@
 function earthstruct = normalized()
 %earth Returns a struct containing physical characteristics of a normalized
-% planet
+% Earth
 % ~~~~~~~~~~~ Might be better as a Class ~~~~~~~~~~~
 %
 %  ~~~~~~~~~~   Attributes    ~~~~~~~~~~~
@@ -12,4 +12,6 @@ function earthstruct = normalized()
 
 earthstruct.mu = 1;
 earthstruct.Re = 1;
+earthstruct.J2 = 1.08262617385222e-3;
+
 end
