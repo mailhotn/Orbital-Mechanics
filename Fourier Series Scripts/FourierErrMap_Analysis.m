@@ -33,7 +33,13 @@ dataFolder = 'C:\Users\User\Dropbox\Doc Fourier Data\Error Mapping'; % ASRI
 % load([dataFolder '\ErrMaps_27-12-2022_10-19.mat']); % SP + Deprit + 2OrdK5 w/o dAop Low ecc 
 % load([dataFolder '\ErrMaps_5-1-2023_7-47.mat']); % 2Ord: K5vK4 w/o dAop Low ecc 
 % load([dataFolder '\ErrMaps_10-1-2023_16-35.mat']); % 2Ord: K5vK6 w/o dAop Low ecc
-load([dataFolder '\ErrMaps_15-3-2023_21-25.mat']); % 2Ord: K5 w/o dAop Low ecc, no Inc singularity in OeOsc 
+% load([dataFolder '\ErrMaps_15-3-2023_21-25.mat']); % 2Ord: K5 w/o dAop Low ecc, no Inc singularity in OeOsc 
+
+% Change to Propagator - Normalized + ode78 + tolerances
+load([dataFolder '\ErrMaps_24-5-2023_20-48.mat']); % 2Ord: K5 w/o dAop Low ecc, no Inc singularity in OeOsc 
+load([dataFolder '\ErrMaps_31-5-2023_23-54.mat']); % same as last + use mean aop
+
+
 
 
 

@@ -78,7 +78,7 @@ parfor iEcc = 1:nEcc
             end
             % Prop Numerical
             tic
-            [~,oeC] = Prop.PropOeOsc(t);
+            [~,oeC] = Prop.PropOeOsc3(t);
             testT = toc;
             cTime = cTime + testT;
             oeC = oeC.';

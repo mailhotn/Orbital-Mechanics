@@ -129,7 +129,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         end
         
         function [Time, X] = PropOeOsc(P,T)
-            % Numerically propagate GVE for oscullating elements
+            % Numerically propagate GVE for osculating elements
             % Singular in e, not i
             % Use this I think
             opts = odeset('reltol',P.relTol,'abstol',P.absTol);
@@ -154,7 +154,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         end
         
         function [Time, X] = PropOeOsc2(P,T)
-            % Numerically propagate GVE for oscullating elements
+            % Numerically propagate GVE for osculating elements
             % Tried different way of writing equations, didnt work well
             % probably worse?
             opts = odeset('reltol',P.relTol,'abstol',P.absTol);
@@ -167,7 +167,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         end
         
         function [Time, X] = PropOeOsc3(P,T)
-            % Numerically propagate GVE for oscullating elements
+            % Numerically propagate LPE for osculating elements
             % Singular in e, not i
             % Use this I think
             opts = odeset('reltol',P.relTol,'abstol',P.absTol);
@@ -321,33 +321,34 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
 
             [freq0,lpeSpec] = P.DynOeFourier2Ord(T,icOsc,kMax);
             
+            % Average out SP from initial conditions
             icM = osc2meSP(icOsc);
             icOsc(3:end) = icOsc(3:end)*pi/180;
             icM(3:end) = icM(3:end)*pi/180;
             
-            a = icM(1);
+            smaM = icM(1);
             
             % Continue with the rest
-            n = sqrt(P.Con.primary.mu/a^3);
+            nM = sqrt(P.Con.primary.mu/smaM^3);
             
-            M = n*T+icOsc(6);
+            M = nM*T+icOsc(6);
             k = 1:kMax;
             X = nan(6*P.Con.nSats,length(T));
             
             % Initial M
-            trigMat = [sin(k.'*M(1))./k.'/n;-cos(k.'*M(1))./k.'/n];
+            trigMat = [sin(k.'*M(1))./k.'/nM;-cos(k.'*M(1))./k.'/nM];
             InitM = sum(lpeSpec((10*kMax+1):end,1).*trigMat);
             
             
             % Fix M
-            Sk = sin(k.'*M)./k.'/n;
-            Ck = -cos(k.'*M)./k.'/n;
+            Sk = sin(k.'*M)./k.'/nM;
+            Ck = -cos(k.'*M)./k.'/nM;
             AkM = lpeSpec((10*kMax+1):11*kMax,:);
             BkM = lpeSpec((11*kMax+1):12*kMax,:);
             M2 = freq0(6)*T + sum(AkM.*Sk + BkM.*Ck) - InitM + M;
             
             % Initial time - With fixed M
-            trigMat = repmat([sin(k.'*M2(1))./k.'/n;-cos(k.'*M2(1))./k.'/n],6,1);
+            trigMat = repmat([sin(k.'*M2(1))./k.'/nM;-cos(k.'*M2(1))./k.'/nM],6,1);
             trigsum1 = lpeSpec(:,1).*trigMat;
             % CHANGE TO MATRIX
             % MULTIPLICATION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -357,9 +358,9 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             
             
             % Calculate all elements
-            Sk = repmat(sin(k.'*M2)./k.'/n,6,1);
-            Ck = repmat(-cos(k.'*M2)./k.'/n,6,1);
-            iAk = (1:(6*kMax)) + reshape(repmat((0:5)*kMax,kMax,1),1,kMax*6);
+            Sk = repmat(sin(k.'*M2)./k.'/nM,6,1);
+            Ck = repmat(-cos(k.'*M2)./k.'/nM,6,1);
+            iAk = (1:(6*kMax)) + reshape(repmat((0:5)*kMax,kMax,1),1,kMax*6); % Indices for Ak in Spectrum
             iBk = (1:(6*kMax)) + reshape(repmat((1:6)*kMax,kMax,1),1,kMax*6);
             Ak = lpeSpec(iAk,:);
             Bk = lpeSpec(iBk,:);
@@ -1271,7 +1272,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             
             nMo = sqrt(mu/a^3);
             p = a*(1-e^2);
-            aop = icOsc(5) + (3/4*J2*(Re/p)^2*nMo*(5*cos(i)^2-1))*t;
+            aop = icM(5) + (3/4*J2*(Re/p)^2*nMo*(5*cos(i)^2-1))*t;
             
             b = (1-sqrt(1-e^2))/e;
             
