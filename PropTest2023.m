@@ -1,3 +1,7 @@
+% Script to make sure that my propagators actually agree. Spent a ton of
+% time on this, changed to ode78, tightened tolerances, then realized that
+% there wasn't really any large disagreement in the first place.
+% Propagators are now more accurate, but still big waste of time.
 clear
 primary = earth();
 mu = primary.mu;

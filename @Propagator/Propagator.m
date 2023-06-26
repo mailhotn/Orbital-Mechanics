@@ -1363,51 +1363,51 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 -9*e*sin(i)^2*sin(aop).*cos(aop)*(3*e^2+1)/2/(1-e^2)^5;
                 -9*e^2*sin(i)^2*sin(aop).*cos(aop)*(2*e^2+1)/8/(1-e^2)^5.5];
             
-            %% Second Order
+            %% Second Order - O(J2^2), not necessary
             
-            d2Cdo2 = [-36*sin(i)^2*(2*cos(aop).^2-1)/(1-e^2)^2;
-                -3*(3*e^2-2)*sin(i)^2*(2*cos(aop).^2-1)/(1-e^2)^3.5;
-                -3*(e^2-6)*e*sin(i)^2*(2*cos(aop).^2-1)/2/(1-e^2)^4;
-                9*e^2*sin(i)^2*(2*cos(aop).^2-1)/2/(1-e^2)^4.5;
-                3*e^3*sin(i)^2*(2*cos(aop).^2-1)/4/(1-e^2)^5];
-            
-            d2Cdo2_si = [-36*sin(i)*(2*cos(aop).^2-1)/(1-e^2)^2;
-                -3*(3*e^2-2)*sin(i)*(2*cos(aop).^2-1)/(1-e^2)^3.5;
-                -3*(e^2-6)*e*sin(i)*(2*cos(aop).^2-1)/2/(1-e^2)^4;
-                9*e^2*sin(i)*(2*cos(aop).^2-1)/2/(1-e^2)^4.5;
-                3*e^3*sin(i)*(2*cos(aop).^2-1)/4/(1-e^2)^5];
-            
-            d2Cdido_si = [-72*cos(i)*sin(aop).*cos(aop)/(1-e^2)^2;
-                (12-18*e^2)*cos(i)*sin(aop).*cos(aop)/(1-e^2)^3.5;
-                3*e*(6-e^2)*cos(i)*sin(aop).*cos(aop)/(1-e^2)^4;
-                9*e^2*cos(i)*sin(aop).*cos(aop)/(1-e^2)^4.5;
-                3*e^3*cos(i)*sin(aop).*cos(aop)/2/(1-e^2)^5];
-            
-            d2Cdedo = [-144*e*sin(i)^2*sin(aop).*cos(aop)/(1-e^2)^3;
-                -(45*e^2-24)*e*sin(i)^2*sin(aop).*cos(aop)/(1-e^2)^4.5;
-                -3*(5*e^4-39*e^2-6)*sin(i)^2*sin(aop).*cos(aop)/2/(1-e^2)^5;
-                (63*e^2+18)*e*sin(i)^2*sin(aop).*cos(aop)/2/(1-e^2)^5.5;
-                -3*e^2*(7*e^2+3)*sin(i)^2*sin(aop).*cos(aop)/4/(1-e^2)^6];
-            
-            d2Sdo2 = [12*sin(i)^2*sin(aop).*cos(aop)/(1-e^2)^3;
-                18*e*sin(i)^2*sin(aop).*cos(aop)/(1-e^2)^3.5;
-                9*e^2*sin(i)^2*sin(aop).*cos(aop)/(1-e^2)^4;
-                3*e^3*sin(i)^2*sin(aop).*cos(aop)/2/(1-e^2)^4.5];
-            
-            d2Sdo2_si = [12*sin(i)*sin(aop).*cos(aop)/(1-e^2)^3;
-                18*e*sin(i)*sin(aop).*cos(aop)/(1-e^2)^3.5;
-                9*e^2*sin(i)*sin(aop).*cos(aop)/(1-e^2)^4;
-                3*e^3*sin(i)*sin(aop).*cos(aop)/2/(1-e^2)^4.5];
-            
-            d2Sdido_si = [-6*cos(i)*(2*cos(aop).^2-1)/(1-e^2)^3;
-                -9*e*cos(i)*(2*cos(aop).^2-1)/(1-e^2)^3.5;
-                -9*e^2*cos(i)*(2*cos(aop).^2-1)/2/(1-e^2)^4;
-                -3*e^3*cos(i)*(2*cos(aop).^2-1)/4/(1-e^2)^4.5];
-            
-            d2Sdedo = [-18*e*sin(i)^2*(2*cos(aop).^2-1)/(1-e^2)^4;
-                -9*(6*e^2+1)*sin(i)^2*(2*cos(aop).^2-1)/2/(1-e^2)^4.5;
-                -9*e*(3*e^2+1)*sin(i)^2*(2*cos(aop).^2-1)/2/(1-e^2)^5;
-                -9*e^2*(2*e^2+1)*sin(i)^2*(2*cos(aop).^2-1)/8/(1-e^2)^5.5];
+            % d2Cdo2 = [-36*sin(i)^2*(2*cos(aop).^2-1)/(1-e^2)^2;
+            %     -3*(3*e^2-2)*sin(i)^2*(2*cos(aop).^2-1)/(1-e^2)^3.5;
+            %     -3*(e^2-6)*e*sin(i)^2*(2*cos(aop).^2-1)/2/(1-e^2)^4;
+            %     9*e^2*sin(i)^2*(2*cos(aop).^2-1)/2/(1-e^2)^4.5;
+            %     3*e^3*sin(i)^2*(2*cos(aop).^2-1)/4/(1-e^2)^5];
+            % 
+            % d2Cdo2_si = [-36*sin(i)*(2*cos(aop).^2-1)/(1-e^2)^2;
+            %     -3*(3*e^2-2)*sin(i)*(2*cos(aop).^2-1)/(1-e^2)^3.5;
+            %     -3*(e^2-6)*e*sin(i)*(2*cos(aop).^2-1)/2/(1-e^2)^4;
+            %     9*e^2*sin(i)*(2*cos(aop).^2-1)/2/(1-e^2)^4.5;
+            %     3*e^3*sin(i)*(2*cos(aop).^2-1)/4/(1-e^2)^5];
+            % 
+            % d2Cdido_si = [-72*cos(i)*sin(aop).*cos(aop)/(1-e^2)^2;
+            %     (12-18*e^2)*cos(i)*sin(aop).*cos(aop)/(1-e^2)^3.5;
+            %     3*e*(6-e^2)*cos(i)*sin(aop).*cos(aop)/(1-e^2)^4;
+            %     9*e^2*cos(i)*sin(aop).*cos(aop)/(1-e^2)^4.5;
+            %     3*e^3*cos(i)*sin(aop).*cos(aop)/2/(1-e^2)^5];
+            % 
+            % d2Cdedo = [-144*e*sin(i)^2*sin(aop).*cos(aop)/(1-e^2)^3;
+            %     -(45*e^2-24)*e*sin(i)^2*sin(aop).*cos(aop)/(1-e^2)^4.5;
+            %     -3*(5*e^4-39*e^2-6)*sin(i)^2*sin(aop).*cos(aop)/2/(1-e^2)^5;
+            %     (63*e^2+18)*e*sin(i)^2*sin(aop).*cos(aop)/2/(1-e^2)^5.5;
+            %     -3*e^2*(7*e^2+3)*sin(i)^2*sin(aop).*cos(aop)/4/(1-e^2)^6];
+            % 
+            % d2Sdo2 = [12*sin(i)^2*sin(aop).*cos(aop)/(1-e^2)^3;
+            %     18*e*sin(i)^2*sin(aop).*cos(aop)/(1-e^2)^3.5;
+            %     9*e^2*sin(i)^2*sin(aop).*cos(aop)/(1-e^2)^4;
+            %     3*e^3*sin(i)^2*sin(aop).*cos(aop)/2/(1-e^2)^4.5];
+            % 
+            % d2Sdo2_si = [12*sin(i)*sin(aop).*cos(aop)/(1-e^2)^3;
+            %     18*e*sin(i)*sin(aop).*cos(aop)/(1-e^2)^3.5;
+            %     9*e^2*sin(i)*sin(aop).*cos(aop)/(1-e^2)^4;
+            %     3*e^3*sin(i)*sin(aop).*cos(aop)/2/(1-e^2)^4.5];
+            % 
+            % d2Sdido_si = [-6*cos(i)*(2*cos(aop).^2-1)/(1-e^2)^3;
+            %     -9*e*cos(i)*(2*cos(aop).^2-1)/(1-e^2)^3.5;
+            %     -9*e^2*cos(i)*(2*cos(aop).^2-1)/2/(1-e^2)^4;
+            %     -3*e^3*cos(i)*(2*cos(aop).^2-1)/4/(1-e^2)^4.5];
+            % 
+            % d2Sdedo = [-18*e*sin(i)^2*(2*cos(aop).^2-1)/(1-e^2)^4;
+            %     -9*(6*e^2+1)*sin(i)^2*(2*cos(aop).^2-1)/2/(1-e^2)^4.5;
+            %     -9*e*(3*e^2+1)*sin(i)^2*(2*cos(aop).^2-1)/2/(1-e^2)^5;
+            %     -9*e^2*(2*e^2+1)*sin(i)^2*(2*cos(aop).^2-1)/8/(1-e^2)^5.5];
             %% Loop for A,B
             AkM = nan(5,kMax);
             Ak_eM = nan(5,kMax);
@@ -1675,32 +1675,26 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
 %                 0, -eta^2*(dSde.'*Bk_eM + S.'*Bkde_eM) + 6*S.'*BkM];
 %             
             %% Integrate 2nd Order components
-            dAop = 0*0.75*J2*Re^2/p^2*(5*cos(i)^2-1); % divided be n
+            % dAop = 0*0.75*J2*Re^2/p^2*(5*cos(i)^2-1); %  O(J2^2)
             
-            dSmaSpec = Rsma*[(S.'*(BkM.*k) + dAop*(-dCdo.'*AkM)),...
-                (-C.'*(AkM.*k) -dAop*(dSdo.'*BkM))].';
+            dSmaSpec = Rsma*[S.'*(BkM.*k),...
+                -C.'*(AkM.*k)].';
             
-            dEccSpec = Recc*[eta*S.'*(Bk_eM.*k) - dCdo.'*Ak_eM ...
-                + dAop*(-eta*dCdo.'*Ak_eM - d2Sdo2.'*Bk_eM./k),...
-                -eta*C.'*(Ak_eM.*k) - dSdo.'*Bk_eM ...
-                - dAop*(eta*dSdo.'*Bk_eM - d2Cdo2.'*Ak_eM./k)].';
+            dEccSpec = Recc*[eta*S.'*(Bk_eM.*k) - dCdo.'*Ak_eM,...
+                -eta*C.'*(Ak_eM.*k) - dSdo.'*Bk_eM].';
             
-            dIncSpec = Rinc*[dCdo_si.'*AkM + dAop*(d2Sdo2_si.'*BkM./k),...
-                dSdo_si.'*BkM - dAop*(d2Cdo2_si.'*AkM./k)].';
+            dIncSpec = Rinc*[dCdo_si.'*AkM,...
+                dSdo_si.'*BkM].';
             
-            dRanSpec = Rran*[dCdi_si.'*AkM + dAop*(d2Sdido_si.'*BkM./k),...
-                dSdi_si.'*BkM - dAop*(d2Cdido_si.'*AkM./k)].';
+            dRanSpec = Rran*[dCdi_si.'*AkM,...
+                dSdi_si.'*BkM].';
             
             
-            dAopSpec = Raop*[eta*(dCde.'*Ak_eM + C.'*Akde_eM) - cos(i)/eta*dCdi_si.'*AkM + ...
-                dAop*(eta*(d2Sdedo.'*Bk_eM + dSdo.'*Bkde_eM) - cos(i)/eta*d2Sdido_si.'*BkM)./k,...
-                eta*(dSde.'*Bk_eM + S.'*Bkde_eM) - cos(i)/eta*dSdi_si.'*BkM - ...
-                dAop*(eta*(d2Cdedo.'*Ak_eM + dCdo.'*Akde_eM) - cos(i)/eta*d2Cdido_si.'*AkM)./k].';
+            dAopSpec = Raop*[eta*(dCde.'*Ak_eM + C.'*Akde_eM) - cos(i)/eta*dCdi_si.'*AkM,...
+                eta*(dSde.'*Bk_eM + S.'*Bkde_eM) - cos(i)/eta*dSdi_si.'*BkM].';
             
-            dManSpec = Rman*[-eta^2*(dCde.'*Ak_eM + C.'*Akde_eM) + 6*C.'*AkM + ...
-                dAop*(-eta^2*(d2Sdedo.'*Bk_eM + dSdo.'*Bkde_eM) + 6*dSdo.'*BkM)./k,...
-                -eta^2*(dSde.'*Bk_eM + S.'*Bkde_eM) + 6*S.'*BkM - ...
-                dAop*(-eta^2*(dCde.'*Ak_eM + C.'*Akde_eM) + 6*C.'*AkM)./k].';
+            dManSpec = Rman*[-eta^2*(dCde.'*Ak_eM + C.'*Akde_eM) + 6*C.'*AkM,...
+                -eta^2*(dSde.'*Bk_eM + S.'*Bkde_eM) + 6*S.'*BkM].';
             
             lpeSpec = [dSmaSpec;
                 dEccSpec;
