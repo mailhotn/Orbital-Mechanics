@@ -1,3 +1,4 @@
+clear
 %% Define Satellite & Noise Model
 ic = [7000, 0.01, 55, 10, 10, 10];
 primary = earth();
@@ -37,19 +38,41 @@ mOeMeas = osc2me(oeMeas);
 mOeMeas(5:6,:) = wrapTo180(mOeMeas(5:6,:));
 mOeFour = nan(size(oeTrue));
 
-for iTime = 1:nT
-    [~, lpeSpec] = LpeJ2Fourier(oeMeas(:,iTime),kMax,primary);
-    k = 1:kMax;
-    M = oeMeas(6,iTime);
-    a = oeMeas(1,iTime);
-    nMo = sqrt(mu/a^3);
-    % find M
-    trigVec1 = [cos(k*M)./k/nMo,sin(k*M)./k/nMo].';
-    M2 = oeMeas(6,iTime) - lpeSpec(6,:)*trigVec1;
-    % Use updated M for estimate
-    trigVec2 = [cos(k*M2)./k/nMo,sin(k*M2)./k/nMo].';
-    mOeFour(:,iTime) = oeMeas(:,iTime) - lpeSpec*trigVec2;
-end
+[~, lpeSpec] = LpeJ2Fourier(oeMeas,kMax,primary);
+M = oeMeas(6,:);
+a = oeMeas(1,:);
+nMo = sqrt(mu./a.^3);
+k = (1:kMax).';
+Ck = -cos(k*M)./k./nMo;
+Sk = sin(k*M)./k./nMo;
+
+smaVar =  sum(Sk.*squeeze(lpeSpec(1,:,:)).',1) + ...
+    sum(Ck.*squeeze(lpeSpec(2,:,:)).',1);
+eccVar =  sum(Sk.*squeeze(lpeSpec(3,:,:)).',1) + ...
+    sum(Ck.*squeeze(lpeSpec(4,:,:)).',1); 
+incVar =  sum(Sk.*squeeze(lpeSpec(5,:,:)).',1) + ...
+    sum(Ck.*squeeze(lpeSpec(6,:,:)).',1); 
+ranVar =  sum(Sk.*squeeze(lpeSpec(7,:,:)).',1) + ...
+    sum(Ck.*squeeze(lpeSpec(8,:,:)).',1); 
+aopVar =  sum(Sk.*squeeze(lpeSpec(9,:,:)).',1) + ...
+    sum(Ck.*squeeze(lpeSpec(10,:,:)).',1); 
+manVar =  sum(Sk.*squeeze(lpeSpec(11,:,:)).',1) + ...
+    sum(Ck.*squeeze(lpeSpec(12,:,:)).',1); 
+
+mOeFour = mOeMeas - [smaVar;eccVar;incVar;ranVar;aopVar;manVar];
+% for iTime = 1:nT
+%     [~, lpeSpec] = LpeJ2Fourier(oeMeas(:,iTime),kMax,primary);
+%     k = 1:kMax;
+%     M = oeMeas(6,iTime);
+%     a = oeMeas(1,iTime);
+%     nMo = sqrt(mu/a^3);
+%     % find M
+%     trigVec1 = [cos(k*M)./k./nMo,sin(k*M)./k/nMo].';
+%     M2 = oeMeas(6,iTime) - lpeSpec(6,:)*trigVec1;
+%     % Use updated M for estimate
+%     trigVec2 = [cos(k*M2)./k/nMo,sin(k*M2)./k/nMo].';
+%     mOeFour(:,iTime) = oeMeas(:,iTime) - lpeSpec*trigVec2;
+% end
 mOeFour(5:6,:) = wrapTo180(mOeFour(5:6,:));
 errorB(:,iMonte,:) = mOeMeas - mOeTrue;
 errorF(:,iMonte,:) = mOeFour - mOeTrue;
