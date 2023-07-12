@@ -16,7 +16,7 @@ kMax = 5;
 t = 0:100:86400;
 nT = length(t);
 
-nMonte = 100000;
+nMonte = 1000;
 
 errorB = nan(6,nMonte,length(t));
 errorF = nan(6,nMonte,length(t));
@@ -36,7 +36,7 @@ parfor iMonte = 1:nMonte
     [~, eciTrue] = Prop.PropEciJ2(t);
     oeTrue = eci2oe(eciTrue);
     mOeTrue = osc2me(oeTrue);
-    mOeTrue(5:6,:) = wrapTo180(mOeTrue(5:6,:));
+    % mOeTrue(5:6,:) = wrapTo180(mOeTrue(5:6,:));
     %% Contaminate
     noise = mvnrnd(zeros(6,1),covEci,nT);
     eciMeas = eciTrue + noise;
@@ -54,7 +54,13 @@ parfor iMonte = 1:nMonte
     k = (1:kMax).';
     Ck = -cos(k*M)./k./nMo;
     Sk = sin(k*M)./k./nMo;
-
+    % Fix M
+    manVar =  sum(Sk.*squeeze(lpeSpec(11,:,:)).',1) + ...
+        sum(Ck.*squeeze(lpeSpec(12,:,:)).',1);
+    M2 = mOeMeas(6,:)- manVar;
+    Ck = -cos(k*M2)./k./nMo;
+    Sk = sin(k*M2)./k./nMo;
+    % Calculate other Elements
     smaVar =  sum(Sk.*squeeze(lpeSpec(1,:,:)).',1) + ...
         sum(Ck.*squeeze(lpeSpec(2,:,:)).',1);
     eccVar =  sum(Sk.*squeeze(lpeSpec(3,:,:)).',1) + ...
@@ -83,6 +89,7 @@ parfor iMonte = 1:nMonte
     %     mOeFour(:,iTime) = oeMeas(:,iTime) - lpeSpec*trigVec2;
     % end
     mOeFour(4:6,:) = wrapTo180(mOeFour(4:6,:));
+    mOeTrue(4:6,:) = wrapTo180(mOeTrue(4:6,:));
     errorB(:,iMonte,:) = mOeMeas - mOeTrue;
     errorF(:,iMonte,:) = mOeFour - mOeTrue;
 end
@@ -96,6 +103,7 @@ errData.incRange = incRange;
 errData.kMax = kMax;
 errData.nMonte = nMonte;
 errData.covEci = covEci;
+errData.t = t;
 
 errData.errorB = errorB;
 errData.errorF = errorF;
