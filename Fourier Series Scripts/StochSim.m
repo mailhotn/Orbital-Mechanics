@@ -24,6 +24,7 @@ errorF = nan(6,nMonte,length(t));
 
 %% Monte Carlo Runs
 totalTime = tic;
+pool = parpool('Threads');
 parfor iMonte = 1:nMonte
     % Generate Constellation
     sma = smaRange(1) + rand*(smaRange(2)-smaRange(1));
@@ -44,7 +45,7 @@ parfor iMonte = 1:nMonte
 
     %% Calculate Means
     mOeMeas = osc2me(oeMeas);
-    mOeMeas(4:6,:) = wrapTo180(mOeMeas(4:6,:));
+    % mOeMeas(4:6,:) = wrapTo180(mOeMeas(4:6,:));
     mOeFour = nan(size(oeTrue));
 
     [~, lpeSpec] = LpeJ2Fourier(oeMeas,kMax,primary);
@@ -54,6 +55,7 @@ parfor iMonte = 1:nMonte
     k = (1:kMax).';
     Ck = -cos(k*M)./k./nMo;
     Sk = sin(k*M)./k./nMo;
+
     % Fix M
     manVar =  sum(Sk.*squeeze(lpeSpec(11,:,:)).',1) + ...
         sum(Ck.*squeeze(lpeSpec(12,:,:)).',1);
@@ -88,8 +90,8 @@ parfor iMonte = 1:nMonte
     %     trigVec2 = [cos(k*M2)./k/nMo,sin(k*M2)./k/nMo].';
     %     mOeFour(:,iTime) = oeMeas(:,iTime) - lpeSpec*trigVec2;
     % end
-    mOeFour(4:6,:) = wrapTo180(mOeFour(4:6,:));
-    mOeTrue(4:6,:) = wrapTo180(mOeTrue(4:6,:));
+    % mOeFour(4:6,:) = wrapTo180(mOeFour(4:6,:));
+    % mOeTrue(4:6,:) = wrapTo180(mOeTrue(4:6,:));
     errorB(:,iMonte,:) = mOeMeas - mOeTrue;
     errorF(:,iMonte,:) = mOeFour - mOeTrue;
 end
@@ -104,14 +106,14 @@ errData.kMax = kMax;
 errData.nMonte = nMonte;
 errData.covEci = covEci;
 errData.t = t;
-
-errData.errorB = errorB;
-errData.errorF = errorF;
+errData.runTime = eTime;
+errData.errorB = single(errorB);
+errData.errorF = single(errorF);
 
 c = clock;
 save([dataFolder '\StochErr_' num2str(c(3)) '-' num2str(c(2)) '-' ...
     num2str(c(1)) '_' num2str(c(4)) '-' num2str(c(5)), '.mat'],'errData');
-
+delete(pool);
 % sigB = nan(6,nT);
 % sigF = nan(6,nT);
 % for iOe = 1:6

@@ -1,6 +1,10 @@
 dataFolder = 'C:\Users\User\Dropbox\Doc Fourier Data\Stochastic Estimation';
 % load([dataFolder '\name.mat']);
+% load([dataFolder '\StochErr_12-7-2023_15-10.mat']);
+% load([dataFolder '\StochErr_12-7-2023_17-4.mat']);
+load([dataFolder '\StochErr_16-7-2023_14-41.mat']);
 
+%% Analyze Data
 t = errData.t;
 nT = length(t);
 sigB = nan(6,nT);
@@ -13,19 +17,19 @@ end
 %% Plot STD
 
 figure(1)
-plot(t,sigB(1,:),'-',t,sigF(1,:),'.')
+plot(t,sigB(1,:),'o',t,sigF(1,:),'.')
 
 figure(2)
-plot(t,sigB(2,:),'-',t,sigF(2,:),'.')
+plot(t,sigB(2,:),'o',t,sigF(2,:),'.')
 
 figure(3)
-plot(t,sigB(3,:),'-',t,sigF(3,:),'.')
+plot(t,sigB(3,:),'o',t,sigF(3,:),'.')
 
 figure(4)
-plot(t,sigB(4,:),'-',t,sigF(4,:),'.')
+plot(t,sigB(4,:),'o',t,sigF(4,:),'.')
 
 figure(5)
-plot(t,sigB(5,:),'-',t,sigF(5,:),'.')
+plot(t,sigB(5,:),'o',t,sigF(5,:),'.')
 
 figure(6)
-plot(t,sigB(6,:),'-',t,sigF(6,:),'.')
+plot(t,sigB(6,:),'o',t,sigF(6,:),'.')
