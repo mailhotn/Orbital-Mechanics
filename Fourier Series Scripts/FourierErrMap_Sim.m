@@ -1,7 +1,7 @@
 clear
 %% Define Parameters
-dataFolder = 'C:\Users\User\Dropbox\Doc Fourier Data\Error Mapping';
-dbPath = 'C:\Users\User\Dropbox'; % ASRI
+dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping';
+dbPath = 'C:\Users\User\Google Drive'; % ASRI
 primary = earth();
 k1 = 5;
 k2 = 5;

@@ -1,6 +1,6 @@
 clear
 %% Load Data
-dataFolder = 'C:\Users\User\Dropbox\Doc Fourier Data\Error Mapping'; % ASRI
+dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping'; % ASRI
 % dataFolder = 'D:\Dropbox\Doc Fourier Data\Error Mapping'; % Laptop
 % load([dataFolder '\ErrMaps_15-6-2022_9-52.mat']); % First run e:0.005-0.55, i:0.4-90
 % load([dataFolder '\ErrMaps_15-6-2022_11-13.mat']); % Singularity test e:0.5-0.7, i:60-70

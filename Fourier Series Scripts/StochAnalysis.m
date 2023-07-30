@@ -1,8 +1,9 @@
-dataFolder = 'C:\Users\User\Dropbox\Doc Fourier Data\Stochastic Estimation';
+dataFolder = 'C:\Users\User\Google Drive\Doc Data\Stochastic Estimation';
 % load([dataFolder '\name.mat']);
 % load([dataFolder '\StochErr_12-7-2023_15-10.mat']);
 % load([dataFolder '\StochErr_12-7-2023_17-4.mat']);
-load([dataFolder '\StochErr_16-7-2023_14-41.mat']);
+% load([dataFolder '\StochErr_16-7-2023_14-41.mat']);
+load([dataFolder '\StochErr_30-7-2023_14-45.mat']);
 
 %% Analyze Data
 t = errData.t;

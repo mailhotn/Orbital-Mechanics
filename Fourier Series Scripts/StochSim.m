@@ -1,7 +1,7 @@
 clear
 %% Define Satellite & Noise Model
-dataFolder = 'C:\Users\User\Dropbox\Doc Fourier Data\Stochastic Estimation';
-dbPath = 'C:\Users\User\Dropbox'; % ASRI
+dataFolder = 'C:\Users\User\Google Drive\Doc Data\Stochastic Estimation';
+drivePath = 'C:\Users\User\Google Drive'; % ASRI
 smaRange = [7000,10000];
 eccRange = [-2,-1]; % 10^x
 incRange = [1,30];
@@ -16,7 +16,7 @@ kMax = 5;
 t = 0:100:86400;
 nT = length(t);
 
-nMonte = 1000;
+nMonte = 20000;
 
 errorB = nan(6,nMonte,length(t));
 errorF = nan(6,nMonte,length(t));
@@ -96,7 +96,7 @@ parfor iMonte = 1:nMonte
     errorF(:,iMonte,:) = mOeFour - mOeTrue;
 end
 eTime = toc(totalTime);
-reportIFTTT(dbPath,eTime);
+reportIFTTT(drivePath,eTime);
 %% Save Data
 errData = struct();
 errData.smaRange = smaRange;
