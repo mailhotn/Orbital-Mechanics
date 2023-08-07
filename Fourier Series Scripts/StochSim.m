@@ -21,7 +21,7 @@ nMonte = 20000;
 errorB = nan(6,nMonte,length(t));
 errorF = nan(6,nMonte,length(t));
 
-
+mOeMat = nan(6,nMonte,length(t));
 %% Monte Carlo Runs
 totalTime = tic;
 pool = parpool('Threads');
@@ -37,6 +37,7 @@ parfor iMonte = 1:nMonte
     [~, eciTrue] = Prop.PropEciJ2(t);
     oeTrue = eci2oe(eciTrue);
     mOeTrue = osc2me(oeTrue);
+    mOeMat(:,iMonte,:) = mOeTrue;
     % mOeTrue(5:6,:) = wrapTo180(mOeTrue(5:6,:));
     %% Contaminate
     noise = mvnrnd(zeros(6,1),covEci,nT);
@@ -77,20 +78,6 @@ parfor iMonte = 1:nMonte
         sum(Ck.*squeeze(lpeSpec(12,:,:)).',1);
 
     mOeFour = mOeMeas - [smaVar;eccVar;incVar;ranVar;aopVar;manVar];
-    % for iTime = 1:nT
-    %     [~, lpeSpec] = LpeJ2Fourier(oeMeas(:,iTime),kMax,primary);
-    %     k = 1:kMax;
-    %     M = oeMeas(6,iTime);
-    %     a = oeMeas(1,iTime);
-    %     nMo = sqrt(mu/a^3);
-    %     % find M
-    %     trigVec1 = [cos(k*M)./k./nMo,sin(k*M)./k/nMo].';
-    %     M2 = oeMeas(6,iTime) - lpeSpec(6,:)*trigVec1;
-    %     % Use updated M for estimate
-    %     trigVec2 = [cos(k*M2)./k/nMo,sin(k*M2)./k/nMo].';
-    %     mOeFour(:,iTime) = oeMeas(:,iTime) - lpeSpec*trigVec2;
-    % end
-    % mOeFour(4:6,:) = wrapTo180(mOeFour(4:6,:));
     % mOeTrue(4:6,:) = wrapTo180(mOeTrue(4:6,:));
     errorB(:,iMonte,:) = mOeMeas - mOeTrue;
     errorF(:,iMonte,:) = mOeFour - mOeTrue;
@@ -109,6 +96,7 @@ errData.t = t;
 errData.runTime = eTime;
 errData.errorB = single(errorB);
 errData.errorF = single(errorF);
+errData.mOeTrue = single(mOeMat);
 
 c = clock;
 save([dataFolder '\StochErr_' num2str(c(3)) '-' num2str(c(2)) '-' ...
