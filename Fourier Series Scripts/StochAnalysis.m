@@ -5,7 +5,24 @@ dataFolder = 'C:\Users\User\Google Drive\Doc Data\Stochastic Estimation';
 % load([dataFolder '\StochErr_12-7-2023_15-10.mat']);
 % load([dataFolder '\StochErr_12-7-2023_17-4.mat']);
 % load([dataFolder '\StochErr_16-7-2023_14-41.mat']);
-load([dataFolder '\StochErr_19-7-2023_17-0.mat']); % 20,000 runs, no wrapping
+% load([dataFolder '\StochErr_19-7-2023_17-0.mat']); % 20,000 runs, no wrapping
+
+% Added element saving
+% load([dataFolder '\StochErr_7-8-2023_14-31.mat']); % 20,000 runs, no wrapping
+
+% Nonrandom Orbit
+% load([dataFolder '\StochErr_9-8-2023_12-53.mat']); 
+
+% Back to Random, use nominal osc sma for mean motion in Fourier
+% load([dataFolder '\StochErr_16-8-2023_15-49.mat']); 
+
+% nominal mean sma for mean motion
+% load([dataFolder '\StochErr_17-8-2023_10-45.mat']);
+% load([dataFolder '\StochErr_17-8-2023_11-15.mat']); % long period
+
+
+
+
 
 %% Analyze Data
 t = errData.t;
@@ -19,6 +36,10 @@ end
 mErrB = squeeze(mean(errData.errorB,2));
 mErrF = squeeze(mean(errData.errorF,2));
 
+%% Stats
+meanSigF = mean(sigF,2)
+meanSigB = mean(sigB,2)
+sigDiff = meanSigB - meanSigF
 %% Plot STD
 
 figure(1)

@@ -13,10 +13,10 @@ sigV = 2e-5;
 covEci = diag([sigR*ones(1,3),sigV*ones(1,3)]);
 kMax = 5;
 
-t = 0:100:86400;
+t = 0:1000:86400;
 nT = length(t);
 
-nMonte = 20000;
+nMonte = 1000;
 
 errorB = nan(6,nMonte,length(t));
 errorF = nan(6,nMonte,length(t));
@@ -30,7 +30,8 @@ parfor iMonte = 1:nMonte
     sma = smaRange(1) + rand*(smaRange(2)-smaRange(1));
     inc = incRange(1) + rand*(incRange(2)-incRange(1));
     ecc = 10^(eccRange(1) + rand*(eccRange(2)-eccRange(1)));
-    ic = [sma, ecc, inc, rand(1,3)*360];
+    ic = [sma, ecc, inc, rand(1,3)*360].';
+    icM = osc2me(ic);
     Sat = SingleSat(ic);
     Prop = Propagator(Sat);
     %% True Prop
@@ -51,8 +52,9 @@ parfor iMonte = 1:nMonte
 
     [~, lpeSpec] = LpeJ2Fourier(oeMeas,kMax,primary);
     M = oeMeas(6,:);
-    a = oeMeas(1,:);
-    nMo = sqrt(mu./a.^3);
+    % a = oeMeas(1,:); % Use nominal a instead - cheating? not really
+    nomSma = icM(1);
+    nMo = sqrt(mu./nomSma.^3);
     k = (1:kMax).';
     Ck = -cos(k*M)./k./nMo;
     Sk = sin(k*M)./k./nMo;
