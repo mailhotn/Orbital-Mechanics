@@ -13,24 +13,30 @@ sigV = 2e-5;
 covEci = diag([sigR*ones(1,3),sigV*ones(1,3)]);
 kMax = 5;
 
-t = 0:1000:86400;
+t = 0:100:86400;
 nT = length(t);
 
 nMonte = 1000;
 
 errorB = nan(6,nMonte,length(t));
 errorF = nan(6,nMonte,length(t));
-
+oeErr = nan(6,nMonte,length(t));
 mOeMat = nan(6,nMonte,length(t));
 %% Monte Carlo Runs
 totalTime = tic;
 pool = parpool('Threads');
 parfor iMonte = 1:nMonte
-    % Generate Constellation
-    sma = smaRange(1) + rand*(smaRange(2)-smaRange(1));
-    inc = incRange(1) + rand*(incRange(2)-incRange(1));
-    ecc = 10^(eccRange(1) + rand*(eccRange(2)-eccRange(1)));
-    ic = [sma, ecc, inc, rand(1,3)*360].';
+    % General IC
+    % sma = smaRange(1) + rand*(smaRange(2)-smaRange(1));
+    % inc = incRange(1) + rand*(incRange(2)-incRange(1));
+    % ecc = 10^(eccRange(1) + rand*(eccRange(2)-eccRange(1)));
+    % ic = [sma, ecc, inc, rand(1,3)*360].';
+    % Fixed IC
+    sma = 7000;
+    ecc = 0.01;
+    inc = 30;
+    ic = [sma, ecc, inc, 10, 10, 10].';
+    % Initialize Constellation
     icM = osc2me(ic);
     Sat = SingleSat(ic);
     Prop = Propagator(Sat);
@@ -44,7 +50,7 @@ parfor iMonte = 1:nMonte
     noise = mvnrnd(zeros(6,1),covEci,nT);
     eciMeas = eciTrue + noise;
     oeMeas = eci2oe(eciMeas);
-
+    oeErr(:,iMonte,:) = oeMeas - oeTrue;
     %% Calculate Means
     mOeMeas = osc2me(oeMeas);
     % mOeMeas(4:6,:) = wrapTo180(mOeMeas(4:6,:));
@@ -84,6 +90,12 @@ parfor iMonte = 1:nMonte
     errorB(:,iMonte,:) = mOeMeas - mOeTrue;
     errorF(:,iMonte,:) = mOeFour - mOeTrue;
 end
+delete(pool);
+sigOe = nan(6,nT);
+for iOe = 1:6
+    sigOe(iOe,:) = std(squeeze(oeErr(iOe,:,:)));
+end
+covOe = mean(sigOe,2);
 eTime = toc(totalTime);
 reportIFTTT(drivePath,eTime);
 %% Save Data
@@ -99,11 +111,12 @@ errData.runTime = eTime;
 errData.errorB = single(errorB);
 errData.errorF = single(errorF);
 errData.mOeTrue = single(mOeMat);
+errDat.covOe = covOe;
 
 c = clock;
 save([dataFolder '\StochErr_' num2str(c(3)) '-' num2str(c(2)) '-' ...
     num2str(c(1)) '_' num2str(c(4)) '-' num2str(c(5)), '.mat'],'errData');
-delete(pool);
+
 % sigB = nan(6,nT);
 % sigF = nan(6,nT);
 % for iOe = 1:6
