@@ -368,7 +368,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             
             X = icOsc + freq0*T + sumMat*(Ak.*Sk + Bk.*Ck) - InitVal;
 %             X(6,:) = M2;
-            X(6,:) = X(6,:) + M; % subtract M(0)? test with nonzero IC
+            X(6,:) = X(6,:) + M - icOsc(6); % subtract M(0)? test with nonzero IC
             
             
             X(3:5,:) = wrapTo360(X(3:5,:)*180/pi);
