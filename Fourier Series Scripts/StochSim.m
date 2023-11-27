@@ -2,7 +2,7 @@ clear
 %% Define Satellite & Noise Model
 dataFolder = 'C:\Users\User\Google Drive\Doc Data\Stochastic Estimation';
 drivePath = 'C:\Users\User\Google Drive'; % ASRI
-smaRange = [7000,10000];
+smaRange = [7000,8000];
 eccRange = [-2,-1]; % 10^x
 incRange = [1,30];
 primary = earth();
@@ -68,7 +68,7 @@ parfor iMonte = 1:nMonte
     % Fix M
     manVar =  sum(Sk.*squeeze(lpeSpec(11,:,:)).',1) + ...
         sum(Ck.*squeeze(lpeSpec(12,:,:)).',1);
-    M2 = mOeMeas(6,:)- manVar;
+    M2 = oeMeas(6,:)- manVar;
     Ck = -cos(k*M2)./k./nMo;
     Sk = sin(k*M2)./k./nMo;
     % Calculate other Elements
@@ -85,7 +85,7 @@ parfor iMonte = 1:nMonte
     manVar =  sum(Sk.*squeeze(lpeSpec(11,:,:)).',1) + ...
         sum(Ck.*squeeze(lpeSpec(12,:,:)).',1);
 
-    mOeFour = mOeMeas - [smaVar;eccVar;incVar;ranVar;aopVar;manVar];
+    mOeFour = oeMeas - [smaVar;eccVar;incVar;ranVar;aopVar;manVar];
     % mOeTrue(4:6,:) = wrapTo180(mOeTrue(4:6,:));
     errorB(:,iMonte,:) = mOeMeas - mOeTrue;
     errorF(:,iMonte,:) = mOeFour - mOeTrue;

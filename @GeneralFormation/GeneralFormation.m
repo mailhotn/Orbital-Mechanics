@@ -1,7 +1,7 @@
 classdef GeneralFormation < Constellation
     %GeneralFormation Defines a chief and any number of deputy satellites.
 % The formation is defined through the chief's orbital elements and the
-% deputys' differential orbital elements
+% deputies' differential orbital elements
 
     properties (SetAccess = private)
         % General Architecture
@@ -19,7 +19,7 @@ classdef GeneralFormation < Constellation
     end
     
     methods
-        function GF = GeneralFormation(oeChief,dOeDeputy,brouwer)
+        function GF = GeneralFormation(oeChief,dOeDeputy,brouwer,primary)
             %%%% Pre Initialization %%%%
             switch nargin
                 case 0
@@ -32,6 +32,8 @@ classdef GeneralFormation < Constellation
                     primary = earth();
                 case 3
                     primary = earth();
+                case 4
+                    
             end
             nSats = 1 + size(dOeDeputy,2);
                         

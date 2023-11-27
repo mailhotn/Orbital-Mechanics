@@ -17,8 +17,11 @@ dataFolder = 'C:\Users\User\Google Drive\Doc Data\Stochastic Estimation';
 % load([dataFolder '\StochErr_16-8-2023_15-49.mat']); 
 
 % nominal mean sma for mean motion
-% load([dataFolder '\StochErr_17-8-2023_10-45.mat']);
+load([dataFolder '\StochErr_17-8-2023_10-45.mat']);
 % load([dataFolder '\StochErr_17-8-2023_11-15.mat']); % long period
+
+% Fixed(?) error with Fourier using mean? - or not
+% load([dataFolder '\StochErr_27-11-2023_13-32.mat']); 
 
 
 
