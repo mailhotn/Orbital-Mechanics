@@ -36,9 +36,11 @@ dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping'; % ASRI
 % load([dataFolder '\ErrMaps_15-3-2023_21-25.mat']); % 2Ord: K5 w/o dAop Low ecc, no Inc singularity in OeOsc 
 
 % Change to Propagator - Normalized + ode78 + tolerances
-% load([dataFolder '\ErrMaps_24-5-2023_20-48.mat']); % 2Ord: K5 w/o dAop Low ecc, no Inc singularity in OeOsc 
-load([dataFolder '\ErrMaps_31-5-2023_23-54.mat']); % same as last + use mean aop
-
+load([dataFolder '\ErrMaps_24-5-2023_20-48.mat']); % 2Ord: K5 w/o dAop Low ecc, no Inc singularity in OeOsc 
+% load([dataFolder '\ErrMaps_31-5-2023_23-54.mat']); % same as last + use mean aop
+% load([dataFolder '\ErrMaps_27-12-2023_11-45.mat']); % same as last + variable initial M, small sample
+% load([dataFolder '\ErrMaps_27-12-2023_12-30.mat']); % same as last + variable M, small sample 
+% load([dataFolder '\ErrMaps_27-12-2023_13-52.mat']); % variable initial M, removed Brouwer weird wrapping
 
 
 
@@ -69,12 +71,12 @@ errTenB(errTenB==inf) = nan;
 %% Plot Relative Errors
 plotPropErrMap(eccRange,incRange,errTenF,errTenB,'Fourier','Brouwer SP',0)
 
-plotPropErrMap(eccRange,incRange,errTenF2,errTenB,'Fourier2','Brouwer SP',1)
+% plotPropErrMap(eccRange,incRange,errTenF2,errTenB,'Fourier2','Brouwer SP',1)
 
-plotPropErrMap(eccRange,incRange,errTenF2,errTenF,'Fourier2','Fourier',2)
+% plotPropErrMap(eccRange,incRange,errTenF2,errTenF,'Fourier2','Fourier',2)
 
 %% Plot Absolute Errors
-plotPropErrMap(eccRange,incRange,errTenF2,[],'Fourier2',[],10)
+% plotPropErrMap(eccRange,incRange,errTenF2,[],'Fourier2',[],10)
 
 plotPropErrMap(eccRange,incRange,errTenF,[],'Fourier',[],20)
 

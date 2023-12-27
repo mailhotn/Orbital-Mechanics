@@ -1,5 +1,5 @@
 clear
-oeLead = [7000, 0.01, 5, 10, 10, 10].'; % init oe
+oeLead = [7000, 0.01, 5, 0, 0, 0].'; % init oe
 dOe = [0,0,0,0,0,1].'; % mean element difference for follower
 oeMat = [oeLead,oeLead + dOe];
 kMax = 5;
@@ -10,7 +10,7 @@ leadProp = Propagator(leadSat);
 primary = earth();
 mu = primary.mu;
 
-t = 0:1000:86400*100;
+t = 0:100:86400*5;
 
 %% Sim Difference Prop
 [~,oeC] = leadProp.PropOeOsc3(t);
@@ -29,7 +29,6 @@ oeMatB = me2osc(oeMat);
 % Fourier
 [~,lpeSpec] = LpeJ2Fourier(oeMat,kMax);
 M = oeMat(6,:);
-% a = oeMeas(1,:); % Use nominal a instead - cheating? not really
 nomSma = oeLead(1);
 nMo = sqrt(mu./nomSma.^3);
 k = (1:kMax).';

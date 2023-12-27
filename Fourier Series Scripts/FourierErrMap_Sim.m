@@ -44,11 +44,11 @@ parfor iEcc = 1:nEcc
         errVecD = zeros(6,1);
         for iTry = 1:nMonte
             % Get OE
-            rNum = rand(3,1);
+            rNum = rand(4,1);
             sma = minSma + rNum(1)*(maxSma-minSma);
             ran = rNum(2)*360;
             aop = rNum(3)*360;
-            man = 0;
+            man = rNum(4)*360;
             oe = [sma,ecc,inc,ran,aop,man];
             
             
@@ -89,9 +89,9 @@ parfor iEcc = 1:nEcc
                 [~,OeM] = Prop.PropOeMeanShort(t);
                 oeB = me2oscSP(OeM.');
                 oeB(6,:) = 180/pi*unwrap(pi/180*oeB(6,:));
-                if oeB(6,1) > 180
-                    oeB(6,:) = oeB(6,:) - 360;
-                end
+                % if oeB(6,1) > 180
+                %     oeB(6,:) = oeB(6,:) - 360;
+                % end
                 testT = toc;
                 bTime = bTime + testT;
                 errB = abs(oeC-oeB);
