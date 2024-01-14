@@ -36,11 +36,12 @@ dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping'; % ASRI
 % load([dataFolder '\ErrMaps_15-3-2023_21-25.mat']); % 2Ord: K5 w/o dAop Low ecc, no Inc singularity in OeOsc 
 
 % Change to Propagator - Normalized + ode78 + tolerances
-load([dataFolder '\ErrMaps_24-5-2023_20-48.mat']); % 2Ord: K5 w/o dAop Low ecc, no Inc singularity in OeOsc 
+% load([dataFolder '\ErrMaps_24-5-2023_20-48.mat']); % 2Ord: K5 w/o dAop Low ecc, no Inc singularity in OeOsc 
 % load([dataFolder '\ErrMaps_31-5-2023_23-54.mat']); % same as last + use mean aop
 % load([dataFolder '\ErrMaps_27-12-2023_11-45.mat']); % same as last + variable initial M, small sample
 % load([dataFolder '\ErrMaps_27-12-2023_12-30.mat']); % same as last + variable M, small sample 
-% load([dataFolder '\ErrMaps_27-12-2023_13-52.mat']); % variable initial M, removed Brouwer weird wrapping
+% load([dataFolder '\ErrMaps_27-12-2023_13-52.mat']); % variable initial M, removed Brouwer weird wrapping small
+load([dataFolder '\ErrMaps_28-12-2023_21-59.mat']); % same as last large sample
 
 
 

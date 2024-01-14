@@ -78,6 +78,16 @@ classdef GeneralFormation < Constellation
             
             oeM = X;
         end
+
+        function oeM = InitialOeMeanShort(GF) %???
+            % returns the orbital elements as a matrix of column vectors
+            % each column represents [a,e,i,RAAN,AOP,Me].'
+            X = zeros(6,GF.nSats);
+            X(:,1) = GF.oeChief;
+            X(:,2:end) = GF.oeChief + GF.dOeDeputy;
+            
+            oeM = X;
+        end
     end
     
     methods(Access = protected, Sealed)

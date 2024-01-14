@@ -314,65 +314,71 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         function [Time, X] = PropOeFourier2Ord(P,T,kMax)
             % Propagate for time T using Fourier LPE
             % Assume coefficients varying in AOP up to first order
-            
-            %% Handle Initial conditions
-            
-            icOsc = reshape(P.Con.InitialOeOsc,[6*P.Con.nSats,1]); 
 
-            [freq0,lpeSpec] = P.DynOeFourier2Ord(T,icOsc,kMax);
-            
-            % Average out SP from initial conditions
-            icM = osc2meSP(icOsc);
-            icOsc(3:end) = icOsc(3:end)*pi/180;
-            icM(3:end) = icM(3:end)*pi/180;
-            
-            smaM = icM(1);
-            
-            % Continue with the rest
-            nM = sqrt(P.Con.primary.mu/smaM^3);
-            
-            M = nM*T+icOsc(6);
-            k = 1:kMax;
+            %% Handle Initial conditions
+            icVec = reshape(P.Con.InitialOeOsc,[6*P.Con.nSats,1]); % ic of all sats
             X = nan(6*P.Con.nSats,length(T));
-            
-            % Initial M
-            trigMat = [sin(k.'*M(1))./k.'/nM;-cos(k.'*M(1))./k.'/nM];
-            InitM = sum(lpeSpec((10*kMax+1):end,1).*trigMat);
-            
-            
-            % Fix M
-            Sk = sin(k.'*M)./k.'/nM;
-            Ck = -cos(k.'*M)./k.'/nM;
-            AkM = lpeSpec((10*kMax+1):11*kMax,:);
-            BkM = lpeSpec((11*kMax+1):12*kMax,:);
-            M2 = freq0(6)*T + sum(AkM.*Sk + BkM.*Ck) - InitM + M;
-            
-            % Initial time - With fixed M
-            trigMat = repmat([sin(k.'*M2(1))./k.'/nM;-cos(k.'*M2(1))./k.'/nM],6,1);
-            trigsum1 = lpeSpec(:,1).*trigMat;
-            % CHANGE TO MATRIX
-            % MULTIPLICATION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            InitVal = [sum(trigsum1(1:2*kMax)); sum(trigsum1((2*kMax+1):4*kMax));...
-                sum(trigsum1((4*kMax+1):6*kMax)); sum(trigsum1((6*kMax+1):8*kMax));...
-                sum(trigsum1((8*kMax+1):10*kMax)); sum(trigsum1((10*kMax+1):12*kMax))];
-            
-            
-            % Calculate all elements
-            Sk = repmat(sin(k.'*M2)./k.'/nM,6,1);
-            Ck = repmat(-cos(k.'*M2)./k.'/nM,6,1);
-            iAk = (1:(6*kMax)) + reshape(repmat((0:5)*kMax,kMax,1),1,kMax*6); % Indices for Ak in Spectrum
-            iBk = (1:(6*kMax)) + reshape(repmat((1:6)*kMax,kMax,1),1,kMax*6);
-            Ak = lpeSpec(iAk,:);
-            Bk = lpeSpec(iBk,:);
-            sumMat = blkdiag(ones(1,kMax),ones(1,kMax),ones(1,kMax),ones(1,kMax),ones(1,kMax),ones(1,kMax));
-            
-            X = icOsc + freq0*T + sumMat*(Ak.*Sk + Bk.*Ck) - InitVal;
-%             X(6,:) = M2;
-            X(6,:) = X(6,:) + M - icOsc(6); % subtract M(0)? test with nonzero IC
-            
-            
-            X(3:5,:) = wrapTo360(X(3:5,:)*180/pi);
-            X(6,:) = X(6,:)*180/pi;
+            % for satellites - inefficient, but no good option
+            for iSat = 1:P.Con.nSats
+                icOsc = icVec((1:6)+6*(iSat-1));
+
+                [freq0,lpeSpec] = P.DynOeFourier2Ord(T,icOsc,kMax);
+
+                % Average out SP from initial conditions
+                icM = osc2meSP(icOsc);
+                icOsc(3:end) = icOsc(3:end)*pi/180;
+                icM(3:end) = icM(3:end)*pi/180;
+
+                smaM = icM(1);
+
+                % Continue with the rest
+                nM = sqrt(P.Con.primary.mu/smaM^3);
+
+                M = nM*T+icOsc(6);
+                k = 1:kMax;
+                Xi = nan(6,length(T));
+
+                % Initial M
+                trigMat = [sin(k.'*M(1))./k.'/nM;-cos(k.'*M(1))./k.'/nM];
+                InitM = sum(lpeSpec((10*kMax+1):end,1).*trigMat);
+
+
+                % Fix M
+                Sk = sin(k.'*M)./k.'/nM;
+                Ck = -cos(k.'*M)./k.'/nM;
+                AkM = lpeSpec((10*kMax+1):11*kMax,:);
+                BkM = lpeSpec((11*kMax+1):12*kMax,:);
+                M2 = freq0(6)*T + sum(AkM.*Sk + BkM.*Ck) - InitM + M;
+
+                % Initial time - With fixed M
+                trigMat = repmat([sin(k.'*M2(1))./k.'/nM;-cos(k.'*M2(1))./k.'/nM],6,1);
+                trigsum1 = lpeSpec(:,1).*trigMat;
+                % CHANGE TO MATRIX
+                % MULTIPLICATION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                InitVal = [sum(trigsum1(1:2*kMax)); sum(trigsum1((2*kMax+1):4*kMax));...
+                    sum(trigsum1((4*kMax+1):6*kMax)); sum(trigsum1((6*kMax+1):8*kMax));...
+                    sum(trigsum1((8*kMax+1):10*kMax)); sum(trigsum1((10*kMax+1):12*kMax))];
+
+
+                % Calculate all elements
+                Sk = repmat(sin(k.'*M2)./k.'/nM,6,1);
+                Ck = repmat(-cos(k.'*M2)./k.'/nM,6,1);
+                iAk = (1:(6*kMax)) + reshape(repmat((0:5)*kMax,kMax,1),1,kMax*6); % Indices for Ak in Spectrum
+                iBk = (1:(6*kMax)) + reshape(repmat((1:6)*kMax,kMax,1),1,kMax*6);
+                Ak = lpeSpec(iAk,:);
+                Bk = lpeSpec(iBk,:);
+                sumMat = blkdiag(ones(1,kMax),ones(1,kMax),ones(1,kMax),ones(1,kMax),ones(1,kMax),ones(1,kMax));
+
+                Xi = icOsc + freq0*T + sumMat*(Ak.*Sk + Bk.*Ck) - InitVal;
+                %             X(6,:) = M2;
+                Xi(6,:) = Xi(6,:) + M - icOsc(6); % subtract M(0)? test with nonzero IC
+
+
+                Xi(3:5,:) = wrapTo360(Xi(3:5,:)*180/pi);
+                Xi(6,:) = Xi(6,:)*180/pi;
+                % finished Xi, assign then iterate
+                X((1:6)+6*(iSat-1),:) = Xi; 
+            end
             X = X.';
             Time = T;
         end
