@@ -1,5 +1,5 @@
 clear
-oeLead = [7000, 0.01, 5, 10, 10, 5].'; % init oe
+oeLead = [15000, 0.01, 2, 5, 5, 5].'; % init oe
 dOe = [0,0,0,0,0,1].'; % mean element difference for follower
 oeMat = [oeLead,oeLead + dOe];
 kMax = 5;
@@ -41,8 +41,8 @@ dOeF = oeF(7:12,:)-oeF(1:6,:);
 errOeB = dOeB-dOeC;
 errOeF = dOeF-dOeC;
 
-errB = distB-distC;
-errF = distF-distC;
+errDB = distB-distC;
+errDF = distF-distC;
 
 %% Plot
 figure(1)
@@ -52,8 +52,25 @@ figure(2)
 plot(t/86400,distB)
 
 figure(3)
-plot(t/86400,errB,t/86400,errF)
+plot(t/86400,errDB,t/86400,errDF)
 
+figure(11)
+plot(t/86400,errOeB(1,:),t/86400,errOeF(1,:))
+
+figure(12)
+plot(t/86400,errOeB(2,:),t/86400,errOeF(2,:))
+
+figure(13)
+plot(t/86400,errOeB(3,:),t/86400,errOeF(3,:))
+
+figure(14)
+plot(t/86400,errOeB(4,:),t/86400,errOeF(4,:))
+
+figure(15)
+plot(t/86400,errOeB(5,:),t/86400,errOeF(5,:))
+
+figure(16)
+plot(t/86400,errOeB(6,:),t/86400,errOeF(6,:))
 %% Init Difference - Doesn't work
 % % Calculate osc elements w/ Brouwer & w/ Fourier
 % oeMatB = me2osc(oeMat);
