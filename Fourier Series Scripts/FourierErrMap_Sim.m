@@ -50,8 +50,8 @@ parfor iEcc = 1:nEcc
             aop = rNum(3)*360;
             man = rNum(4)*360;
             oe = [sma,ecc,inc,ran,aop,man];
-            
-            
+
+
             % Define Sat
             Sat = SingleSat(oe,earth());
             Prop = Propagator(Sat);
@@ -61,7 +61,7 @@ parfor iEcc = 1:nEcc
                 try
                     tic
                     [t,oeD] = Prop.PropOeDeprit(nT,nOrb);
-                    
+
                     testT = toc;
                     dTime = dTime + testT;
                     oeD = oeD.';
@@ -82,7 +82,7 @@ parfor iEcc = 1:nEcc
             testT = toc;
             cTime = cTime + testT;
             oeC = oeC.';
-            
+
             try
                 % Prop Brouwer
                 tic
@@ -107,7 +107,7 @@ parfor iEcc = 1:nEcc
             testT = toc;
             fTime = fTime + testT;
             oeF = oeF.';
-            
+
             if k1~=k2
                 % Prop Fourier - k2
                 tic
@@ -116,24 +116,26 @@ parfor iEcc = 1:nEcc
                 f2Time = f2Time + testT;
                 oeF2 = oeF2.';
                 % Fourier Error k2
-                
+
                 errF2 = abs(oeC-oeF2);
                 errF2 = [errF2(1,:)/oe(1);errF2(2,:)/oe(2);errF2(3:end,:)*pi/180];
                 errVecF2 = errVecF2 + trapz(t.',errF2,2)/t(end);
             end
-            
+
             % Fourier Error
             errF = abs(oeC-oeF);
             errF = [errF(1,:)/oe(1);errF(2,:)/oe(2);errF(3:end,:)*pi/180];
             errVecF = errVecF + trapz(t.',errF,2)/t(end);
-            
 
-            
-            % Deprit Error
-            errD = abs(oeC-oeD);
-            errD = [errD(1,:)/oe(1);errD(2,:)/oe(2);errD(3:end,:)*pi/180];
-            errVecD = errVecD + trapz(t.',errD,2)/t(end);
-            
+
+
+            if depritFlag
+                % Deprit Error
+                errD = abs(oeC-oeD);
+                errD = [errD(1,:)/oe(1);errD(2,:)/oe(2);errD(3:end,:)*pi/180];
+                errVecD = errVecD + trapz(t.',errD,2)/t(end);
+            end
+
         end
         % Average
         errVecB = errVecB/nMonte;

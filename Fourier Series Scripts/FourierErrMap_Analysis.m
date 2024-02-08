@@ -1,7 +1,7 @@
 clear
 %% Load Data
 dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping'; % ASRI
-% dataFolder = 'D:\Dropbox\Doc Fourier Data\Error Mapping'; % Laptop
+% dataFolder = 'D:\Dropbox\Doc Fourier Data\Error Mapping'; % Laptop???
 % load([dataFolder '\ErrMaps_15-6-2022_9-52.mat']); % First run e:0.005-0.55, i:0.4-90
 % load([dataFolder '\ErrMaps_15-6-2022_11-13.mat']); % Singularity test e:0.5-0.7, i:60-70
 % load([dataFolder '\ErrMaps_21-6-2022_4-33.mat']); % Big Mapping e:0.001-0.7, i:0.1-179.9
@@ -41,7 +41,8 @@ dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping'; % ASRI
 % load([dataFolder '\ErrMaps_27-12-2023_11-45.mat']); % same as last + variable initial M, small sample
 % load([dataFolder '\ErrMaps_27-12-2023_12-30.mat']); % same as last + variable M, small sample 
 % load([dataFolder '\ErrMaps_27-12-2023_13-52.mat']); % variable initial M, removed Brouwer weird wrapping small
-load([dataFolder '\ErrMaps_28-12-2023_21-59.mat']); % same as last large sample
+% load([dataFolder '\ErrMaps_28-12-2023_21-59.mat']); % same as last large sample
+load([dataFolder '\ErrMaps_24-1-2024_3-57.mat']); % Low sma
 
 
 

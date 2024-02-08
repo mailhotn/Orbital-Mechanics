@@ -1,5 +1,5 @@
 clear
-oeLead = [15000, 0.01, 2, 5, 5, 5].'; % init oe
+oeLead = [7000, 0.01, 5, 10, 10, 10].'; % init oe
 dOe = [0,0,0,0,0,1].'; % mean element difference for follower
 oeMat = [oeLead,oeLead + dOe];
 kMax = 5;
@@ -14,7 +14,8 @@ Prop = Propagator(Form);
 primary = earth();
 mu = primary.mu;
 
-t = 0:100:86400*5;
+nDay = 1;
+t = 0:100:86400*nDay;
 
 %% Sim Difference Prop
 % Prop Formation
@@ -25,52 +26,111 @@ oeB = reshape(me2oscSP(reshape(oeM.',6,length(t)*2)),12,length(t));
 [~,oeF] = Prop.PropOeFourier2Ord(t,kMax);
 oeF = oeF.';
 
-% Get relative position
+% Get relative ECI vector
 dEciC = oe2eci(oeC(7:12,:))-oe2eci(oeC(1:6,:));
 dEciB = oe2eci(oeB(7:12,:))-oe2eci(oeB(1:6,:));
 dEciF = oe2eci(oeF(7:12,:))-oe2eci(oeF(1:6,:));
-
+% Distance
 distC = vecnorm(dEciC(1:3,:));
 distB = vecnorm(dEciB(1:3,:));
 distF = vecnorm(dEciF(1:3,:));
-
+% Velocity
+relVC = vecnorm(dEciC(4:6,:));
+relVB = vecnorm(dEciB(4:6,:));
+relVF = vecnorm(dEciF(4:6,:));
+% Differential elements
 dOeC = oeC(7:12,:)-oeC(1:6,:);
 dOeB = oeB(7:12,:)-oeB(1:6,:);
 dOeF = oeF(7:12,:)-oeF(1:6,:);
-
+% Diff OE errors, normalized by nominal a,e, radians
 errOeB = dOeB-dOeC;
+errOeB = [errOeB(1:2,:)./oeLead(1:2); errOeB(3:6,:)*pi/180];
 errOeF = dOeF-dOeC;
-
+errOeF = [errOeF(1:2,:)./oeLead(1:2); errOeF(3:6,:)*pi/180];
+% Distance & velocity errors
 errDB = distB-distC;
 errDF = distF-distC;
 
-%% Plot
-figure(1)
-plot(t/86400,distF)
+errVB = relVB-relVC;
+errVF = relVF-relVC;
 
-figure(2)
-plot(t/86400,distB)
+trapz(t,abs(errOeB),2)/t(end)
+trapz(t,abs(errOeF),2)/t(end)
+
+trapz(t,abs(errDB))/t(end)*1000
+trapz(t,abs(errDF))/t(end)*1000
+
+trapz(t,abs(errVB))/t(end)*1000*100
+trapz(t,abs(errVF))/t(end)*1000*100
+%% Plot
+% figure(1)
+% plot(t/86400,distF)
+% 
+% figure(2)
+% plot(t/86400,distB)
 
 figure(3)
-plot(t/86400,errDB,t/86400,errDF)
+plot(t/3600,errDB,t/3600,errDF)
+legend('Brouwer','Fourier')
+xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+xlim([0,nDay*24])
+ylabel('$\delta r \ Error \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
+
+figure(4)
+plot(t/3600,errVB,t/3600,errVF)
+legend('Brouwer','Fourier')
+xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+xlim([0,nDay*24])
+ylabel('$\delta v \ Error \left[\rm{\frac{km}{s}}\right]$',Interpreter='latex',FontSize=12)
 
 figure(11)
-plot(t/86400,errOeB(1,:),t/86400,errOeF(1,:))
+plot(t/3600,errOeB(1,:),t/3600,errOeF(1,:))
+legend('Brouwer','Fourier')
+xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+xlim([0,nDay*24])
+xticks(linspace(0,nDay*24,5*nDay))
+ylabel('$ \delta a \ Error$',Interpreter='latex',FontSize=12)
 
 figure(12)
-plot(t/86400,errOeB(2,:),t/86400,errOeF(2,:))
+plot(t/3600,errOeB(2,:),t/3600,errOeF(2,:))
+legend('Brouwer','Fourier')
+xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+xlim([0,nDay*24])
+xticks(linspace(0,nDay*24,5*nDay))
+ylabel('$ \delta e \ Error$',Interpreter='latex',FontSize=12)
 
 figure(13)
-plot(t/86400,errOeB(3,:),t/86400,errOeF(3,:))
+plot(t/3600,errOeB(3,:),t/3600,errOeF(3,:))
+legend('Brouwer','Fourier')
+xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+xlim([0,nDay*24])
+xticks(linspace(0,nDay*24,5*nDay))
+ylabel('$ \delta i \ Error \left[\rm{rad}\right]$',Interpreter='latex',FontSize=12)
 
 figure(14)
-plot(t/86400,errOeB(4,:),t/86400,errOeF(4,:))
+plot(t/3600,errOeB(4,:),t/3600,errOeF(4,:))
+legend('Brouwer','Fourier')
+xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+xlim([0,nDay*24])
+xticks(linspace(0,nDay*24,5*nDay))
+ylabel('$ \delta \Omega \ Error \left[\rm{rad}\right]$',Interpreter='latex',FontSize=12)
 
 figure(15)
-plot(t/86400,errOeB(5,:),t/86400,errOeF(5,:))
+plot(t/3600,errOeB(5,:),t/3600,errOeF(5,:))
+legend('Brouwer','Fourier')
+xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+xlim([0,nDay*24])
+xticks(linspace(0,nDay*24,5*nDay))
+ylabel('$ \delta \omega \ Error \left[\rm{rad}\right]$',Interpreter='latex',FontSize=12)
 
 figure(16)
-plot(t/86400,errOeB(6,:),t/86400,errOeF(6,:))
+plot(t/3600,errOeB(6,:),t/3600,errOeF(6,:))
+legend('Brouwer','Fourier')
+xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+xlim([0,nDay*24])
+xticks(linspace(0,nDay*24,5*nDay))
+ylabel('$ \delta M \ Error \left[\rm{rad}\right]$',Interpreter='latex',FontSize=12)
+
 %% Init Difference - Doesn't work
 % % Calculate osc elements w/ Brouwer & w/ Fourier
 % oeMatB = me2osc(oeMat);
