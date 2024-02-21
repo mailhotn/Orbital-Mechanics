@@ -54,7 +54,10 @@ classdef GeneralFormation < Constellation
             % of column vectors in the order:[a e i O w M].'
             oeM = GF.InitialOeMean();
             if GF.useBrouwer
-                oe  = me2osc(oeM,GF.J2,GF.Re);
+                oe = zeros(6,GF.nSats);
+                for iSat = 1:GF.nSats
+                    oe(:,iSat)  = me2oscNum(oeM(:,iSat));
+                end
             else
                 oe = oeM;
             end
