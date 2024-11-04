@@ -325,7 +325,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 [freq0,lpeSpec] = P.DynOeFourier2Ord(T,icOsc,kMax);
 
                 % Average out SP from initial conditions
-                icM = osc2meSP(icOsc);
+                icM = osc2meSP(icOsc); % change to numerical mean
                 icOsc(3:end) = icOsc(3:end)*pi/180;
                 icM(3:end) = icM(3:end)*pi/180;
 
@@ -1268,7 +1268,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             
             nT = length(t);
             
-            icM = osc2meSP(icOsc);
+            icM = osc2meSP(icOsc); % change to numerical mean
             icM(3:end) = icM(3:end)*pi/180;
             icOsc(3:end) = icOsc(3:end)*pi/180;
             % handle elements vector
