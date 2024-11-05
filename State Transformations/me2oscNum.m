@@ -8,9 +8,9 @@ primary = earth();
 eta = sqrt(1-oeM(2)^2);
 boundVec = oeM*primary.J2;
 boundVec(2) = primary.J2;
-boundVec(3:end) = 1;
-ub = oeM + 2*boundVec/eta^4;
-lb = oeM - 2*boundVec/eta^4;
+boundVec(3:end) = [1,1,3,3];
+ub = oeM + 3*boundVec/eta^4;
+lb = oeM - 3*boundVec/eta^4;
 lb(2:3) = lb(2:3).*(lb(2:3)>0); % bring lower bounds up from 0
 options = optimoptions('fmincon',Display='off',...
     OptimalityTolerance=1e-8,...
@@ -50,9 +50,12 @@ Prop = Propagator(Sat);
 [tVec,xOsc] = Prop.PropOeOsc3(tSpan);
 xM = nan(1,6);
 
+% Unwrap O, w, M before averaging
+xOsc(:,4:6) = 180/pi*unwrap(pi/180*xOsc(:,4:6));
+
 % Use mean n to get M0
 xM(1:5) = trapz(tVec,xOsc(:,1:5))/(tVec(end)-tVec(1));
-M0 = xOsc(:,6) - 180/pi*tVec.*sqrt(primary.mu./xM(1).^3); %M0 = Mosc - nMt - mean mean motion
+M0 = xOsc(:,6) - 180/pi*tVec.*sqrt(primary.mu./xM(1).^3); %M0 = Mosc - nMt : mean mean motion
 xM(6) = trapz(tVec,M0)/(tVec(end)-tVec(1));
 
 % Don't use mean n to get M0

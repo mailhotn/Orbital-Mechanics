@@ -13,6 +13,8 @@ Sat = SingleSat(oeOsc,primary);
 Prop = Propagator(Sat);
 [tVec,xOsc] = Prop.PropOeOsc3(tSpan);
 xM = nan(1,6);
+% Unwrap O, w, M before averaging
+xOsc(:,4:6) = 180/pi*unwrap(pi/180*xOsc(:,4:6));
 % Use mean n to get M0
 xM(1:5) = trapz(tVec,xOsc(:,1:5))/(tVec(end)-tVec(1));
 M0 = xOsc(:,6) - 180/pi*tVec.*sqrt(primary.mu./xM(1).^3); %M0 = Mosc - nMt - mean mean motion
