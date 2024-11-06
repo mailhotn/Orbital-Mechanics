@@ -22,6 +22,6 @@ xM(6) = trapz(tVec,M0)/(tVec(end)-tVec(1));
 % Don't use mean n to get M0
 % M0 = xOsc(:,6) - 180/pi*tVec.*sqrt(primary.mu./xOsc(:,1).^3); %M0 = Mosc - nt
 % xM = trapz(tVec,[xOsc(:,1:5),M0])/(tVec(end)-tVec(1)); % How to Average Mean anomaly???
-
+xM(4:5) = wrapTo360(xM(4:5));
 oeM = xM.';
 
