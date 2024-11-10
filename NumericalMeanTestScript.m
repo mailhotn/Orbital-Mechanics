@@ -1,10 +1,10 @@
 clear
-oeRange = [3000,0.2,180,359,359,359].';
+oeRange = [3000,0.2,179,360,360,360].';
 minPer = 7000;
 primary = earth();
 J2 = primary.J2;
 %% Internal Test
-nTest = 100000;
+nTest = 200000; % 10,000 take 2500s in parallel
 fValVec = nan(1,nTest);
 oeMat = nan(6,nTest);
 % fValSum = 0;
@@ -14,7 +14,7 @@ tic
 parfor iTest = 1:nTest
     rNum = rand(6,1);
     oe = oeRange.*rNum;
-    oe(2) = oe(2) + 0.001;
+    oe(2) = oe(2) + 0.001; % minimum eccentricity - no errors for e>0.01
     % make sure perigee is out of earth
     rP = oe(1)+minPer;
     oe(1) = rP/(1-oe(2));
@@ -22,7 +22,7 @@ parfor iTest = 1:nTest
     % oe is mean
     [oeM,fVal] = me2oscNum(oe);
     fValVec(iTest) = fVal;
-    oeMat(:,iTest) = oeM;
+    oeMat(:,iTest) = oe;
 
     % Test Part
     % [oeOsc1,fVal,exitflag,output] = me2oscNum(oe);
