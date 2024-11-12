@@ -8,8 +8,9 @@ function [oeOsc1,fVal,exitflag,output] = me2oscNum(oeM)
 primary = earth();
 eta = sqrt(1-oeM(2)^2);
 % set bounds
-boundVec = 2*oeM*primary.J2;
+boundVec = oeM*primary.J2;
 boundVec(2) = 3*primary.J2;
+minEcc = primary.J2/2;
 boundVec(3:end) = [1,1,4,3];
 
 
@@ -17,18 +18,19 @@ A = [];
 b = [];
 % Alternate bounds for low ecc
 if oeM(2) < 1e-2
-    delLon = 4;
-    boundVec(3:6) = [0.5,0.5,25,25];
+    delLon = 6;
+    boundVec(3:6) = [1,1,25,25];
     A = [0 0 0 0 1 1;
         0 0 0 0 -1 -1];
     b = [(oeM(5)+oeM(6)) + delLon;
         -(oeM(5)+oeM(6)) + delLon];
 end
 % Finish Bounds
-ub = oeM + 3*boundVec/eta^4;
-lb = oeM - 3*boundVec/eta^4;
-lb(2:3) = lb(2:3).*(lb(2:3)>0); % bring lower bounds up from 0
-
+ub = oeM + 4*boundVec/eta^4;
+lb = oeM - 4*boundVec/eta^4;
+lb(2) = lb(2)*(lb(2)>=minEcc) + minEcc*(lb(2)<minEcc);
+lb(3) = lb(3)*(lb(3)>0); % bring inc lower bounds up from 0
+ub(3) = ub(3)*(ub(3)<180) + 180*(ub(3)>180); % no 180+ inc
 options = optimoptions('fmincon',Display='off',...
     OptimalityTolerance=1e-8,...
     Algorithm='interior-point');
