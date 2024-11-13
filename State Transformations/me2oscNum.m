@@ -5,6 +5,8 @@ function [oeOsc1,fVal,exitflag,output] = me2oscNum(oeM)
 % Convoluted way of saying this is a numerical mean to Oscullating
 % transformation for one satellite
 
+% *******  May be inaccurate for e<1e-3  *******
+
 primary = earth();
 eta = sqrt(1-oeM(2)^2);
 % set bounds
@@ -37,6 +39,10 @@ options = optimoptions('fmincon',Display='off',...
 [oeOsc0,fVal,exitflag,output] = fmincon(@(x)meanSim(x,oeM),oeM,A,b,[],[],lb,ub,[],options);
 oeOsc0(4:5) = wrapTo360(oeOsc0(4:5));
 oeOsc1 = oeOsc0;
+if fVal > 1e-4
+    warning(['Numerical mean to oscullating failed to find accurate' ...
+        ' solution, fVal = ' num2str(fVal) ' , e = ' num2str(oeM(2))])
+end
 % add half orbit ?
 % Sat = SingleSat(oeOsc0,primary);
 % Prop = Propagator(Sat);

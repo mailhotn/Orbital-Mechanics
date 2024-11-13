@@ -88,4 +88,4 @@ aop1 = aop0 + dAopS - dAopM;
 man1 = man0 + dManS - dManM;
 
 oeOsc = [sma1;ecc1;180/pi*inc1;180/pi*ran1;180/pi*aop1;180/pi*man1];
-oeOsc(3:end,:) = (oeOsc(3:end,:));
+oeOsc(3:5,:) = wrapTo360(oeOsc(3:5,:));
