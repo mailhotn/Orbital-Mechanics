@@ -65,7 +65,7 @@ classdef SingleSat < Constellation
      methods(Access = protected, Sealed)
         function propgroups = getPropertyGroups(Sat) %#ok
             propgroups = matlab.mixin.util.PropertyGroup;
-            propgroups(1).Title = 'Satellite Orbital Elements';
+            propgroups(1).Title = 'Oscullating Orbital Elements';
             propgroups(1).PropertyList = {'sma','e','inc','raan','aop','me'};
             propgroups(2).Title = 'Primary Body Characteristics';
             propgroups(2).PropertyList = {'mu','R','J2'};

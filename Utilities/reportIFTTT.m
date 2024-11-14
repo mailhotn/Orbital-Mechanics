@@ -2,6 +2,9 @@ function reportIFTTT(GoogleDrivePath,time)
 if nargin < 2
     time = pi;
 end
+if nargin < 1
+    GoogleDrivePath = 'C:\Users\User\Google Drive'; % ASRI
+end
 
 c = clock;
 fileID = fopen([GoogleDrivePath '\Doc Data\zNotifications\CalcDone_'...

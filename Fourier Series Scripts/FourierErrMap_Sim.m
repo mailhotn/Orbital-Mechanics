@@ -6,9 +6,9 @@ primary = earth();
 k1 = 5;
 k2 = 5;
 nOrb = 1;
-dT = 100; % sec
-depritFlag = 0;
-nT = 80;
+dT = 100; % sec only used if Deprit is not being tested
+depritFlag = 0; % Probably forget about this part?
+nT = 80; % Only used if Deprit is being tested
 % Region Params
 nInc = 361;
 nEcc = 100;
@@ -73,7 +73,7 @@ parfor iEcc = 1:nEcc
                     oeD = nan(6,80);
                 end
             else
-                t = 0:dT:nOrb*T; %#ok<UNRCH>
+                t = 0:dT:nOrb*T; 
                 oeD = nan(6,80);
             end
             % Prop Numerical
@@ -131,7 +131,7 @@ parfor iEcc = 1:nEcc
 
             if depritFlag
                 % Deprit Error
-                errD = abs(oeC-oeD);
+                errD = abs(oeC-oeD); %#ok<UNRCH>
                 errD = [errD(1,:)/oe(1);errD(2,:)/oe(2);errD(3:end,:)*pi/180];
                 errVecD = errVecD + trapz(t.',errD,2)/t(end);
             end

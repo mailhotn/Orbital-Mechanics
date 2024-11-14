@@ -325,7 +325,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 [freq0,lpeSpec] = P.DynOeFourier2Ord(T,icOsc,kMax);
 
                 % Average out SP from initial conditions
-                icM = osc2meSP(icOsc); % change to numerical mean
+                icM = osc2meNum(icOsc); % change to numerical mean
                 icOsc(3:end) = icOsc(3:end)*pi/180;
                 icM(3:end) = icM(3:end)*pi/180;
 
@@ -336,28 +336,28 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
 
                 M = nM*T+icOsc(6);
                 k = 1:kMax;
-                Xi = nan(6,length(T));
+                Xi = nan(6,length(T)); % Xi is result for current iteration
 
-                % Initial M
-                trigMat = [sin(k.'*M(1))./k.'/nM;-cos(k.'*M(1))./k.'/nM];
-                InitM = sum(lpeSpec((10*kMax+1):end,1).*trigMat);
+                % % Initial M - Possibly redundant
+                % trigMat = [sin(k.'*M(1))./k.'/nM;-cos(k.'*M(1))./k.'/nM]; % 2kx1 - Sk, Ck for t=0
+                % InitM = sum(lpeSpec((10*kMax+1):end,1).*trigMat);
 
-
-                % Fix M
-                Sk = sin(k.'*M)./k.'/nM;
-                Ck = -cos(k.'*M)./k.'/nM;
+                % Fix M - from linear M to variations based off Fourier
+                Sk = sin(k.'*M)./k.'/nM; % kxnT
+                Ck = -cos(k.'*M)./k.'/nM; % kxnT
                 AkM = lpeSpec((10*kMax+1):11*kMax,:);
                 BkM = lpeSpec((11*kMax+1):12*kMax,:);
-                M2 = freq0(6)*T + sum(AkM.*Sk + BkM.*Ck) - InitM + M;
+                fourIntSolM = sum(AkM.*Sk + BkM.*Ck);
+                M2 = freq0(6)*T + fourIntSolM - fourIntSolM(1) + M;
 
-                % Initial time - With fixed M
-                trigMat = repmat([sin(k.'*M2(1))./k.'/nM;-cos(k.'*M2(1))./k.'/nM],6,1);
-                trigsum1 = lpeSpec(:,1).*trigMat;
-                % CHANGE TO MATRIX
-                % MULTIPLICATION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                InitVal = [sum(trigsum1(1:2*kMax)); sum(trigsum1((2*kMax+1):4*kMax));...
-                    sum(trigsum1((4*kMax+1):6*kMax)); sum(trigsum1((6*kMax+1):8*kMax));...
-                    sum(trigsum1((8*kMax+1):10*kMax)); sum(trigsum1((10*kMax+1):12*kMax))];
+                % % Initial time - With corrected M
+                % trigMat = repmat([sin(k.'*M2(1))./k.'/nM;-cos(k.'*M2(1))./k.'/nM],6,1);
+                % trigsum1 = lpeSpec(:,1).*trigMat;
+                % % CHANGE TO MATRIX
+                % % MULTIPLICATION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                % InitVal = [sum(trigsum1(1:2*kMax)); sum(trigsum1((2*kMax+1):4*kMax));...
+                %     sum(trigsum1((4*kMax+1):6*kMax)); sum(trigsum1((6*kMax+1):8*kMax));...
+                %     sum(trigsum1((8*kMax+1):10*kMax)); sum(trigsum1((10*kMax+1):12*kMax))];
 
 
                 % Calculate all elements
@@ -368,10 +368,12 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 Ak = lpeSpec(iAk,:);
                 Bk = lpeSpec(iBk,:);
                 sumMat = blkdiag(ones(1,kMax),ones(1,kMax),ones(1,kMax),ones(1,kMax),ones(1,kMax),ones(1,kMax));
+                fourIntSolAll = sumMat*(Ak.*Sk + Bk.*Ck); % Solution to integral of LPE in Fourier Form
 
-                Xi = icOsc + freq0*T + sumMat*(Ak.*Sk + Bk.*Ck) - InitVal;
+                Xi = icOsc + freq0*T + fourIntSolAll - fourIntSolAll(:,1);
                 %             X(6,:) = M2;
-                Xi(6,:) = Xi(6,:) + M - icOsc(6); % subtract M(0)? test with nonzero IC
+                Xi(6,:) = Xi(6,:) + M - icOsc(6); % subtracted M(0)  
+                % why M instead of M2? because M2 would be adding varitations twice
 
 
                 Xi(3:5,:) = wrapTo360(Xi(3:5,:)*180/pi);
@@ -1268,7 +1270,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             
             nT = length(t);
             
-            icM = osc2meSP(icOsc); % change to numerical mean
+            icM = osc2meNum(icOsc); % change to numerical mean
             icM(3:end) = icM(3:end)*pi/180;
             icOsc(3:end) = icOsc(3:end)*pi/180;
             % handle elements vector
