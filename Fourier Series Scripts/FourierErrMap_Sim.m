@@ -1,4 +1,5 @@
 clear
+TurnOffPCWhenDone = 0;
 %% Define Parameters
 dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping';
 dbPath = 'C:\Users\User\Google Drive'; % ASRI
@@ -179,3 +180,7 @@ MapData.errTenD = errTenD;
 c = clock;
 save([dataFolder '\ErrMaps_' num2str(c(3)) '-' num2str(c(2)) '-' ...
     num2str(c(1)) '_' num2str(c(4)) '-' num2str(c(5)), '.mat'],'MapData');
+%% PC Shutdown!
+if TurnOffPCWhenDone
+    system('shutdown /s');
+end

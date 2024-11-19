@@ -13,22 +13,25 @@ classdef GeneralFormation < Constellation
         % Deputy Differential Elements
         dOeDeputy
         
-        % Brouwer Flag (For DSS Homework)
-        useBrouwer
+        % Mean Elements Flag (For DSS Homework) 
+        % If true (default) - formation is defined by mean elements. This
+        % should be the case to satisfy the energy matching condition.
+        % Largely useless, this should always be true.
+        useMean
         
     end
     
     methods
-        function GF = GeneralFormation(oeChief,dOeDeputy,brouwer,primary)
+        function GF = GeneralFormation(oeChief,dOeDeputy,oeAreMean,primary)
             %%%% Pre Initialization %%%%
             switch nargin
                 case 0
                     oeChief = [7100, 0.05, 90, 0, 30, 0].';
                     dOeDeputy = [0,0,0,0,0,1].';
-                    brouwer = true;
+                    oeAreMean = true;
                     primary = earth();
                 case 2
-                    brouwer = true;
+                    oeAreMean = true;
                     primary = earth();
                 case 3
                     primary = earth();
@@ -46,19 +49,19 @@ classdef GeneralFormation < Constellation
             GF.oeChief   = oeChief;
             GF.dOeDeputy = dOeDeputy;
 
-            GF.useBrouwer = brouwer;
+            GF.useMean = oeAreMean;
         end
         
         function oe = InitialOeOsc(GF) %[a e i O w M]
             % Returns Orbital Elements of constellation as 6xnSats matrix
             % of column vectors in the order:[a e i O w M].'
             oeM = GF.InitialOeMean();
-            if GF.useBrouwer
+            if GF.useMean % if defined by mean, convert to Osc
                 oe = zeros(6,GF.nSats);
                 for iSat = 1:GF.nSats
                     oe(:,iSat)  = me2oscNum(oeM(:,iSat));
                 end
-            else
+            else % if defined by osc, output osc
                 oe = oeM;
             end
         end
@@ -75,6 +78,9 @@ classdef GeneralFormation < Constellation
         function oeM = InitialOeMean(GF)
             % returns the orbital elements as a matrix of column vectors
             % each column represents [a,e,i,RAAN,AOP,Me].'
+
+            % Could add logic to change output if using osc, but doesn't
+            % matter for any practical reasons.
             X = zeros(6,GF.nSats);
             X(:,1) = GF.oeChief;
             X(:,2:end) = GF.oeChief + GF.dOeDeputy;
@@ -85,10 +91,10 @@ classdef GeneralFormation < Constellation
         function oeM = InitialOeMeanShort(GF) %???
             % returns the orbital elements as a matrix of column vectors
             % each column represents [a,e,i,RAAN,AOP,Me].'
-            % oeOsc = GF.InitialOeOsc;
-            % oeM = osc2meSP(oeOsc);
+            oeOsc = GF.InitialOeOsc;
+            oeM = osc2meSP(oeOsc);
             
-            oeM = GF.InitialOeMean;
+            % oeM = GF.InitialOeMean;
         end
     end
     

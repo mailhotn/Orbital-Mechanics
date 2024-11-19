@@ -226,7 +226,8 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         
         function [Time, X] = PropOeFourierNum(P,T,kMax)
             % Propagate for time T using Fourier series of LPE
-            % Very stupid
+            % Very stupid - only for demonstrating that Fourier series is
+            % correct.
             % Currently only works for one satellite
             opts = odeset('reltol',P.relTol,'abstol',P.absTol);
             IC = reshape(P.Con.InitialOeOsc,[6*P.Con.nSats,1]);

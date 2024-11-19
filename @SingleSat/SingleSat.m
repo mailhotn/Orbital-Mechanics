@@ -1,6 +1,6 @@
 classdef SingleSat < Constellation
     % SingleSat defines a "constellation" of a single satellite with given
-    % orbital elements. This is useful for using the constellation
+    % osculating orbital elements. This is useful for using the constellation
     % propagator framework when working with a single satellite.
     properties
         sma  % semi-major axis [km]

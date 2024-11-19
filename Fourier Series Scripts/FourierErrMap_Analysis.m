@@ -42,7 +42,11 @@ dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping'; % ASRI
 % load([dataFolder '\ErrMaps_27-12-2023_12-30.mat']); % same as last + variable M, small sample 
 % load([dataFolder '\ErrMaps_27-12-2023_13-52.mat']); % variable initial M, removed Brouwer weird wrapping small
 % load([dataFolder '\ErrMaps_28-12-2023_21-59.mat']); % same as last large sample
-load([dataFolder '\ErrMaps_24-1-2024_3-57.mat']); % Low sma
+% load([dataFolder '\ErrMaps_24-1-2024_3-57.mat']); % Low sma
+
+% Changed over to Numerical Mean, which is reliable for e>3e-3
+load([dataFolder '\ErrMaps_15-11-2024_11-24.mat']); % First Numerical mean based Fourier
+
 
 
 

@@ -1,5 +1,5 @@
 clear
-oeLead = [7000, 0.01, 5, 10, 10, 10].'; % init oe
+oeLead = [7000, 0.01, 5, 5, 5, 5].'; % init oe
 dOe = [0,0,0,0,0,1].'; % mean element difference for follower
 oeMat = [oeLead,oeLead + dOe];
 kMax = 5;
@@ -69,7 +69,8 @@ trapz(t,abs(errVF))/t(end)*1000*100
 % figure(2)
 % plot(t/86400,distB)
 
-figure(3)
+% Relative Distance & Velocity
+figure(1)
 plot(t/3600,errDB,t/3600,errDF)
 legend('Brouwer','Fourier')
 xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
@@ -77,7 +78,7 @@ xlim([0,nDay*24])
 xticks(linspace(0,nDay*24,5*nDay))
 ylabel('$\delta r \ Error \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
 
-figure(4)
+figure(2)
 plot(t/3600,errVB,t/3600,errVF)
 legend('Brouwer','Fourier')
 xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
@@ -85,6 +86,29 @@ xlim([0,nDay*24])
 xticks(linspace(0,nDay*24,5*nDay))
 ylabel('$\delta v \ Error \left[\rm{\frac{km}{s}}\right]$',Interpreter='latex',FontSize=12)
 
+figure(3)
+plot(t/3600,dEciB(1,:)-dEciC(1,:),t/3600,dEciF(1,:)-dEciC(1,:))
+legend('Brouwer','Fourier')
+xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+xlim([0,nDay*24])
+xticks(linspace(0,nDay*24,5*nDay))
+ylabel('$\delta x \ Error \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
+figure(4)
+plot(t/3600,dEciB(2,:)-dEciC(2,:),t/3600,dEciF(2,:)-dEciC(2,:))
+legend('Brouwer','Fourier')
+xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+xlim([0,nDay*24])
+xticks(linspace(0,nDay*24,5*nDay))
+ylabel('$\delta y \ Error \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
+figure(5)
+plot(t/3600,dEciB(3,:)-dEciC(3,:),t/3600,dEciF(3,:)-dEciC(3,:))
+legend('Brouwer','Fourier')
+xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+xlim([0,nDay*24])
+xticks(linspace(0,nDay*24,5*nDay))
+ylabel('$\delta z \ Error \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
+
+% orbital Elements
 figure(11)
 plot(t/3600,errOeB(1,:),t/3600,errOeF(1,:))
 legend('Brouwer','Fourier')
