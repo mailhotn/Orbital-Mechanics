@@ -16,7 +16,7 @@ nEcc = 100;
 nMonte = 500; % 6000 trials is about 1.3 minute (not parallel)
 incRange = linspace(0,90,nInc);
 % eccRange = linspace(0.01,0.5,nEcc);
-eccRange = logspace(-2,-1,nEcc);
+eccRange = logspace(log10(0.005),log10(0.1),nEcc); 
 maxSma = 10000;
 
 %% Initialize Error Tensors
