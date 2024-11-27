@@ -1,11 +1,15 @@
-function plotPropErrMap(eccRange,incRange,errTen1,errTen2,label1,label2,nFig)
+function plotPropErrMap(eccRange,incRange,errTen1,errTen2,label1,label2,nFig,logE)
 %plotPropErrMap plots error maps for comaprison of propagation methods
 %
 % ~~~~~~~~~~~~~~  Inputs  ~~~~~~~~~~~~~~~
 % errTen1, errTen2: nEcc x nInc x 6 Tensors
 % label1, label2: label strings - optional
 % nFig - 10s digit for figure numbering - default 0
-%
+% logE - flag to use logarithmic e Axis
+
+if nargin < 8
+    logE = false;
+end
 if nargin < 7
     nFig = 0;
 end
@@ -16,7 +20,14 @@ end
 if nargin == 3
     errTen2 = [];
 end
-
+if logE
+    eccRange = log10(eccRange);
+    eccLabel = '$\rm{Eccentricity}$'; % switched to labeling ecc directly
+    eTicks = flip(eccRange(end):-0.1:eccRange(1)).';
+    eTickLabels = num2str(10.^eTicks,2);
+elseif ~logE
+    eccLabel = '$\rm{Eccentricity}$';
+end
 
 if ~isempty(errTen2) % errTen2 exists - Comparison
     % Create Mesh
@@ -39,105 +50,37 @@ if ~isempty(errTen2) % errTen2 exists - Comparison
     
     levelsMan = [linspace(-max(abs(errTen1(:,:,6)-errTen2(:,:,6)),[],'all'),0,10),...
         linspace(0,max(abs(errTen1(:,:,6)-errTen2(:,:,6)),[],'all'),10)];
-    % Virtual colorfix mesh
+    
+    % setup for loop
+    levelsOe = [levelsSma;levelsEcc;levelsInc;levelsRan;levelsAop;levelsMan];
+    titleSet = {'sma','ecc','inc','raan','aop','M'};
+    
+    % Virtual colorfix mesh - makes a small mesh off screen with the full
+    % range of colors so we consistently get 0 as the same color
     [xV,yV] = meshgrid([1,2],[1,2]);
     
-    % Plot
-    figure(nFig*10+1)
-    contourf(xV,yV,levelsSma(end)*[1,0;0,-1],levelsSma)
+    for iOe = 1:6
+     % Plot all
+    figure(nFig*10+iOe)
+    contourf(xV,yV,levelsOe(iOe,end)*[1,0;0,-1],levelsOe(iOe,:))
     colorbar
     colormap jet
     shading interp
     hold on
-    contourf(incMesh,eccMesh,errTen1(:,:,1)-errTen2(:,:,1),levelsSma,'LineColor','none')
+    contourf(incMesh,eccMesh,errTen1(:,:,iOe)-errTen2(:,:,iOe),levelsOe(iOe,:),'LineColor','none')
     xlim([incRange(1),incRange(end)])
     ylim([eccRange(1),eccRange(end)])
     xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
-    ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
+    ylabel(eccLabel,'interpreter','latex','fontsize',12)
+    if logE
+        yticks(eTicks)
+        yticklabels(eTickLabels)
+    end
     if ~isempty(label1)
-        title(['sma: ' label1 '-' label2])
+        title([titleSet{iOe} ': ' label1 '-' label2])
     end
     hold off
-    
-    figure(nFig*10+2)
-    contourf(xV,yV,levelsEcc(end)*[1,0;0,-1],levelsEcc)
-    colorbar
-    colormap jet
-    shading interp
-    hold on
-    contourf(incMesh,eccMesh,errTen1(:,:,2)-errTen2(:,:,2),levelsEcc,'LineColor','none')
-    xlim([incRange(1),incRange(end)])
-    ylim([eccRange(1),eccRange(end)])
-    xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
-    ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
-    if ~isempty(label1)
-        title(['ecc: ' label1 '-' label2])
     end
-    hold off
-    
-    figure(nFig*10+3)
-    contourf(xV,yV,levelsInc(end)*[1,0;0,-1],levelsInc)
-    colorbar
-    colormap jet
-    shading interp
-    hold on
-    contourf(incMesh,eccMesh,errTen1(:,:,3)-errTen2(:,:,3),levelsInc,'LineColor','none')
-    xlim([incRange(1),incRange(end)])
-    ylim([eccRange(1),eccRange(end)])
-    xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
-    ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
-    if ~isempty(label1)
-        title(['inc: ' label1 '-' label2])
-    end
-    hold off
-    
-    figure(nFig*10+4)
-    contourf(xV,yV,levelsRan(end)*[1,0;0,-1],levelsRan)
-    colorbar
-    colormap jet
-    shading interp
-    hold on
-    contourf(incMesh,eccMesh,errTen1(:,:,4)-errTen2(:,:,4),levelsRan,'LineColor','none')
-    xlim([incRange(1),incRange(end)])
-    ylim([eccRange(1),eccRange(end)])
-    xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
-    ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
-    if ~isempty(label1)
-        title(['raan: ' label1 '-' label2])
-    end
-    hold off
-    
-    figure(nFig*10+5)
-    contourf(xV,yV,levelsAop(end)*[1,0;0,-1],levelsAop)
-    colorbar
-    colormap jet
-    shading interp
-    hold on
-    contourf(incMesh,eccMesh,errTen1(:,:,5)-errTen2(:,:,5),levelsAop,'LineColor','none')
-    xlim([incRange(1),incRange(end)])
-    ylim([eccRange(1),eccRange(end)])
-    xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
-    ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
-    if ~isempty(label1)
-        title(['aop: ' label1 '-' label2])
-    end
-    hold off
-    
-    figure(nFig*10+6)
-    contourf(xV,yV,levelsMan(end)*[1,0;0,-1],levelsMan)
-    colorbar
-    colormap jet
-    shading interp
-    hold on
-    contourf(incMesh,eccMesh,errTen1(:,:,6)-errTen2(:,:,6),levelsMan,'LineColor','none')
-    xlim([incRange(1),incRange(end)])
-    ylim([eccRange(1),eccRange(end)])
-    xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
-    ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
-    if ~isempty(label1)
-        title(['M: ' label1 '-' label2])
-    end
-    hold off
 else % no ErrTen2 - Absolute Error
     
     % Create Mesh
@@ -149,105 +92,34 @@ else % no ErrTen2 - Absolute Error
     levelsRan = linspace(0,max(errTen1(:,:,4),[],'all'),20);
     levelsAop = linspace(0,max(errTen1(:,:,5),[],'all'),20);
     levelsMan = linspace(0,max(errTen1(:,:,6),[],'all'),20);
-    % Virtual colorfix mesh
+    % setup for loop
+    levelsOe = [levelsSma;levelsEcc;levelsInc;levelsRan;levelsAop;levelsMan];
+    titleSet = {'sma','ecc','inc','raan','aop','M'};
+    
+    % Virtual colorfix mesh - makes a small mesh off screen with the full
+    % range of colors so we consistently get 0 as the same color
     [xV,yV] = meshgrid([1,2],[1,2]);
     
-    
-    % Plot
-    figure(nFig*10+1)
-    contourf(xV,yV,levelsSma(end)*[1,0;0,1],levelsSma)
+    for iOe = 1:6
+     % Plot all
+    figure(nFig*10+iOe)
+    contourf(xV,yV,levelsOe(iOe,end)*[1,0;0,-1],levelsOe(iOe,:))
     colorbar
     colormap jet
     shading interp
     hold on
-    contourf(incMesh,eccMesh,errTen1(:,:,1),levelsSma,'LineColor','none')
+    contourf(incMesh,eccMesh,errTen1(:,:,iOe),levelsOe(iOe,:),'LineColor','none')
     xlim([incRange(1),incRange(end)])
     ylim([eccRange(1),eccRange(end)])
     xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
-    ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
+    ylabel(eccLabel,'interpreter','latex','fontsize',12)
+    if logE
+        yticks(eTicks)
+        yticklabels(eTickLabels)
+    end
     if ~isempty(label1)
-        title(['sma: ' label1])
+        title([titleSet{iOe} ': ' label1])
     end
     hold off
-    
-    figure(nFig*10+2)
-    contourf(xV,yV,levelsEcc(end)*[1,0;0,1],levelsEcc)
-    colorbar
-    colormap jet
-    shading interp
-    hold on
-    contourf(incMesh,eccMesh,errTen1(:,:,2),levelsEcc,'LineColor','none')
-    xlim([incRange(1),incRange(end)])
-    ylim([eccRange(1),eccRange(end)])
-    xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
-    ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
-    if ~isempty(label1)
-        title(['ecc: ' label1])
-    end
-    hold off
-    
-    figure(nFig*10+3)
-    contourf(xV,yV,levelsInc(end)*[1,0;0,1],levelsInc)
-    colorbar
-    colormap jet
-    shading interp
-    hold on
-    contourf(incMesh,eccMesh,errTen1(:,:,3),levelsInc,'LineColor','none')
-    xlim([incRange(1),incRange(end)])
-    ylim([eccRange(1),eccRange(end)])
-    xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
-    ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
-    if ~isempty(label1)
-        title(['inc: ' label1])
-    end
-    hold off
-    
-    figure(nFig*10+4)
-    contourf(xV,yV,levelsRan(end)*[1,0;0,1],levelsRan)
-    colorbar
-    colormap jet
-    shading interp
-    hold on
-    contourf(incMesh,eccMesh,errTen1(:,:,4),levelsRan,'LineColor','none')
-    xlim([incRange(1),incRange(end)])
-    ylim([eccRange(1),eccRange(end)])
-    xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
-    ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
-    if ~isempty(label1)
-        title(['raan: ' label1])
-    end
-    hold off
-    
-    figure(nFig*10+5)
-    contourf(xV,yV,levelsAop(end)*[1,0;0,1],levelsAop)
-    colorbar
-    colormap jet
-    shading interp
-    hold on
-    contourf(incMesh,eccMesh,errTen1(:,:,5),levelsAop,'LineColor','none')
-    xlim([incRange(1),incRange(end)])
-    ylim([eccRange(1),eccRange(end)])
-    xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
-    ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
-    if ~isempty(label1)
-        title(['aop: ' label1])
-    end
-    hold off
-    
-    figure(nFig*10+6)
-    contourf(xV,yV,levelsMan(end)*[1,0;0,1],levelsMan)
-    colorbar
-    colormap jet
-    shading interp
-    hold on
-    contourf(incMesh,eccMesh,errTen1(:,:,6),levelsMan,'LineColor','none')
-    xlim([incRange(1),incRange(end)])
-    ylim([eccRange(1),eccRange(end)])
-    xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
-    ylabel('$\rm{Eccentricity}$','interpreter','latex','fontsize',12)
-    if ~isempty(label1)
-        title(['M: ' label1])
-    end
-    hold off
-    
+    end  
 end

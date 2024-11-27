@@ -45,9 +45,10 @@ dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping'; % ASRI
 % load([dataFolder '\ErrMaps_24-1-2024_3-57.mat']); % Low sma
 
 % Changed over to Numerical Mean, which is reliable for e>3e-3
-load([dataFolder '\ErrMaps_15-11-2024_11-24.mat']); % First Numerical mean based Fourier
+% load([dataFolder '\ErrMaps_15-11-2024_11-24.mat']); % First Numerical mean based Fourier
 
-
+% Changed range to go down to e = 5e-3
+load([dataFolder '\ErrMaps_21-11-2024_13-10.mat']); % Numerical mean based Fourier
 
 
 
@@ -62,7 +63,7 @@ errTenD = MapData.errTenD;
 
 errTenB(errTenB==inf) = nan;
 
-%% Cut off low ecc
+%% Cut off low ecc - why?
 % eccCut = 0.1;
 % eccRange = eccRange(eccRange>eccCut);
 % errTenF = errTenF((nEcc-length(eccRange)+1):end,:,:);
@@ -75,7 +76,7 @@ errTenB(errTenB==inf) = nan;
 % errTenB = errTenB(:,1:length(incRange),:);
 % errTenD = errTenD(:,1:length(incRange),:);
 %% Plot Relative Errors
-plotPropErrMap(eccRange,incRange,errTenF,errTenB,'Fourier','Brouwer SP',0)
+plotPropErrMap(eccRange,incRange,errTenF,errTenB,'Fourier','Brouwer SP',0,true)
 
 % plotPropErrMap(eccRange,incRange,errTenF2,errTenB,'Fourier2','Brouwer SP',1)
 
@@ -84,6 +85,6 @@ plotPropErrMap(eccRange,incRange,errTenF,errTenB,'Fourier','Brouwer SP',0)
 %% Plot Absolute Errors
 % plotPropErrMap(eccRange,incRange,errTenF2,[],'Fourier2',[],10)
 
-plotPropErrMap(eccRange,incRange,errTenF,[],'Fourier',[],20)
+plotPropErrMap(eccRange,incRange,errTenF,[],'Fourier',[],20,true)
 
-plotPropErrMap(eccRange,incRange,errTenB,[],'Brouwer',[],30)
+plotPropErrMap(eccRange,incRange,errTenB,[],'Brouwer',[],30,true)

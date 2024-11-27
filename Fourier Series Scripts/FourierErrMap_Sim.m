@@ -1,5 +1,5 @@
 clear
-TurnOffPCWhenDone = 0;
+TurnOffPCWhenDone = true;
 %% Define Parameters
 dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping';
 dbPath = 'C:\Users\User\Google Drive'; % ASRI
@@ -12,11 +12,16 @@ depritFlag = 0; % Probably forget about this part?
 nT = 80; % Only used if Deprit is being tested
 % Region Params
 nInc = 361;
-nEcc = 100;
-nMonte = 500; % 6000 trials is about 1.3 minute (not parallel)
+nEcc = 50;
+nMonte = 500; % 10000 trials is about 3.63 minute (not parallel)
+
+% % Region parameters for speed test - 10000 runs
+% nInc = 10;
+% nEcc = 10;
+% nMonte = 100;
 incRange = linspace(0,90,nInc);
 % eccRange = linspace(0.01,0.5,nEcc);
-eccRange = logspace(log10(0.005),log10(0.1),nEcc); 
+eccRange = logspace(log10(0.001),log10(0.1),nEcc);
 maxSma = 10000;
 
 %% Initialize Error Tensors
@@ -31,7 +36,7 @@ fTime = 0;
 f2Time = 0;
 dTime = 0;
 %% Loops
-disp(['Starting Mapping' newline 'Estimated runtime: ' num2str(nInc*nEcc*nMonte/4500/4/60) 'h'])
+disp(['Starting Mapping' newline 'Estimated runtime: ' num2str(nInc*nEcc*nMonte*3.64/10000/4/60) 'h'])
 totalTime = tic;
 parfor iEcc = 1:nEcc
     ecc = eccRange(iEcc);
@@ -74,7 +79,7 @@ parfor iEcc = 1:nEcc
                     oeD = nan(6,80);
                 end
             else
-                t = 0:dT:nOrb*T; 
+                t = 0:dT:nOrb*T;
                 oeD = nan(6,80);
             end
             % Prop Numerical
@@ -102,33 +107,40 @@ parfor iEcc = 1:nEcc
                 % Error remains infinite
                 errVecB = errVecB + inf(6,1);
             end
-            % Prop Fourier - k1
-            tic
-            [~,oeF] = Prop.PropOeFourier2Ord(t,k1);
-            testT = toc;
-            fTime = fTime + testT;
-            oeF = oeF.';
 
-            if k1~=k2
-                % Prop Fourier - k2
+            try
+                % Prop Fourier - k1
                 tic
-                [~,oeF2] = Prop.PropOeFourier2Ord(t,k2);
+                [~,oeF] = Prop.PropOeFourier2Ord(t,k1);
                 testT = toc;
-                f2Time = f2Time + testT;
-                oeF2 = oeF2.';
-                % Fourier Error k2
+                fTime = fTime + testT;
+                oeF = oeF.';
 
-                errF2 = abs(oeC-oeF2);
-                errF2 = [errF2(1,:)/oe(1);errF2(2,:)/oe(2);errF2(3:end,:)*pi/180];
-                errVecF2 = errVecF2 + trapz(t.',errF2,2)/t(end);
+                % Fourier Error
+                errF = abs(oeC-oeF);
+                errF = [errF(1,:)/oe(1);errF(2,:)/oe(2);errF(3:end,:)*pi/180];
+                errVecF = errVecF + trapz(t.',errF,2)/t(end);
+            catch
+                errVecF = errVecF+inf(6,1);
             end
 
-            % Fourier Error
-            errF = abs(oeC-oeF);
-            errF = [errF(1,:)/oe(1);errF(2,:)/oe(2);errF(3:end,:)*pi/180];
-            errVecF = errVecF + trapz(t.',errF,2)/t(end);
+            if k1~=k2
+                try
+                    % Prop Fourier - k2
+                    tic
+                    [~,oeF2] = Prop.PropOeFourier2Ord(t,k2);
+                    testT = toc;
+                    f2Time = f2Time + testT;
+                    oeF2 = oeF2.';
+                    % Fourier Error k2
 
-
+                    errF2 = abs(oeC-oeF2);
+                    errF2 = [errF2(1,:)/oe(1);errF2(2,:)/oe(2);errF2(3:end,:)*pi/180];
+                    errVecF2 = errVecF2 + trapz(t.',errF2,2)/t(end);
+                catch
+                    errVecF2 = errVecF2+inf(6,1);
+                end
+            end
 
             if depritFlag
                 % Deprit Error
