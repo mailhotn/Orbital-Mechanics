@@ -23,7 +23,8 @@ end
 if logE
     eccRange = log10(eccRange);
     eccLabel = '$\rm{Eccentricity}$'; % switched to labeling ecc directly
-    eTicks = flip(eccRange(end):-0.1:eccRange(1)).';
+    eTicks = flip(eccRange(end):-0.2:eccRange(1)).';
+    eTicks(1) = eccRange(1);
     eTickLabels = num2str(10.^eTicks,2);
 elseif ~logE
     eccLabel = '$\rm{Eccentricity}$';

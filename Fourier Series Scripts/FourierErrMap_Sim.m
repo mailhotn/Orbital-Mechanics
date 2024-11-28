@@ -21,7 +21,7 @@ nMonte = 500; % 10000 trials is about 3.63 minute (not parallel)
 % nMonte = 100;
 incRange = linspace(0,90,nInc);
 % eccRange = linspace(0.01,0.5,nEcc);
-eccRange = logspace(log10(0.001),log10(0.1),nEcc);
+eccRange = logspace(log10(0.002),log10(0.1),nEcc);
 maxSma = 10000;
 
 %% Initialize Error Tensors
@@ -36,7 +36,9 @@ fTime = 0;
 f2Time = 0;
 dTime = 0;
 %% Loops
+disp(datetime('now'))
 disp(['Starting Mapping' newline 'Estimated runtime: ' num2str(nInc*nEcc*nMonte*3.64/10000/4/60) 'h'])
+
 totalTime = tic;
 parfor iEcc = 1:nEcc
     ecc = eccRange(iEcc);

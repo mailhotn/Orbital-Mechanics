@@ -48,7 +48,11 @@ dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping'; % ASRI
 % load([dataFolder '\ErrMaps_15-11-2024_11-24.mat']); % First Numerical mean based Fourier
 
 % Changed range to go down to e = 5e-3
-load([dataFolder '\ErrMaps_21-11-2024_13-10.mat']); % Numerical mean based Fourier
+% load([dataFolder '\ErrMaps_21-11-2024_13-10.mat']); % Numerical mean based Fourier
+% Changed range to e=1-e3, me2oscNum no longer reliable, but propagation
+% only needs osc2meNum which is
+load([dataFolder '\ErrMaps_28-11-2024_5-38.mat']); % Numerical mean based Fourier
+
 
 
 
@@ -63,11 +67,11 @@ errTenD = MapData.errTenD;
 
 errTenB(errTenB==inf) = nan;
 
-%% Cut off low ecc - why?
-% eccCut = 0.1;
-% eccRange = eccRange(eccRange>eccCut);
-% errTenF = errTenF((nEcc-length(eccRange)+1):end,:,:);
-% errTenB = errTenB((nEcc-length(eccRange)+1):end,:,:);
+%% Cut off low ecc - Useful if something fails for low ecc
+eccCut = 0.002;
+eccRange = eccRange(eccRange>eccCut);
+errTenF = errTenF((nEcc-length(eccRange)+1):end,:,:);
+errTenB = errTenB((nEcc-length(eccRange)+1):end,:,:);
 
 %% Cut off high inc - shows that brouwer always had issues
 % incCut = 50;

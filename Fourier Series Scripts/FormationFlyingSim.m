@@ -1,5 +1,5 @@
 clear
-oeLead = [7000, 0.005, 5, 5, 5, 5].'; % init oe
+oeLead = [7000, 0.003, 5, 5, 5, 5].'; % init oe
 dOe = [0,0,0,0,0,1].'; % mean element difference for follower
 oeMat = [oeLead,oeLead + dOe];
 kMax = 5;
@@ -25,6 +25,11 @@ oeC = oeC.';
 oeB = reshape(me2oscSP(reshape(oeM.',6,length(t)*2)),12,length(t));
 [~,oeF] = Prop.PropOeFourier2Ord(t,kMax);
 oeF = oeF.';
+
+% unwrap RAAN & AOP for comparison
+oeB([4,5,10,11],:) = 180/pi*unwrap(pi/180*oeB([4,5,10,11],:),2);
+oeC([4,5,10,11],:) = 180/pi*unwrap(pi/180*oeC([4,5,10,11],:),2);
+oeF([4,5,10,11],:) = 180/pi*unwrap(pi/180*oeF([4,5,10,11],:),2);
 
 % Get relative ECI vector
 dEciC = oe2eci(oeC(7:12,:))-oe2eci(oeC(1:6,:));
