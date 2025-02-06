@@ -48,7 +48,11 @@ dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping'; % ASRI
 % load([dataFolder '\ErrMaps_15-11-2024_11-24.mat']); % First Numerical mean based Fourier
 % load([dataFolder '\ErrMaps_21-11-2024_13-10.mat']); % eMin = 5e-3 
 % load([dataFolder '\ErrMaps_28-11-2024_5-38.mat']); % eMin = 1e-3 - Brouwer lost accuracy
-load([dataFolder '\ErrMaps_30-11-2024_11-14.mat']); % eMin = 2e-3
+% load([dataFolder '\ErrMaps_30-11-2024_11-14.mat']); % eMin = 2e-3
+
+% Added Cartesian errors
+% load([dataFolder '\ErrMaps_6-2-2025_14-11.mat']); % test
+load([dataFolder '\ErrMaps_6-2-2025_15-0.mat']); % test 2
 
 
 
@@ -88,3 +92,6 @@ plotPropErrMap(eccRange,incRange,errTenF,errTenB,'Fourier','Brouwer SP',0,true)
 plotPropErrMap(eccRange,incRange,errTenF,[],'Fourier',[],20,true)
 
 plotPropErrMap(eccRange,incRange,errTenB,[],'Brouwer',[],30,true)
+
+%% Relative Cartesian
+plotPropErrMap(eccRange,incRange,MapData.errTenRswF,MapData.errTenRswB,'Fourier','Brouwer SP',0,true)

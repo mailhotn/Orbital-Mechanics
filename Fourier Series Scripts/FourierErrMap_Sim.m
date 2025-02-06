@@ -1,5 +1,5 @@
 clear
-TurnOffPCWhenDone = true;
+TurnOffPCWhenDone = false;
 %% Define Parameters
 dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping';
 dbPath = 'C:\Users\User\Google Drive'; % ASRI
@@ -15,10 +15,11 @@ nInc = 361;
 nEcc = 100;
 nMonte = 800; % 10000 trials is about 3.63 minute (not parallel)
 
-% % Region parameters for speed test - 10000 runs
-% nInc = 10;
+% % Region parameters for speed test - 6000 runs
+% nInc = 6;
 % nEcc = 10;
 % nMonte = 100;
+%
 incRange = linspace(0,90,nInc);
 % eccRange = linspace(0.01,0.5,nEcc);
 eccRange = logspace(log10(0.002),log10(0.1),nEcc);
@@ -30,8 +31,8 @@ errTenF2 = inf(nEcc,nInc,6);
 errTenB = inf(nEcc,nInc,6);
 errTenD = inf(nEcc,nInc,6);
 % cartesian errors
-errTenFX = inf(nEcc,nInc,6);
-errTenBX = inf(nEcc,nInc,6);
+errTenRswF = inf(nEcc,nInc,6);
+errTenRswB = inf(nEcc,nInc,6);
 
 bTime = 0;
 cTime = 0;
@@ -53,6 +54,8 @@ parfor iEcc = 1:nEcc
         errVecF = zeros(6,1);
         errVecF2 = zeros(6,1);
         errVecD = zeros(6,1);
+        errVecRswF = zeros(6,1);
+        errVecRswB = zeros(6,1);
         for iTry = 1:nMonte
             % Get OE
             rNum = rand(4,1);
@@ -93,6 +96,7 @@ parfor iEcc = 1:nEcc
             testT = toc;
             cTime = cTime + testT;
             oeC = oeC.';
+            eciC = oe2eci(oeC,primary,'me');
 
             try
                 % Prop Brouwer
@@ -100,6 +104,7 @@ parfor iEcc = 1:nEcc
                 [~,OeM] = Prop.PropOeMeanShort(t);
                 oeB = me2oscSP(OeM.');
                 oeB(6,:) = 180/pi*unwrap(pi/180*oeB(6,:));
+                eciB = oe2eci(oeB,primary,'me');
                 % if oeB(6,1) > 180
                 %     oeB(6,:) = oeB(6,:) - 360;
                 % end
@@ -108,6 +113,10 @@ parfor iEcc = 1:nEcc
                 errB = abs(oeC-oeB);
                 errB = [errB(1,:)/oe(1);errB(2,:)/oe(2);errB(3:end,:)*pi/180];
                 errVecB = errVecB + trapz(t.',errB,2)/t(end);
+
+                % Cartesian
+                errRswB = eci2rsw(eciB-eciC,oeC);
+                errVecRswB = errVecRswB + trapz(t.',errRswB,2)/t(end);
             catch
                 % Error remains infinite
                 errVecB = errVecB + inf(6,1);
@@ -117,6 +126,7 @@ parfor iEcc = 1:nEcc
                 % Prop Fourier - k1
                 tic
                 [~,oeF] = Prop.PropOeFourier2Ord(t,k1);
+                eciF = oe2eci(oeF,primary,'me');
                 testT = toc;
                 fTime = fTime + testT;
                 oeF = oeF.';
@@ -125,6 +135,10 @@ parfor iEcc = 1:nEcc
                 errF = abs(oeC-oeF);
                 errF = [errF(1,:)/oe(1);errF(2,:)/oe(2);errF(3:end,:)*pi/180];
                 errVecF = errVecF + trapz(t.',errF,2)/t(end);
+
+                % Cartesian
+                errRswF = eci2rsw(eciF-eciC,oeC);
+                errVecRswF = errVecRswF + trapz(t.',errRswF,2)/t(end);
             catch
                 errVecF = errVecF+inf(6,1);
             end
@@ -160,11 +174,15 @@ parfor iEcc = 1:nEcc
         errVecF = errVecF/nMonte;
         errVecF2 = errVecF2/nMonte;
         errVecD = errVecD/nMonte;
+        errVecRswF = errVecRswF/nMonte;
+        errVecRswB = errVecRswB/nMonte;
         % Assign errors
         errTenB(iEcc,iInc,:) = errVecB;
         errTenF(iEcc,iInc,:) = errVecF;
         errTenF2(iEcc,iInc,:) = errVecF2;
         errTenD(iEcc,iInc,:) = errVecD;
+        errTenRswF(iEcc,iInc,:) = errVecRswF;
+        errTenRswB(iEcc,iInc,:) = errVecRswB;
     end
 end
 eTime = toc(totalTime);
@@ -193,6 +211,8 @@ MapData.errTenF = errTenF;
 MapData.errTenF2 = errTenF2;
 MapData.errTenB = errTenB;
 MapData.errTenD = errTenD;
+MapData.errTenRswF = errTenRswF;
+MapData.errTenRswB = errTenRswB;
 
 c = clock;
 save([dataFolder '\ErrMaps_' num2str(c(3)) '-' num2str(c(2)) '-' ...
