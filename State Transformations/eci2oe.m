@@ -1,4 +1,4 @@
-function OE = eci2oe( X1, X2 ,primary )
+function OE = eci2oe( X1, X2 ,primary , fastParam)
 %state2elements calculate orbital elements from state in geocentric
 %equatorial reference frame. Accepts R and V matrices of N different points
 %and outputs the elements as a 6xN matrix
@@ -19,6 +19,9 @@ end
 if nargin < 3
     primary = earth();
      % default is earth orbit of satellite with negligible mass
+end
+if nargin < 4 % default is true anomaly, for backwards compatibility
+    fastParam = 'ta';
 end
 mu = primary.mu;
 if ~isempty(X2) % X1 is R, X2 is V
@@ -57,7 +60,13 @@ th = (vr>=0).*acosd(dot(E./e,R./r,1)) + ...
     (vr<0).*(360 - acosd(dot(E./e,R./r,1)));
 
 a = h.^2./(mu*(1-e.^2));
-OE = real([a; e; i; O; w; th]);
+
+if strcmp(fastParam,'ta')
+    fP = th;
+elseif strcmp(fastParam,'me')
+    fP = ta2me(th,e);
+end
+OE = real([a; e; i; O; w; fP]);
 % Just get rid of imaginary stuff. For some reason matlab gets an error of
 % O(eps) when calculating the product of two normalized vectors, there is
 % no reason to get imaginary numbers from the acos

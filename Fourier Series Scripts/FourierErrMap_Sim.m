@@ -12,8 +12,8 @@ depritFlag = 0; % Probably forget about this part?
 nT = 80; % Only used if Deprit is being tested
 % Region Params
 nInc = 361;
-nEcc = 50;
-nMonte = 500; % 10000 trials is about 3.63 minute (not parallel)
+nEcc = 100;
+nMonte = 800; % 10000 trials is about 3.63 minute (not parallel)
 
 % % Region parameters for speed test - 10000 runs
 % nInc = 10;
@@ -29,6 +29,9 @@ errTenF = inf(nEcc,nInc,6);
 errTenF2 = inf(nEcc,nInc,6);
 errTenB = inf(nEcc,nInc,6);
 errTenD = inf(nEcc,nInc,6);
+% cartesian errors
+errTenFX = inf(nEcc,nInc,6);
+errTenBX = inf(nEcc,nInc,6);
 
 bTime = 0;
 cTime = 0;

@@ -46,13 +46,9 @@ dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping'; % ASRI
 
 % Changed over to Numerical Mean, which is reliable for e>3e-3
 % load([dataFolder '\ErrMaps_15-11-2024_11-24.mat']); % First Numerical mean based Fourier
-
-% Changed range to go down to e = 5e-3
-% load([dataFolder '\ErrMaps_21-11-2024_13-10.mat']); % Numerical mean based Fourier
-% Changed range to e=1-e3, me2oscNum no longer reliable, but propagation
-% only needs osc2meNum which is
-load([dataFolder '\ErrMaps_28-11-2024_5-38.mat']); % Numerical mean based Fourier
-
+% load([dataFolder '\ErrMaps_21-11-2024_13-10.mat']); % eMin = 5e-3 
+% load([dataFolder '\ErrMaps_28-11-2024_5-38.mat']); % eMin = 1e-3 - Brouwer lost accuracy
+load([dataFolder '\ErrMaps_30-11-2024_11-14.mat']); % eMin = 2e-3
 
 
 
