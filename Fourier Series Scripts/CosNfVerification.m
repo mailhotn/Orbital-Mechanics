@@ -1,5 +1,5 @@
 clear
-e = 0.1;
+e = 0.5;
 M = 0:0.001:2*pi;
 tol = 1e-14;
 %% Calculate N-R, Battin
@@ -52,6 +52,17 @@ errorc1s1F = norm(c1s1T-c1s1F)/length(c1s1T)
 errorc2s1F = norm(c2s1T-c2s1F)/length(c2s1T)
 errorc3s1F = norm(c3s1T-c3s1F)/length(c3s1T)
 errorc4s1F = norm(c4s1T-c4s1F)/length(c4s1T)
+%% Hansen
+kMax = 10;
+kVec = [1:kMax].';
+trigMat = cos(kVec.*M);
+[xHans2,xHans02] = hansenCoeffs(e,0,2,kMax,kMax+5);
+[xHans2m] = hansenCoeffs(e,0,-2,kMax,kMax+5);
+cHans2 = xHans2+xHans2m;
+c2H = (1+xHans02+cHans2*trigMat)/2;
+
+errorc2H = norm(c2H-c2F)/length(c2F)
+
 %% Plot Stuff
 figure(1) % M & E
 plot(M,fT,M,fF,'--','linewidth',2)
@@ -62,7 +73,7 @@ yticklabels({'0','\pi/2','\pi','3\pi/2','2\pi'})
 axis([0 2*pi 0 2*pi])
 
 figure(2)
-plot(M,c2T,M,c2F,'--','linewidth',2)
+plot(M,c2T,M,c2F,M,c2H,'--','linewidth',2)
 xticks(0:pi/2:2*pi)
 xticklabels({'0','\pi/2','\pi','3\pi/2','2\pi'})
 xlabel('M')

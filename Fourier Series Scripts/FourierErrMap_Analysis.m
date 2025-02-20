@@ -52,7 +52,9 @@ dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping'; % ASRI
 
 % Added Cartesian errors
 % load([dataFolder '\ErrMaps_6-2-2025_14-11.mat']); % test
-load([dataFolder '\ErrMaps_6-2-2025_15-0.mat']); % test 2
+% load([dataFolder '\ErrMaps_6-2-2025_15-0.mat']); % test 2
+% load([dataFolder '\ErrMaps_8-2-2025_11-22.mat']); % big run - unit error in eci2rsw probably useless
+load([dataFolder '\ErrMaps_16-2-2025_12-40.mat']); % test 3 - unit correction
 
 
 

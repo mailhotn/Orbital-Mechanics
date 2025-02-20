@@ -1,5 +1,5 @@
 clear
-TurnOffPCWhenDone = false;
+TurnOffPCWhenDone = true;
 %% Define Parameters
 dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping';
 dbPath = 'C:\Users\User\Google Drive'; % ASRI
@@ -15,11 +15,11 @@ nInc = 361;
 nEcc = 100;
 nMonte = 800; % 10000 trials is about 3.63 minute (not parallel)
 
-% % Region parameters for speed test - 6000 runs
-% nInc = 6;
+% Region parameters for speed test - 6000 runs
+% nInc = 12;
 % nEcc = 10;
-% nMonte = 100;
-%
+% nMonte = 200;
+
 incRange = linspace(0,90,nInc);
 % eccRange = linspace(0.01,0.5,nEcc);
 eccRange = logspace(log10(0.002),log10(0.1),nEcc);

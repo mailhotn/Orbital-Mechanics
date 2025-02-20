@@ -55,10 +55,10 @@ xPqw(5,:) = (-cosd(O).*sind(w) - sind(O).*cosd(i).*cosd(w)).*dx +...
 xPqw(6,:) = sind(O).*sind(i).*dx -cosd(O).*sind(i).*dy + cosd(i).*dz; 
 
 % LVLH
-xRsw(1,:) = cos(f).*xPqw(1,:) + sin(f).*xPqw(2,:);
-xRsw(2,:) = -sin(f).*xPqw(1,:) + cos(f).*xPqw(2,:);
+xRsw(1,:) = cosd(f).*xPqw(1,:) + sind(f).*xPqw(2,:);
+xRsw(2,:) = -sind(f).*xPqw(1,:) + cosd(f).*xPqw(2,:);
 xRsw(3,:) = xPqw(3,:);
 
-xRsw(4,:) = cos(f).*xPqw(4,:) + sin(f).*xPqw(5,:);
-xRsw(5,:) = -sin(f).*xPqw(4,:) + cos(f).*xPqw(5,:);
+xRsw(4,:) = cosd(f).*xPqw(4,:) + sind(f).*xPqw(5,:);
+xRsw(5,:) = -sind(f).*xPqw(4,:) + cosd(f).*xPqw(5,:);
 xRsw(6,:) = xPqw(6,:);
