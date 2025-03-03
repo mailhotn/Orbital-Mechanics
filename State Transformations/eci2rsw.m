@@ -37,7 +37,7 @@ z = xEci(3,:);
 dx = xEci(4,:);
 dy = xEci(5,:);
 dz = xEci(6,:);
-% Perifocal
+% ECI to Perifocal
 xPqw(1,:) = (cosd(O).*cosd(w)-sind(O).*sind(w).*cosd(i)).*x +...
     (sind(O).*cosd(w) + cosd(O).*cosd(i).*sind(w)).*y + ...
     sind(i).*sind(w).*z;
@@ -54,7 +54,7 @@ xPqw(5,:) = (-cosd(O).*sind(w) - sind(O).*cosd(i).*cosd(w)).*dx +...
     cosd(w).*sind(i).*dz;
 xPqw(6,:) = sind(O).*sind(i).*dx -cosd(O).*sind(i).*dy + cosd(i).*dz; 
 
-% LVLH
+% Perifocal to LVLH
 xRsw(1,:) = cosd(f).*xPqw(1,:) + sind(f).*xPqw(2,:);
 xRsw(2,:) = -sind(f).*xPqw(1,:) + cosd(f).*xPqw(2,:);
 xRsw(3,:) = xPqw(3,:);
