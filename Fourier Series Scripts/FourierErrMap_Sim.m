@@ -115,7 +115,7 @@ parfor iEcc = 1:nEcc
                 errVecB = errVecB + trapz(t.',errB,2)/t(end);
 
                 % Cartesian
-                errRswB = eci2rsw(eciB-eciC,oeC);
+                errRswB = abs(eci2rsw(eciB-eciC,oeC));
                 errVecRswB = errVecRswB + trapz(t.',errRswB,2)/t(end);
             catch
                 % Error remains infinite
@@ -137,7 +137,7 @@ parfor iEcc = 1:nEcc
                 errVecF = errVecF + trapz(t.',errF,2)/t(end);
 
                 % Cartesian
-                errRswF = eci2rsw(eciF-eciC,oeC);
+                errRswF = abs(eci2rsw(eciF-eciC,oeC));
                 errVecRswF = errVecRswF + trapz(t.',errRswF,2)/t(end);
             catch
                 errVecF = errVecF+inf(6,1);

@@ -374,7 +374,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 Xi = icOsc + freq0*T + fourIntSolAll - fourIntSolAll(:,1);
                 %             X(6,:) = M2;
                 Xi(6,:) = Xi(6,:) + M - icOsc(6); % subtracted M(0)  
-                % why M instead of M2? because M2 would be adding varitations twice
+                % why M instead of M2? because M2 would be adding variations twice
 
 
                 Xi(3:5,:) = wrapTo360(Xi(3:5,:)*180/pi);

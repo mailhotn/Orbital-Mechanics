@@ -55,7 +55,8 @@ dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping'; % ASRI
 % load([dataFolder '\ErrMaps_6-2-2025_15-0.mat']); % test 2
 % load([dataFolder '\ErrMaps_8-2-2025_11-22.mat']); % big run - unit error in eci2rsw probably useless
 % load([dataFolder '\ErrMaps_16-2-2025_12-40.mat']); % test 3 - unit correction
-load([dataFolder '\ErrMaps_22-2-2025_10-36.mat']); % big run - post correction
+% load([dataFolder '\ErrMaps_22-2-2025_10-36.mat']); % big run - post correction
+load([dataFolder '\ErrMaps_5-3-2025_11-6.mat']); % big run - post corrections
 
 
 
@@ -97,5 +98,7 @@ plotPropErrMap(eccRange,incRange,errTenF,[],'Fourier',[],20,true)
 
 plotPropErrMap(eccRange,incRange,errTenB,[],'Brouwer',[],30,true)
 
-%% Relative Cartesian
+%% Relative Cartesian - LVLH
 plotPropErrMap(eccRange,incRange,MapData.errTenRswF,MapData.errTenRswB,'Fourier','Brouwer SP',0,true)
+
+plotPropErrMap(eccRange,incRange,MapData.errTenRswF,[],'Fourier',[],0,true)
