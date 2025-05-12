@@ -31,18 +31,18 @@ oeB([4,5,10,11],:) = 180/pi*unwrap(pi/180*oeB([4,5,10,11],:),2);
 oeC([4,5,10,11],:) = 180/pi*unwrap(pi/180*oeC([4,5,10,11],:),2);
 oeF([4,5,10,11],:) = 180/pi*unwrap(pi/180*oeF([4,5,10,11],:),2);
 
-% Get relative ECI vector
-dEciC = oe2eci(oeC(7:12,:))-oe2eci(oeC(1:6,:));
-dEciB = oe2eci(oeB(7:12,:))-oe2eci(oeB(1:6,:));
-dEciF = oe2eci(oeF(7:12,:))-oe2eci(oeF(1:6,:));
+% Get relative RSW vector
+dRswC = eci2rsw(oe2eci(oeC(7:12,:))-oe2eci(oeC(1:6,:)),oeC(1:6,:));
+dRswB = eci2rsw(oe2eci(oeB(7:12,:))-oe2eci(oeB(1:6,:)),oeB(1:6,:));
+dRswF = eci2rsw(oe2eci(oeF(7:12,:))-oe2eci(oeF(1:6,:)),oeF(1:6,:));
 % Distance
-distC = vecnorm(dEciC(1:3,:));
-distB = vecnorm(dEciB(1:3,:));
-distF = vecnorm(dEciF(1:3,:));
+distC = vecnorm(dRswC(1:3,:));
+distB = vecnorm(dRswB(1:3,:));
+distF = vecnorm(dRswF(1:3,:));
 % Velocity
-relVC = vecnorm(dEciC(4:6,:));
-relVB = vecnorm(dEciB(4:6,:));
-relVF = vecnorm(dEciF(4:6,:));
+relVC = vecnorm(dRswC(4:6,:));
+relVB = vecnorm(dRswB(4:6,:));
+relVF = vecnorm(dRswF(4:6,:));
 % Differential elements
 dOeC = oeC(7:12,:)-oeC(1:6,:);
 dOeB = oeB(7:12,:)-oeB(1:6,:);
@@ -92,26 +92,26 @@ xticks(linspace(0,nDay*24,5*nDay))
 ylabel('$\delta v \ Error \left[\rm{\frac{km}{s}}\right]$',Interpreter='latex',FontSize=12)
 
 figure(3)
-plot(t/3600,dEciB(1,:)-dEciC(1,:),t/3600,dEciF(1,:)-dEciC(1,:))
+plot(t/3600,dRswB(1,:)-dRswC(1,:),t/3600,dRswF(1,:)-dRswC(1,:))
 legend('Brouwer','Fourier')
 xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
 xlim([0,nDay*24])
 xticks(linspace(0,nDay*24,5*nDay))
-ylabel('$\delta x \ Error \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
+ylabel('$\delta r \ Error \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
 figure(4)
-plot(t/3600,dEciB(2,:)-dEciC(2,:),t/3600,dEciF(2,:)-dEciC(2,:))
+plot(t/3600,dRswB(2,:)-dRswC(2,:),t/3600,dRswF(2,:)-dRswC(2,:))
 legend('Brouwer','Fourier')
 xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
 xlim([0,nDay*24])
 xticks(linspace(0,nDay*24,5*nDay))
-ylabel('$\delta y \ Error \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
+ylabel('$\delta s \ Error \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
 figure(5)
-plot(t/3600,dEciB(3,:)-dEciC(3,:),t/3600,dEciF(3,:)-dEciC(3,:))
+plot(t/3600,dRswB(3,:)-dRswC(3,:),t/3600,dRswF(3,:)-dRswC(3,:))
 legend('Brouwer','Fourier')
 xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
 xlim([0,nDay*24])
 xticks(linspace(0,nDay*24,5*nDay))
-ylabel('$\delta z \ Error \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
+ylabel('$\delta w \ Error \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
 
 % orbital Elements
 figure(11)

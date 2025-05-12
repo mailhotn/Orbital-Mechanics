@@ -101,4 +101,4 @@ plotPropErrMap(eccRange,incRange,errTenB,[],'Brouwer',[],30,true)
 %% Relative Cartesian - LVLH
 plotPropErrMap(eccRange,incRange,MapData.errTenRswF,MapData.errTenRswB,'Fourier','Brouwer SP',0,true)
 
-plotPropErrMap(eccRange,incRange,MapData.errTenRswF,[],'Fourier',[],0,true)
+plotPropErrMap(eccRange,incRange,MapData.errTenRswF,[],'Fourier',[],10,true)

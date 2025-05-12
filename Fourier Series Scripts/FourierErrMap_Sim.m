@@ -5,7 +5,7 @@ dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping';
 dbPath = 'C:\Users\User\Google Drive'; % ASRI
 primary = earth();
 k1 = 5;
-k2 = 5;
+k2 = 5*1i;
 nOrb = 1;
 dT = 100; % sec only used if Deprit is not being tested
 depritFlag = 0; % Probably forget about this part?
@@ -16,9 +16,9 @@ nEcc = 100;
 nMonte = 800; % 10000 trials is about 3.63 minute (not parallel)
 
 % Region parameters for speed test - 6000 runs
-% nInc = 12;
-% nEcc = 10;
-% nMonte = 200;
+nInc = 12;
+nEcc = 10;
+nMonte = 200;
 
 incRange = linspace(0,90,nInc);
 % eccRange = linspace(0.01,0.5,nEcc);
@@ -41,8 +41,11 @@ f2Time = 0;
 dTime = 0;
 %% Loops
 disp(datetime('now'))
-disp(['Starting Mapping' newline 'Estimated runtime: ' num2str(nInc*nEcc*nMonte*3.64/10000/4/60) 'h'])
-
+if k1 == k2
+    disp(['Starting Mapping' newline 'Estimated runtime: ' num2str(nInc*nEcc*nMonte*3.64/10000/4/60) 'h'])
+else
+    disp(['Starting Mapping' newline 'Estimated runtime: ' num2str(nInc*nEcc*nMonte*3.64/10000/4/60) 'h'])
+end
 totalTime = tic;
 parfor iEcc = 1:nEcc
     ecc = eccRange(iEcc);
@@ -147,7 +150,7 @@ parfor iEcc = 1:nEcc
                 try
                     % Prop Fourier - k2
                     tic
-                    [~,oeF2] = Prop.PropOeFourier2Ord(t,k2);
+                    [~,oeF2] = Prop.PropOeFourier(t,abs(k2));
                     testT = toc;
                     f2Time = f2Time + testT;
                     oeF2 = oeF2.';

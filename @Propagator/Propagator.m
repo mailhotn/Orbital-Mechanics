@@ -248,62 +248,46 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             % Assume constant coefficients
             
             % Handle Initial conditions
-            ic = reshape(P.Con.InitialOeOsc,[6*P.Con.nSats,1]);
-            icOsc = ic;
+            icOsc = reshape(P.Con.InitialOeOsc,[6*P.Con.nSats,1]);
+            icM = osc2meNum(icOsc);
+            icM(3:end) = icM(3:end)*pi/180;
             icOsc(3:end) = icOsc(3:end)*pi/180;
-            ic = osc2meSP(ic);
-            ic(3:end) = ic(3:end)*pi/180;
+
+            smaM = icM(1);
             
-            a = ic(1);
-            
-            %             % Get mean a by substracting short period variations. The mean
-            %             % mean motion resulting *should* be the correct frequency for M
-            %             e = ic(2);
-            %             i = ic(3);
-            %             aop = ic(5);
-            %
-            %             eta = sqrt(1-e^2);
-            %             f = pi/180*me2ta(ic(6)*180/pi,e);
-            %             a_r = (1+e.*cos(f))./eta.^2;
-            %             g2 = -P.Con.primary.J2/2*(P.Con.primary.Re/a)^2;
-            % %             a = a + 3*g2*a*(1-1.5*sin(i)^2)/eta^3; % Kozai - weird
-            %             a = a + a*g2*((3*cos(i)^2-1).*(a_r^3 - 1/eta^3) ...
-            %                 + 3*(1-cos(i)^2)*a_r^3*cos(2*aop + 2*f));
-            %             ic(1) = a; % Reassign a given averaging
-            
-            % Continue with the rest
-            n = sqrt(P.Con.primary.mu/a^3);
+            nM = sqrt(P.Con.primary.mu/smaM^3);
             %             n = sqrt(P.Con.primary.mu/a^3)*(1+3*g2*(1-1.5*sin(i)^2)/eta^3); % kozai Fix
-            [~,lpeSpec] = P.DynOeFourier([],ic,kMax);
+            [freq0,lpeSpec] = P.DynOeFourier([],icM,kMax);
             %                         n = n + lpeSpec(11,1); % <-------------------  Work on this
-            M = n*T+icOsc(6);
+            M = nM*T+icOsc(6);
             k = 1:kMax;
             
-            X = nan(6*P.Con.nSats,length(T));
+            X = nan(6,length(T));
             
             % Initial time
-            trigMat = repmat([sin(k*M(1))./k/n;-cos(k*M(1))./k/n],6,1);
+            trigMat = repmat([sin(k*M(1))./k/nM;-cos(k*M(1))./k/nM],6,1);
             trigsum1 = sum(lpeSpec(:,2:end).*trigMat,2);
             InitVal = [sum(trigsum1(1:2)); sum(trigsum1(3:4));...
                 sum(trigsum1(5:6)); sum(trigsum1(7:8)); sum(trigsum1(9:10));...
                 sum(trigsum1(11:12))];
             M2 = M;
             
-            % Fix M
-            Sk = sin(k.'*M)./k.'/n;
-            Ck = -cos(k.'*M)./k.'/n;
-            AkM = lpeSpec(11,2:end);
-            BkM = lpeSpec(12,2:end);
+            % Fix M - add first FOurier variations
+            Sk = sin(k.'*M)./k.'/nM;
+            Ck = -cos(k.'*M)./k.'/nM;
+            AkM = lpeSpec(11,:);
+            BkM = lpeSpec(12,:);
             M2 = lpeSpec(11,1)*T + AkM*Sk + BkM*Ck - InitVal(6) + M;
             
             % Calculate all elements
-            Sk = sin(k.'*M2)./k.'/n;
-            Ck = -cos(k.'*M2)./k.'/n;
-            Ak = lpeSpec(1:2:11,2:end);
-            Bk = lpeSpec(2:2:12,2:end);
+            Sk = sin(k.'*M2)./k.'/nM;
+            Ck = -cos(k.'*M2)./k.'/nM;
+            Ak = lpeSpec(1:2:11,:);
+            Bk = lpeSpec(2:2:12,:);
+            fourIntSolAll = Ak*Sk + Bk*Ck;
             
-            X = icOsc + lpeSpec(1:2:11,1)*T + Ak*Sk + Bk*Ck -InitVal;
-            X(6,:) = M2;
+            X = icOsc + freq0*T + fourIntSolAll - fourIntSolAll(:,1);
+            X(6,:) = X(6,:) + M - icOsc(6);
             
             
             X(3:5,:) = wrapTo360(X(3:5,:)*180/pi);
@@ -326,7 +310,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 [freq0,lpeSpec] = P.DynOeFourier2Ord(T,icOsc,kMax);
 
                 % Average out SP from initial conditions
-                icM = osc2meNum(icOsc); % change to numerical mean
+                icM = osc2meNum(icOsc); % changed to numerical mean
                 icOsc(3:end) = icOsc(3:end)*pi/180;
                 icM(3:end) = icM(3:end)*pi/180;
 
@@ -415,7 +399,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             aolQ = pi/180*(aop + f);                  % theta
             ranQ = pi/180*ran;                        % nu
             vraP = sqrt(mu/sma/(1-ecc^2))*ecc*sind(f);% R
-            amoP = sqrt((1-ecc^2)*sma*mu);            % Theta
+            amoP = sqrt((1-ecc^2)*sma*mu);            % Theta - angular momentum
             amzP = amoP*cosd(inc);                    % N
             % Solution
             X = mu*J2*Re^2*(0.5-1.5*amzP^2/amoP^2);
@@ -885,22 +869,31 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 circshift(-P.Con.mu*R2./r.^3 + f_J2 + f_J3,3);
         end
         
-        function [dX,lpeSpec] = DynOeFourier(P,t,X,kMax) %#ok<INUSL>
-            
+        function [freq0,lpeSpec] = DynOeFourier(P,t,icOsc,kMax) %#ok<INUSL>
+            %% Handle Input
             J2 = P.Con.primary.J2;
             Re = P.Con.primary.Re;
             mu = P.Con.primary.mu;
             
             % handle elements vector
-            a = X(1);
-            e = X(2);
-            i = X(3);
-            aop = X(5);
-            M = X(6);
+            nT = length(t);
+            
+            icM = osc2meNum(icOsc); % change to numerical mean
+            icM(3:end) = icM(3:end)*pi/180;
+            icOsc(3:end) = icOsc(3:end)*pi/180;
+            % handle elements vector
+            a = icM(1);
+            e = icM(2);
+            i = icM(3);
+            
+            nMo = sqrt(mu/a^3);
+            p = a*(1-e^2);
+            aop = icM(5);
+            
             b = (1-sqrt(1-e^2))/e;
             
             
-            % constant vectors
+            %% constant vectors
             m2 = (0:4).';
             m3 = (0:6).';
             m4 = (0:8).';
@@ -1220,16 +1213,15 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 k = k+1;
             end
             
-            
-            n = sqrt(mu/a^3); % bad practice, should rename but whatever
+
             eta = sqrt(1-e^2);
             % constant potential values
-            R = -n^2*Re^2/2; % common factor
-            Rsma = -n*J2*Re^2/a;
-            Recc = -n*eta*J2*Re^2/2/a^2;
-            Rinc = -n*J2*Re^2*cos(i)/2/a^2/eta;
-            Rran = -n*J2*Re^2/2/a^2/eta;
-            Raop = -n*J2*Re^2/2/a^2;
+            R = -nMo^2*Re^2/2; % common factor
+            Rsma = -nMo*J2*Re^2/a;
+            Recc = -nMo*eta*J2*Re^2/2/a^2;
+            Rinc = -nMo*J2*Re^2*cos(i)/2/a^2/eta;
+            Rran = -nMo*J2*Re^2/2/a^2/eta;
+            Raop = -nMo*J2*Re^2/2/a^2;
             Rman = Raop;
             
             % Freq 0 elements without common factor
@@ -1241,26 +1233,20 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             k = 1:kMax;
             lpeSpec = nan(12,kMax+1);
             
-            lpeSpec(1:2,:) = Rsma*[0, S.'*(BkM.*k);
-                0, -C.'*(AkM.*k)];
-            lpeSpec(3:4,:) = Recc*[0, eta*S.'*(Bk_eM.*k) - dCdo.'*Ak_eM;
-                0, -eta*C.'*(Ak_eM.*k) - dSdo.'*Bk_eM];
-            lpeSpec(5:6,:) = Rinc*[0, dCdo_si.'*AkM;
-                0, dSdo_si.'*BkM];
-            lpeSpec(7:8,:) = Rran*[ran0, dCdi_si.'*AkM;
-                0, dSdi_si.'*BkM];
-            lpeSpec(9:10,:) = Raop*[aop0, eta*(dCde.'*Ak_eM + C.'*Akde_eM) - cos(i)/eta*dCdi_si.'*AkM;
-                0, eta*(dSde.'*Bk_eM + S.'*Bkde_eM) - cos(i)/eta*dSdi_si.'*BkM];
-            lpeSpec(11:12,:) = Rman*[man0, -eta^2*(dCde.'*Ak_eM + C.'*Akde_eM) + 6*C.'*AkM;
-                0, -eta^2*(dSde.'*Bk_eM + S.'*Bkde_eM) + 6*S.'*BkM];
-            % ******* Output dX *******
-            k = 0:kMax;
-            Ck = cos(k.'*M);
-            Sk = sin(k.'*M);
-            
-            dX = lpeSpec(1:2:11,:)*Ck + lpeSpec(2:2:12,:)*Sk;
-            dX(6) = dX(6) + n;
-            
+            lpeSpec(1:2,:) = Rsma*[S.'*(BkM.*k);
+                -C.'*(AkM.*k)];
+            lpeSpec(3:4,:) = Recc*[eta*S.'*(Bk_eM.*k) - dCdo.'*Ak_eM;
+                -eta*C.'*(Ak_eM.*k) - dSdo.'*Bk_eM];
+            lpeSpec(5:6,:) = Rinc*[dCdo_si.'*AkM;
+                dSdo_si.'*BkM];
+            lpeSpec(7:8,:) = Rran*[dCdi_si.'*AkM;
+                dSdi_si.'*BkM];
+            lpeSpec(9:10,:) = Raop*[eta*(dCde.'*Ak_eM + C.'*Akde_eM) - cos(i)/eta*dCdi_si.'*AkM;
+                eta*(dSde.'*Bk_eM + S.'*Bkde_eM) - cos(i)/eta*dSdi_si.'*BkM];
+            lpeSpec(11:12,:) = Rman*[-eta^2*(dCde.'*Ak_eM + C.'*Akde_eM) + 6*C.'*AkM;
+                -eta^2*(dSde.'*Bk_eM + S.'*Bkde_eM) + 6*S.'*BkM];
+            %% Zero Frequency Components
+            freq0 = [0; 0; 0; Rran*ran0; Raop*aop0; Rman*man0];
         end
         
         function [freq0, lpeSpec] = DynOeFourier2Ord(P,t,icOsc,kMax) 
