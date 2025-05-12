@@ -265,19 +265,20 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             X = nan(6,length(T));
             
             % Initial time
-            trigMat = repmat([sin(k*M(1))./k/nM;-cos(k*M(1))./k/nM],6,1);
-            trigsum1 = sum(lpeSpec(:,2:end).*trigMat,2);
-            InitVal = [sum(trigsum1(1:2)); sum(trigsum1(3:4));...
-                sum(trigsum1(5:6)); sum(trigsum1(7:8)); sum(trigsum1(9:10));...
-                sum(trigsum1(11:12))];
-            M2 = M;
+            % trigMat = repmat([sin(k*M(1))./k/nM;-cos(k*M(1))./k/nM],6,1);
+            % trigsum1 = sum(lpeSpec(:,2:end).*trigMat,2);
+            % InitVal = [sum(trigsum1(1:2)); sum(trigsum1(3:4));...
+            %     sum(trigsum1(5:6)); sum(trigsum1(7:8)); sum(trigsum1(9:10));...
+            %     sum(trigsum1(11:12))];
+            % M2 = M;
             
             % Fix M - add first FOurier variations
             Sk = sin(k.'*M)./k.'/nM;
             Ck = -cos(k.'*M)./k.'/nM;
             AkM = lpeSpec(11,:);
             BkM = lpeSpec(12,:);
-            M2 = lpeSpec(11,1)*T + AkM*Sk + BkM*Ck - InitVal(6) + M;
+            fourIntSolM = AkM*Sk + BkM*Ck;
+            M2 = freq0(6)*T + fourIntSolM - fourIntSolM(1) + M;
             
             % Calculate all elements
             Sk = sin(k.'*M2)./k.'/nM;
@@ -1231,7 +1232,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             
             % Calculate Spectrum of Elements
             k = 1:kMax;
-            lpeSpec = nan(12,kMax+1);
+            lpeSpec = nan(12,kMax);
             
             lpeSpec(1:2,:) = Rsma*[S.'*(BkM.*k);
                 -C.'*(AkM.*k)];

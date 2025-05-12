@@ -56,7 +56,10 @@ dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping'; % ASRI
 % load([dataFolder '\ErrMaps_8-2-2025_11-22.mat']); % big run - unit error in eci2rsw probably useless
 % load([dataFolder '\ErrMaps_16-2-2025_12-40.mat']); % test 3 - unit correction
 % load([dataFolder '\ErrMaps_22-2-2025_10-36.mat']); % big run - post correction
-load([dataFolder '\ErrMaps_5-3-2025_11-6.mat']); % big run - post corrections
+% load([dataFolder '\ErrMaps_5-3-2025_11-6.mat']); % big run - post corrections
+
+% Re-Added comparison to 1st Order Fourier
+load([dataFolder '\ErrMaps_12-5-2025_13-12.mat']); % test
 
 
 
@@ -87,12 +90,12 @@ errTenB = errTenB((nEcc-length(eccRange)+1):end,:,:);
 %% Plot Relative Errors
 plotPropErrMap(eccRange,incRange,errTenF,errTenB,'Fourier','Brouwer SP',0,true)
 
-% plotPropErrMap(eccRange,incRange,errTenF2,errTenB,'Fourier2','Brouwer SP',1)
+plotPropErrMap(eccRange,incRange,errTenF2,errTenB,'Fourier2','Brouwer SP',1,true)
 
-% plotPropErrMap(eccRange,incRange,errTenF2,errTenF,'Fourier2','Fourier',2)
+plotPropErrMap(eccRange,incRange,errTenF2,errTenF,'Fourier2','Fourier',2,true)
 
 %% Plot Absolute Errors
-% plotPropErrMap(eccRange,incRange,errTenF2,[],'Fourier2',[],10)
+plotPropErrMap(eccRange,incRange,errTenF2,[],'Fourier2',[],10,true)
 
 plotPropErrMap(eccRange,incRange,errTenF,[],'Fourier',[],20,true)
 

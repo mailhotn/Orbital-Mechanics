@@ -13,12 +13,12 @@ nT = 80; % Only used if Deprit is being tested
 % Region Params
 nInc = 361;
 nEcc = 100;
-nMonte = 800; % 10000 trials is about 3.63 minute (not parallel)
+nMonte = 100; % 10000 trials is about 3.63 minute (not parallel)
 
-% Region parameters for speed test - 6000 runs
-nInc = 12;
-nEcc = 10;
-nMonte = 200;
+% Region parameters for speed test - 24000 runs
+% nInc = 12;
+% nEcc = 10;
+% nMonte = 200;
 
 incRange = linspace(0,90,nInc);
 % eccRange = linspace(0.01,0.5,nEcc);
@@ -32,6 +32,7 @@ errTenB = inf(nEcc,nInc,6);
 errTenD = inf(nEcc,nInc,6);
 % cartesian errors
 errTenRswF = inf(nEcc,nInc,6);
+errTenRswF2 = inf(nEcc,nInc,6);
 errTenRswB = inf(nEcc,nInc,6);
 
 bTime = 0;
@@ -44,7 +45,7 @@ disp(datetime('now'))
 if k1 == k2
     disp(['Starting Mapping' newline 'Estimated runtime: ' num2str(nInc*nEcc*nMonte*3.64/10000/4/60) 'h'])
 else
-    disp(['Starting Mapping' newline 'Estimated runtime: ' num2str(nInc*nEcc*nMonte*3.64/10000/4/60) 'h'])
+    disp(['Starting Mapping' newline 'Estimated runtime: ' num2str(nInc*nEcc*nMonte*5.95/6000/4/60) 'h'])
 end
 totalTime = tic;
 parfor iEcc = 1:nEcc
@@ -58,6 +59,7 @@ parfor iEcc = 1:nEcc
         errVecF2 = zeros(6,1);
         errVecD = zeros(6,1);
         errVecRswF = zeros(6,1);
+        errVecRswF2 = zeros(6,1);
         errVecRswB = zeros(6,1);
         for iTry = 1:nMonte
             % Get OE
@@ -159,6 +161,9 @@ parfor iEcc = 1:nEcc
                     errF2 = abs(oeC-oeF2);
                     errF2 = [errF2(1,:)/oe(1);errF2(2,:)/oe(2);errF2(3:end,:)*pi/180];
                     errVecF2 = errVecF2 + trapz(t.',errF2,2)/t(end);
+                    % Cartesian
+                errRswF2 = abs(eci2rsw(eciF2-eciC,oeC));
+                errVecRswF2 = errVecRswF2 + trapz(t.',errRswF2,2)/t(end);
                 catch
                     errVecF2 = errVecF2+inf(6,1);
                 end
@@ -178,6 +183,7 @@ parfor iEcc = 1:nEcc
         errVecF2 = errVecF2/nMonte;
         errVecD = errVecD/nMonte;
         errVecRswF = errVecRswF/nMonte;
+        errVecRswF2 = errVecRswF2/nMonte;
         errVecRswB = errVecRswB/nMonte;
         % Assign errors
         errTenB(iEcc,iInc,:) = errVecB;
@@ -185,6 +191,7 @@ parfor iEcc = 1:nEcc
         errTenF2(iEcc,iInc,:) = errVecF2;
         errTenD(iEcc,iInc,:) = errVecD;
         errTenRswF(iEcc,iInc,:) = errVecRswF;
+        errTenRswF2(iEcc,iInc,:) = errVecRswF2;
         errTenRswB(iEcc,iInc,:) = errVecRswB;
     end
 end
@@ -215,6 +222,7 @@ MapData.errTenF2 = errTenF2;
 MapData.errTenB = errTenB;
 MapData.errTenD = errTenD;
 MapData.errTenRswF = errTenRswF;
+MapData.errTenRswF2 = errTenRswF2;
 MapData.errTenRswB = errTenRswB;
 
 c = clock;
