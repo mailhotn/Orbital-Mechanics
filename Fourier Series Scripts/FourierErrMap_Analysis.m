@@ -59,7 +59,9 @@ dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping'; % ASRI
 % load([dataFolder '\ErrMaps_5-3-2025_11-6.mat']); % big run - post corrections
 
 % Re-Added comparison to 1st Order Fourier
-load([dataFolder '\ErrMaps_12-5-2025_13-12.mat']); % test
+% load([dataFolder '\ErrMaps_12-5-2025_13-12.mat']); % test
+% load([dataFolder '\ErrMaps_12-5-2025_13-37.mat']); % test 2 
+load([dataFolder '\ErrMaps_13-5-2025_10-11.mat']); % big run  failed?! - Fixed
 
 
 
