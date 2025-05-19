@@ -49,6 +49,7 @@ ylabel('$\frac{a_x\left(t\right)}{a\left(0\right)}$','fontsize',18,'interpreter'
 xlabel('$Orbit$','interpreter','latex','fontsize',16)
 grid on
 xlim([0,10])
+% xlim([100,110])
 xticks(1:nOrb)
 
 % % eccentricity
@@ -60,6 +61,7 @@ ylabel('$e_x$','fontsize',16,'interpreter','latex')
 xlabel('$Orbit$','interpreter','latex','fontsize',16)
 grid on
 xlim([0,10])
+% xlim([100,110])
 xticks(1:nOrb)
 
 % inclination

@@ -48,7 +48,7 @@ else
     disp(['Starting Mapping' newline 'Estimated runtime: ' num2str(nInc*nEcc*nMonte*5.56/10000/4/60) 'h'])
 end
 totalTime = tic;
-for iEcc = 1:nEcc
+parfor iEcc = 1:nEcc
     ecc = eccRange(iEcc);
     minSma = (primary.Re+100)/(1-ecc); % Can change to not go through the atmosphere
     for iInc = 1:nInc

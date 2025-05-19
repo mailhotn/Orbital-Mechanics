@@ -61,7 +61,8 @@ dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping'; % ASRI
 % Re-Added comparison to 1st Order Fourier
 % load([dataFolder '\ErrMaps_12-5-2025_13-12.mat']); % test
 % load([dataFolder '\ErrMaps_12-5-2025_13-37.mat']); % test 2 
-load([dataFolder '\ErrMaps_13-5-2025_10-11.mat']); % big run  failed?! - Fixed
+% load([dataFolder '\ErrMaps_13-5-2025_10-11.mat']); % big run  failed?! - Fixed
+% load([dataFolder '\ErrMaps_15-5-2025_9-24.mat']); % F2 is 1st order and is wrong - rerun
 
 
 
@@ -74,6 +75,9 @@ errTenF = MapData.errTenF;
 errTenF2 = MapData.errTenF2;
 errTenB = MapData.errTenB;
 errTenD = MapData.errTenD;
+errTenRswF = MapData.errTenRswF;
+errTenRswF2 = MapData.errTenRswF2;
+errTenRswB = MapData.errTenRswB;
 
 errTenB(errTenB==inf) = nan;
 
@@ -90,20 +94,22 @@ errTenB = errTenB((nEcc-length(eccRange)+1):end,:,:);
 % errTenB = errTenB(:,1:length(incRange),:);
 % errTenD = errTenD(:,1:length(incRange),:);
 %% Plot Relative Errors
-plotPropErrMap(eccRange,incRange,errTenF,errTenB,'Fourier','Brouwer SP',0,true)
+plotPropErrMap(eccRange,incRange,errTenF,errTenB,'Fourier','Brouwer SP',0)
 
-plotPropErrMap(eccRange,incRange,errTenF2,errTenB,'Fourier2','Brouwer SP',1,true)
+plotPropErrMap(eccRange,incRange,errTenF2,errTenB,'Fourier2','Brouwer SP',1)
 
-plotPropErrMap(eccRange,incRange,errTenF2,errTenF,'Fourier2','Fourier',2,true)
+plotPropErrMap(eccRange,incRange,errTenF2,errTenF,'Fourier2','Fourier',2)
 
 %% Plot Absolute Errors
-plotPropErrMap(eccRange,incRange,errTenF2,[],'Fourier2',[],10,true)
+plotPropErrMap(eccRange,incRange,errTenF2,[],'Fourier2',[],10)
 
-plotPropErrMap(eccRange,incRange,errTenF,[],'Fourier',[],20,true)
+plotPropErrMap(eccRange,incRange,errTenF,[],'Fourier',[],20)
 
-plotPropErrMap(eccRange,incRange,errTenB,[],'Brouwer',[],30,true)
+plotPropErrMap(eccRange,incRange,errTenB,[],'Brouwer',[],30)
 
 %% Relative Cartesian - LVLH
-plotPropErrMap(eccRange,incRange,MapData.errTenRswF,MapData.errTenRswB,'Fourier','Brouwer SP',0,true)
+plotPropErrMap(eccRange,incRange,errTenRswF,errTenRswB,'Fourier','Brouwer SP',0,true)
+plotPropErrMap(eccRange,incRange,errTenRswF2,errTenRswB,'Fourier2','Brouwer SP',1,true)
+plotPropErrMap(eccRange,incRange,errTenRswF,errTenRswF2,'Fourier','Fourier2',2,true)
 
-plotPropErrMap(eccRange,incRange,MapData.errTenRswF,[],'Fourier',[],10,true)
+plotPropErrMap(eccRange,incRange,errTenRswF,[],'Fourier',[],10,true)

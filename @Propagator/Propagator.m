@@ -249,6 +249,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             
             % Handle Initial conditions
             icOsc = reshape(P.Con.InitialOeOsc,[6*P.Con.nSats,1]);
+            [freq0,lpeSpec] = P.DynOeFourier([],icOsc,kMax);
             icM = osc2meNum(icOsc);
             icM(3:end) = icM(3:end)*pi/180;
             icOsc(3:end) = icOsc(3:end)*pi/180;
@@ -257,20 +258,11 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             
             nM = sqrt(P.Con.primary.mu/smaM^3);
             %             n = sqrt(P.Con.primary.mu/a^3)*(1+3*g2*(1-1.5*sin(i)^2)/eta^3); % kozai Fix
-            [freq0,lpeSpec] = P.DynOeFourier([],icM,kMax);
             %                         n = n + lpeSpec(11,1); % <-------------------  Work on this
             M = nM*T+icOsc(6);
             k = 1:kMax;
             
             X = nan(6,length(T));
-            
-            % Initial time
-            % trigMat = repmat([sin(k*M(1))./k/nM;-cos(k*M(1))./k/nM],6,1);
-            % trigsum1 = sum(lpeSpec(:,2:end).*trigMat,2);
-            % InitVal = [sum(trigsum1(1:2)); sum(trigsum1(3:4));...
-            %     sum(trigsum1(5:6)); sum(trigsum1(7:8)); sum(trigsum1(9:10));...
-            %     sum(trigsum1(11:12))];
-            % M2 = M;
             
             % Fix M - add first FOurier variations
             Sk = sin(k.'*M)./k.'/nM;
