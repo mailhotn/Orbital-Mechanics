@@ -238,9 +238,40 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             %             X(3:end,:) = wrapTo360(X(3:end,:));
         end
         
-        function [Time, X] = PropOeFourier2(P,T,kMax)
-            % Refactoring Bullshit
-            [Time, X] = PropOeFourier(P,T,kMax);
+        function [Time, X] = PropOeFourierNoMFix(P,T,kMax)
+            % Retest if sequential M is good. It's less rigorous
+            % Propagate for time T using Fourier LPE
+            % Assume constant coefficients
+            
+            % Handle Initial conditions
+            icOsc = reshape(P.Con.InitialOeOsc,[6*P.Con.nSats,1]);
+            [freq0,lpeSpec] = P.DynOeFourier([],icOsc,kMax);
+            icM = osc2meNum(icOsc);
+            icM(3:end) = icM(3:end)*pi/180;
+            icOsc(3:end) = icOsc(3:end)*pi/180;
+
+            smaM = icM(1);
+            
+            nM = sqrt(P.Con.primary.mu/smaM^3);
+            M = nM*T+icOsc(6);
+            k = 1:kMax;
+            
+            X = nan(6,length(T));
+
+            % Calculate all elements
+            Sk = sin(k.'*M)./k.'/nM;
+            Ck = -cos(k.'*M)./k.'/nM;
+            Ak = lpeSpec(1:2:11,:);
+            Bk = lpeSpec(2:2:12,:);
+            fourIntSolAll = Ak*Sk + Bk*Ck;
+            % Assign values
+            X = icOsc + freq0*T + fourIntSolAll - fourIntSolAll(:,1);
+            X(6,:) = X(6,:) + nM*T;
+            
+            X(3:5,:) = wrapTo360(X(3:5,:)*180/pi);
+            X(6,:) = X(6,:)*180/pi;
+            X = X.';
+            Time = T;
         end
         
         function [Time, X] = PropOeFourier(P,T,kMax)
@@ -264,15 +295,15 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             
             X = nan(6,length(T));
             
-            % Fix M - add first FOurier variations
+            % Fix M - add first Fourier variations - Maybe not neccesary
             Sk = sin(k.'*M)./k.'/nM;
             Ck = -cos(k.'*M)./k.'/nM;
             AkM = lpeSpec(11,:);
             BkM = lpeSpec(12,:);
             fourIntSolM = AkM*Sk + BkM*Ck;
             M2 = freq0(6)*T + fourIntSolM - fourIntSolM(1) + M;
-            
-            % Calculate all elements
+
+            % Calculate all other elements
             Sk = sin(k.'*M2)./k.'/nM;
             Ck = -cos(k.'*M2)./k.'/nM;
             Ak = lpeSpec(1:2:11,:);
