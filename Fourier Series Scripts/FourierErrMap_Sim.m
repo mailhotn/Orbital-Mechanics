@@ -16,7 +16,7 @@ nT = 80; % Only used if Deprit is being tested
 % Region Params
 nInc = 361;
 nEcc = 100;
-nMonte = 200; % 10000 trials is about 3.63 minute (not parallel, 2nd order)
+nMonte = 500; % 10000 trials is about 3.63 minute (not parallel, 2nd order)
 
 % Region parameters for speed test - 10000 runs
 % nInc = 10;
@@ -221,7 +221,6 @@ MapData.dTime = dTime;
 MapData.fTime = fTime;
 MapData.f2Time = f2Time;
 MapData.bTime = bTime;
-
 
 MapData.errTenF = errTenF;
 MapData.errTenF2 = errTenF2;

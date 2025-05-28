@@ -1,10 +1,10 @@
 clear
-oe = [10000, 0.05, 40, 40, 10, 0];
+oe = [8000, 0.005, 10, 10, 10, 10];
 
 Sat = SingleSat(oe,earth());
 Prop = Propagator(Sat);
 T = 2*pi*sqrt(oe(1)^3/Sat.primary.mu);
-nOrb = 200;
+nOrb = 20;
 t = 0:60:nOrb*T;
 kLow = 4;
 kHigh = 4;
@@ -14,7 +14,7 @@ oeC = eci2oe(Xeci(:,1:3),Xeci(:,4:6));
 oeC(6,:) = ta2me(oeC(6,:),oeC(2,:));
 %% Conventional LPE
 tic
-[~,oeC] = Prop.PropOeOsc(t);
+[~,oeC] = Prop.PropOeOsc3(t);
 oeC = oeC.';
 oscTime = toc
 %% Mean
@@ -34,7 +34,7 @@ oeS = me2oscSP(OeS.');
 % F10Time = toc
 
 tic
-[~,oeFHigh] = Prop.PropOeFourier2Ord(t,kHigh);
+[~,oeFHigh] = Prop.PropOeFourier(t,kHigh);
 oeFHigh = oeFHigh.';
 F15Time = toc
 t = t/T;
@@ -43,8 +43,8 @@ t = t/T;
 % semimajor axis
 f = figure(1);
 % f.Position(3:4) = [500,250];
-plot(t,oeC(1,:)/oe(1),t,oeFHigh(1,:)/oe(1),'--','linewidth',1.5)
-legend('Conventional','Fourier')
+plot(t,oeC(1,:)-oe(1),t,oeFHigh(1,:)-oe(1),'--','linewidth',1.5)
+legend('Numerical','Fourier')
 ylabel('$\frac{a_x\left(t\right)}{a\left(0\right)}$','fontsize',18,'interpreter','latex')
 xlabel('$Orbit$','interpreter','latex','fontsize',16)
 grid on
@@ -56,7 +56,7 @@ xticks(1:nOrb)
 figure(2)
 % f.Position(3:4) = [500,250];
 plot(t,oeC(2,:),t,oeFHigh(2,:),'--','linewidth',1.5)
-legend('Conventional','Fourier')
+legend('Numerical','Fourier')
 ylabel('$e_x$','fontsize',16,'interpreter','latex')
 xlabel('$Orbit$','interpreter','latex','fontsize',16)
 grid on
@@ -68,7 +68,7 @@ xticks(1:nOrb)
 f = figure(3);
 % f.Position(3:4) = [500,250];
 plot(t,oeC(3,:),t,oeFHigh(3,:),'--','linewidth',1.5)
-legend('Conventional','Fourier')
+legend('Numerical','Fourier')
 ylabel('$i_x \left[{rad}\right]$','fontsize',16,'interpreter','latex')
 xlabel('$Orbit$','interpreter','latex','fontsize',16)
 grid on
@@ -79,7 +79,7 @@ xticks(1:nOrb)
 figure(4)
 % f.Position(3:4) = [500,250];
 plot(t,oeC(4,:),t,oeFHigh(4,:),'--','linewidth',1.5)
-legend('Conventional','Fourier')
+legend('Numerical','Fourier')
 ylabel('$\Omega_x \left[{rad}\right]$','fontsize',16,'interpreter','latex')
 xlabel('$Orbit$','interpreter','latex','fontsize',16)
 grid on
@@ -90,7 +90,7 @@ xticks(1:nOrb)
 figure(5)
 % f.Position(3:4) = [500,250];
 plot(t,oeC(5,:),t,oeFHigh(5,:),'--','linewidth',1.5)
-legend('Conventional','Fourier')
+legend('Numerical','Fourier')
 ylabel('$\omega_x \left[{rad}\right]$','fontsize',16,'interpreter','latex')
 xlabel('$Orbit$','interpreter','latex','fontsize',16)
 grid on
@@ -101,7 +101,7 @@ xticks(1:nOrb)
 figure(6)
 % f.Position(3:4) = [500,250];
 plot(t,oeC(6,:),t,oeFHigh(6,:),'--','linewidth',1.5)
-legend('Conventional','Fourier')
+legend('Numerical','Fourier')
 ylabel('$M_x \left[{rad}\right]$','fontsize',16,'interpreter','latex')
 xlabel('$Orbit$','interpreter','latex','fontsize',16)
 grid on

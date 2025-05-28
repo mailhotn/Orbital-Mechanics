@@ -1,6 +1,10 @@
 function [ th ] = me2ta( X1 , X2, tol)
 %me2ta Calculates the True anomaly (in degrees) corresponding 
 % to the given Mean anomaly (in degrees)
+
+% X1 = M
+% X2 = e
+
 maxIter = 20;
 if nargin < 2
     X2 = [];

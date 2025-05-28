@@ -5,7 +5,7 @@ function earthstruct = earth()
 %
 %  ~~~~~~~~~~   Attributes    ~~~~~~~~~~~
 % mu - gravitational parameter (km^3/s^2)
-% R  - equatorial radius (km)
+% Re - equatorial radius (km)
 % J2 - zonal harmonic
 % we - earth rotation rate (deg/s)
 % Tday - length of sidereal day (s)

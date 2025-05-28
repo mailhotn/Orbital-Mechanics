@@ -1,6 +1,6 @@
 clear
 oeLead = [7000, 0.003, 5, 5, 5, 5].'; % init oe
-dOe = [0,0,0,0,0,1].'; % mean element difference for follower
+dOe = [0,0,0,0,0,2].'; % mean element difference for follower
 oeMat = [oeLead,oeLead + dOe];
 kMax = 5;
 

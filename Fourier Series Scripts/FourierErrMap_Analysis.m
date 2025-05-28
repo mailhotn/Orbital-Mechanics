@@ -63,9 +63,11 @@ dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping'; % ASRI
 % load([dataFolder '\ErrMaps_12-5-2025_13-37.mat']); % test 2 
 % load([dataFolder '\ErrMaps_13-5-2025_10-11.mat']); % big run  failed?! - Fixed
 % load([dataFolder '\ErrMaps_15-5-2025_9-24.mat']); % F2 is 1st order and is wrong - rerun
-load([dataFolder '\ErrMaps_20-5-2025_8-23.mat']); % F2 is 1st order - just as good short-term
+% load([dataFolder '\ErrMaps_20-5-2025_8-23.mat']); % F2 is 1st order - just as good short-term
 
 % Comparison to no M fix
+load([dataFolder '\ErrMaps_23-5-2025_16-29.mat']); % F2 is no M fix
+
 
 
 
@@ -112,7 +114,8 @@ plotPropErrMap(eccRange,incRange,errTenB,[],'Brouwer',[],30)
 
 %% Relative Cartesian - LVLH
 plotPropErrMap(eccRange,incRange,errTenRswF,errTenRswB,'Fourier','Brouwer SP',0,true)
-plotPropErrMap(eccRange,incRange,errTenRswF2,errTenRswB,[],[],1,true)
+plotPropErrMap(eccRange,incRange,errTenRswF,errTenRswB,[],[],1,true)
 plotPropErrMap(eccRange,incRange,errTenRswF,errTenRswF2,'Fourier','Fourier2',2,true)
 
-plotPropErrMap(eccRange,incRange,errTenRswF,[],'Fourier',[],10,true)
+plotPropErrMap(eccRange,incRange,errTenRswF,[],[],[],10,true)
+plotPropErrMap(eccRange,incRange,errTenRswB,[],[],[],10,true)
