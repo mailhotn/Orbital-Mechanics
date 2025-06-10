@@ -14,7 +14,7 @@ Prop = Propagator(Form);
 primary = earth();
 mu = primary.mu;
 
-nDay = 2;
+nDay = 1;
 t = 0:100:86400*nDay;
 
 %% Sim Difference Prop
