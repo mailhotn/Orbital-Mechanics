@@ -243,33 +243,41 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             % Propagate for time T using Fourier LPE
             % Assume constant coefficients
 
-            % Handle Initial conditions
-            icOsc = reshape(P.Con.InitialOeOsc,[6*P.Con.nSats,1]);
-            [freq0,lpeSpec] = P.DynOeFourier([],icOsc,kMax);
-            icM = osc2meNum(icOsc);
-            icM(3:end) = icM(3:end)*pi/180;
-            icOsc(3:end) = icOsc(3:end)*pi/180;
+            icVec = reshape(P.Con.InitialOeOsc,[6*P.Con.nSats,1]); % ic of all sats
+            X = nan(6*P.Con.nSats,length(T));
+            % for satellites - inefficient, could maybe get spectrum of
+            % multiple satellites, not sure if worth the effort though
+            for iSat = 1:P.Con.nSats
+                icOsc = icVec((1:6)+6*(iSat-1));
+                [freq0,lpeSpec] = P.DynOeFourier([],icOsc,kMax);
+                icM = osc2meNum(icOsc);
+                icM(3:end) = icM(3:end)*pi/180;
+                icOsc(3:end) = icOsc(3:end)*pi/180;
 
-            smaM = icM(1);
+                smaM = icM(1);
 
-            nM = sqrt(P.Con.primary.mu/smaM^3);
-            M = nM*T+icOsc(6);
-            k = 1:kMax;
+                nM = sqrt(P.Con.primary.mu/smaM^3);
+                M = nM*T+icOsc(6);
+                k = 1:kMax;
 
-            X = nan(6,length(T));
+                Xi = nan(6,length(T));
 
-            % Calculate all elements
-            Sk = sin(k.'*M)./k.'/nM;
-            Ck = -cos(k.'*M)./k.'/nM;
-            Ak = lpeSpec(1:2:11,:);
-            Bk = lpeSpec(2:2:12,:);
-            fourIntSolAll = Ak*Sk + Bk*Ck;
-            % Assign values
-            X = icOsc + freq0*T + fourIntSolAll - fourIntSolAll(:,1);
-            X(6,:) = X(6,:) + nM*T;
+                % Calculate all elements
+                Sk = sin(k.'*M)./k.'/nM;
+                Ck = -cos(k.'*M)./k.'/nM;
+                Ak = lpeSpec(1:2:11,:);
+                Bk = lpeSpec(2:2:12,:);
+                fourIntSolAll = Ak*Sk + Bk*Ck;
+                % Assign values
+                Xi = icOsc + freq0*T + fourIntSolAll - fourIntSolAll(:,1);
+                Xi(6,:) = Xi(6,:) + M - icOsc(6);
 
-            X(3:5,:) = wrapTo360(X(3:5,:)*180/pi);
-            X(6,:) = X(6,:)*180/pi;
+
+                Xi(3:5,:) = wrapTo360(Xi(3:5,:)*180/pi);
+                Xi(6,:) = Xi(6,:)*180/pi;
+                % finished Xi, assign then iterate
+                X((1:6)+6*(iSat-1),:) = Xi;
+            end
             X = X.';
             Time = T;
         end

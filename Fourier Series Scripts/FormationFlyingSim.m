@@ -1,6 +1,6 @@
 clear
 oeLead = [7000, 0.003, 5, 5, 5, 5].'; % init oe
-dOe = [0,0,0,0,0,2].'; % mean element difference for follower
+dOe = [0,0,0,0,0,1].'; % mean element difference for follower
 oeMat = [oeLead,oeLead + dOe];
 kMax = 5;
 
@@ -14,7 +14,7 @@ Prop = Propagator(Form);
 primary = earth();
 mu = primary.mu;
 
-nDay = 5;
+nDay = 2;
 t = 0:100:86400*nDay;
 
 %% Sim Difference Prop
@@ -23,13 +23,13 @@ t = 0:100:86400*nDay;
 oeC = oeC.';
 [~,oeM] = Prop.PropOeMeanShort(t);
 oeB = reshape(me2oscSP(reshape(oeM.',6,length(t)*2)),12,length(t));
-[~,oeF] = Prop.PropOeFourier2Ord(t,kMax);
+[~,oeF] = Prop.PropOeFourier(t,kMax);
 oeF = oeF.';
 
 % unwrap RAAN & AOP for comparison
-oeB([4,5,10,11],:) = 180/pi*unwrap(pi/180*oeB([4,5,10,11],:),2);
-oeC([4,5,10,11],:) = 180/pi*unwrap(pi/180*oeC([4,5,10,11],:),2);
-oeF([4,5,10,11],:) = 180/pi*unwrap(pi/180*oeF([4,5,10,11],:),2);
+oeB([4,5,10,11],:) = 180/pi*unwrap(pi/180*oeB([4,5,10,11],:),2,2);
+oeC([4,5,10,11],:) = 180/pi*unwrap(pi/180*oeC([4,5,10,11],:),2,2);
+oeF([4,5,10,11],:) = 180/pi*unwrap(pi/180*oeF([4,5,10,11],:),2,2);
 
 % Get relative RSW vector
 dRswC = eci2rsw(oe2eci(oeC(7:12,:))-oe2eci(oeC(1:6,:)),oeC(1:6,:));
