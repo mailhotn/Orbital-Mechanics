@@ -66,7 +66,7 @@ dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping'; % ASRI
 % load([dataFolder '\ErrMaps_20-5-2025_8-23.mat']); % F2 is 1st order - just as good short-term
 
 % Comparison to no M fix
-load([dataFolder '\ErrMaps_23-5-2025_16-29.mat']); % F2 is no M fix
+load([dataFolder '\ErrMaps_23-5-2025_16-29.mat']); % F2 is no M fix - USE IN PAPER
 
 
 
@@ -114,8 +114,8 @@ plotPropErrMap(eccRange,incRange,errTenB,[],'Brouwer',[],30)
 
 %% Relative Cartesian - LVLH
 plotPropErrMap(eccRange,incRange,errTenRswF,errTenRswB,'Fourier','Brouwer SP',0,true)
-plotPropErrMap(eccRange,incRange,errTenRswF,errTenRswB,[],[],1,true)
+plotPropErrMap(eccRange,incRange,errTenRswF,errTenRswB,[],[],1,true) % Final Rel
 plotPropErrMap(eccRange,incRange,errTenRswF,errTenRswF2,'Fourier','Fourier2',2,true)
 
-plotPropErrMap(eccRange,incRange,errTenRswF,[],[],[],10,true)
-plotPropErrMap(eccRange,incRange,errTenRswB,[],[],[],10,true)
+plotPropErrMap(eccRange,incRange,errTenRswF,[],[],[],10,true) % Final Fourier Abs
+plotPropErrMap(eccRange,incRange,errTenRswB,[],[],[],20,true) % Final Brouwer Abs

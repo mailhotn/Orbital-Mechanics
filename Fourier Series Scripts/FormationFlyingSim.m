@@ -58,13 +58,16 @@ errDF = distF-distC;
 
 errVB = relVB-relVC;
 errVF = relVF-relVC;
-
+% oe Error
 trapz(t,abs(errOeB),2)/t(end)
 trapz(t,abs(errOeF),2)/t(end)
-
+% rsw error m, cm/s
+trapz(t,abs(dRswB-dRswC),2)/t(end)*1000.*[1 1 1 100 100 100].'
+trapz(t,abs(dRswF-dRswC),2)/t(end)*1000.*[1 1 1 100 100 100].'
+% Dist error
 trapz(t,abs(errDB))/t(end)*1000
 trapz(t,abs(errDF))/t(end)*1000
-
+% Vel error
 trapz(t,abs(errVB))/t(end)*1000*100
 trapz(t,abs(errVF))/t(end)*1000*100
 %% Plot
@@ -75,43 +78,70 @@ trapz(t,abs(errVF))/t(end)*1000*100
 % plot(t/86400,distB)
 
 % Relative Distance & Velocity
-figure(1)
-plot(t/3600,errDB,t/3600,errDF)
-legend('Brouwer','Fourier')
-xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
-xlim([0,nDay*24])
-xticks(linspace(0,nDay*24,5*nDay))
-ylabel('$\delta r \ Error \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
+% figure(1)
+% plot(t/3600,errDB,t/3600,errDF)
+% legend('Brouwer','Fourier')
+% xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+% xlim([0,nDay*24])
+% xticks(linspace(0,nDay*24,5*nDay))
+% ylabel('$\delta r \ Error \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
 
-figure(2)
-plot(t/3600,errVB,t/3600,errVF)
-legend('Brouwer','Fourier')
-xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
-xlim([0,nDay*24])
-xticks(linspace(0,nDay*24,5*nDay))
-ylabel('$\delta v \ Error \left[\rm{\frac{km}{s}}\right]$',Interpreter='latex',FontSize=12)
+% figure(2)
+% plot(t/3600,errVB,t/3600,errVF)
+% legend('Brouwer','Fourier')
+% xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+% xlim([0,nDay*24])
+% xticks(linspace(0,nDay*24,5*nDay))
+% ylabel('$\delta v \ Error \left[\rm{\frac{km}{s}}\right]$',Interpreter='latex',FontSize=12)
 
-figure(3)
-plot(t/3600,dRswB(1,:)-dRswC(1,:),t/3600,dRswF(1,:)-dRswC(1,:))
-legend('Brouwer','Fourier')
+figure(3) %r
+plot(t/3600,dRswB(1,:)-dRswC(1,:),t/3600,dRswF(1,:)-dRswC(1,:),LineWidth=1.2)
+legend('Kozai','Fourier')
 xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
 xlim([0,nDay*24])
 xticks(linspace(0,nDay*24,5*nDay))
-ylabel('$\delta r \ Error \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
-figure(4)
-plot(t/3600,dRswB(2,:)-dRswC(2,:),t/3600,dRswF(2,:)-dRswC(2,:))
-legend('Brouwer','Fourier')
+ylabel('$\delta r\; \rm{Error}  \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
+
+figure(4) %s
+plot(t/3600,dRswB(2,:)-dRswC(2,:),t/3600,dRswF(2,:)-dRswC(2,:),LineWidth=1.2)
+legend('Kozai','Fourier')
 xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
 xlim([0,nDay*24])
 xticks(linspace(0,nDay*24,5*nDay))
-ylabel('$\delta s \ Error \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
-figure(5)
-plot(t/3600,dRswB(3,:)-dRswC(3,:),t/3600,dRswF(3,:)-dRswC(3,:))
-legend('Brouwer','Fourier')
+ylabel('$\delta s\; \rm{Error}  \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
+
+figure(5) %w
+plot(t/3600,dRswB(3,:)-dRswC(3,:),t/3600,dRswF(3,:)-dRswC(3,:),LineWidth=1.2)
+legend('Kozai','Fourier')
 xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
 xlim([0,nDay*24])
 xticks(linspace(0,nDay*24,5*nDay))
-ylabel('$\delta w \ Error \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
+ylabel('$\delta w\; \rm{Error}  \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
+
+figure(6) %dr
+plot(t/3600,(dRswB(4,:)-dRswC(4,:))*1,t/3600,(dRswF(4,:)-dRswC(4,:))*1,LineWidth=1.2)
+legend('Kozai','Fourier')
+xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+xlim([0,nDay*24])
+xticks(linspace(0,nDay*24,5*nDay))
+ylabel('$\delta \dot{r} \; \rm{Error} \left[{\rm{km}}/\rm{s}\right]$',Interpreter='latex',FontSize=12)
+
+figure(7) %ds
+plot(t/3600,dRswB(5,:)-dRswC(5,:),t/3600,dRswF(5,:)-dRswC(5,:),LineWidth=1.2)
+legend('Kozai','Fourier')
+xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+xlim([0,nDay*24])
+xticks(linspace(0,nDay*24,5*nDay))
+ylabel('$\delta \dot{s}\; \rm{Error}  \left[\rm{km}/\rm{s}\right]$',Interpreter='latex',FontSize=12)
+
+figure(8)% dw
+plot(t/3600,dRswB(6,:)-dRswC(6,:),t/3600,dRswF(6,:)-dRswC(6,:),LineWidth=1.2)
+legend('Kozai','Fourier')
+xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+xlim([0,nDay*24])
+xticks(linspace(0,nDay*24,5*nDay))
+ylabel('$\delta \dot{w}\; \rm{Error} \left[\rm{km}/\rm{s}\right]$',Interpreter='latex',FontSize=12)
+
 
 % orbital Elements
 figure(11)
