@@ -1,6 +1,7 @@
 clear
 %% Load Data
 dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping'; % ASRI
+imageFolder = 'C:\Users\User\Google Drive\Doc Publications\2025 LPE Fourier Paper\Figures\AutoGen';
 % dataFolder = 'D:\Dropbox\Doc Fourier Data\Error Mapping'; % Laptop???
 % load([dataFolder '\ErrMaps_15-6-2022_9-52.mat']); % First run e:0.005-0.55, i:0.4-90
 % load([dataFolder '\ErrMaps_15-6-2022_11-13.mat']); % Singularity test e:0.5-0.7, i:60-70
@@ -66,9 +67,9 @@ dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping'; % ASRI
 % load([dataFolder '\ErrMaps_20-5-2025_8-23.mat']); % F2 is 1st order - just as good short-term
 
 % Comparison to no M fix
-load([dataFolder '\ErrMaps_23-5-2025_16-29.mat']); % F2 is no M fix - USE IN PAPER
-
-
+% load([dataFolder '\ErrMaps_23-5-2025_16-29.mat']); % F2 is no M fix - USE IN PAPER?
+% load([dataFolder '\ErrMaps_8-7-2025_18-35.mat']); % Strict LEO - better?
+load([dataFolder '\ErrMaps_10-7-2025_17-24.mat']); % Stricter LEO - better?
 
 
 
@@ -99,23 +100,23 @@ errTenB = errTenB((nEcc-length(eccRange)+1):end,:,:);
 % errTenB = errTenB(:,1:length(incRange),:);
 % errTenD = errTenD(:,1:length(incRange),:);
 %% Plot Relative Errors
-plotPropErrMap(eccRange,incRange,errTenF,errTenB,'Fourier','Brouwer SP',0)
-
-plotPropErrMap(eccRange,incRange,errTenF2,errTenB,'Fourier2','Brouwer SP',1)
-
-plotPropErrMap(eccRange,incRange,errTenF2,errTenF,'Fourier2','Fourier',2)
-
+% plotPropErrMap(eccRange,incRange,errTenF,errTenB,'Fourier','Brouwer SP',0)
+% 
+% plotPropErrMap(eccRange,incRange,errTenF2,errTenB,'Fourier2','Brouwer SP',1)
+% 
+% plotPropErrMap(eccRange,incRange,errTenF2,errTenF,'Fourier2','Fourier',2)
+% 
 %% Plot Absolute Errors
-plotPropErrMap(eccRange,incRange,errTenF2,[],'Fourier2',[],10)
-
-plotPropErrMap(eccRange,incRange,errTenF,[],'Fourier',[],20)
-
-plotPropErrMap(eccRange,incRange,errTenB,[],'Brouwer',[],30)
+% plotPropErrMap(eccRange,incRange,errTenF2,[],'Fourier2',[],10)
+% 
+% plotPropErrMap(eccRange,incRange,errTenF,[],'Fourier',[],20)
+% 
+% plotPropErrMap(eccRange,incRange,errTenB,[],'Brouwer',[],30)
 
 %% Relative Cartesian - LVLH
-plotPropErrMap(eccRange,incRange,errTenRswF,errTenRswB,'Fourier','Brouwer SP',0,true)
-plotPropErrMap(eccRange,incRange,errTenRswF,errTenRswB,[],[],1,true) % Final Rel
-plotPropErrMap(eccRange,incRange,errTenRswF,errTenRswF2,'Fourier','Fourier2',2,true)
+% plotPropErrMap(eccRange,incRange,errTenRswF,errTenRswB,'Fourier','Brouwer SP',0,true)
+plotPropErrMap(eccRange,incRange,errTenRswF,errTenRswB,[],[],1,'rsw') % Final Rel
+% plotPropErrMap(eccRange,incRange,errTenRswF,errTenRswF2,'Fourier','Fourier2',2,true)
 
-plotPropErrMap(eccRange,incRange,errTenRswF,[],[],[],10,true) % Final Fourier Abs
-plotPropErrMap(eccRange,incRange,errTenRswB,[],[],[],20,true) % Final Brouwer Abs
+plotPropErrMap(eccRange,incRange,errTenRswF,[],[],[],10,'rsw') % Final Fourier Abs
+plotPropErrMap(eccRange,incRange,errTenRswB,[],[],[],20,'rsw') % Final Brouwer Abs

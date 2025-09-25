@@ -62,37 +62,36 @@ errVF = relVF-relVC;
 trapz(t,abs(errOeB),2)/t(end)
 trapz(t,abs(errOeF),2)/t(end)
 % rsw error m, cm/s
-trapz(t,abs(dRswB-dRswC),2)/t(end)*1000.*[1 1 1 100 100 100].'
-trapz(t,abs(dRswF-dRswC),2)/t(end)*1000.*[1 1 1 100 100 100].'
+dRswMeanB = trapz(t,abs(dRswB-dRswC),2)/t(end)*1000.*[1 1 1 100 100 100].'
+dRswMeanF = trapz(t,abs(dRswF-dRswC),2)/t(end)*1000.*[1 1 1 100 100 100].'
 % Dist error
 trapz(t,abs(errDB))/t(end)*1000
 trapz(t,abs(errDF))/t(end)*1000
 % Vel error
 trapz(t,abs(errVB))/t(end)*1000*100
 trapz(t,abs(errVF))/t(end)*1000*100
+% rsw overall (norm of diff vector)
+norm(dRswMeanB(1:3))
+norm(dRswMeanB(4:6))
+norm(dRswMeanF(1:3))
+norm(dRswMeanF(4:6))
 %% Plot
-% figure(1)
-% plot(t/86400,distF)
-% 
-% figure(2)
-% plot(t/86400,distB)
-
 % Relative Distance & Velocity
-% figure(1)
-% plot(t/3600,errDB,t/3600,errDF)
-% legend('Brouwer','Fourier')
-% xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
-% xlim([0,nDay*24])
-% xticks(linspace(0,nDay*24,5*nDay))
-% ylabel('$\delta r \ Error \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
+figure(1)
+plot(t/3600,errDB,t/3600,errDF)
+legend('Kozai','Fourier')
+xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+xlim([0,nDay*24])
+xticks(linspace(0,nDay*24,5*nDay))
+ylabel('$\delta r \ Error \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
 
-% figure(2)
-% plot(t/3600,errVB,t/3600,errVF)
-% legend('Brouwer','Fourier')
-% xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
-% xlim([0,nDay*24])
-% xticks(linspace(0,nDay*24,5*nDay))
-% ylabel('$\delta v \ Error \left[\rm{\frac{km}{s}}\right]$',Interpreter='latex',FontSize=12)
+figure(2)
+plot(t/3600,errVB,t/3600,errVF)
+legend('Kozai','Fourier')
+xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+xlim([0,nDay*24])
+xticks(linspace(0,nDay*24,5*nDay))
+ylabel('$\delta v \ Error \left[\rm{\frac{km}{s}}\right]$',Interpreter='latex',FontSize=12)
 
 figure(3) %r
 plot(t/3600,dRswB(1,:)-dRswC(1,:),t/3600,dRswF(1,:)-dRswC(1,:),LineWidth=1.2)
@@ -143,54 +142,54 @@ xticks(linspace(0,nDay*24,5*nDay))
 ylabel('$\delta \dot{w}\; \rm{Error} \left[\rm{km}/\rm{s}\right]$',Interpreter='latex',FontSize=12)
 
 
-% orbital Elements
-figure(11)
-plot(t/3600,errOeB(1,:),t/3600,errOeF(1,:))
-legend('Brouwer','Fourier')
-xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
-xlim([0,nDay*24])
-xticks(linspace(0,nDay*24,5*nDay))
-ylabel('$ \delta a \ Error$',Interpreter='latex',FontSize=12)
-
-figure(12)
-plot(t/3600,errOeB(2,:),t/3600,errOeF(2,:))
-legend('Brouwer','Fourier')
-xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
-xlim([0,nDay*24])
-xticks(linspace(0,nDay*24,5*nDay))
-ylabel('$ \delta e \ Error$',Interpreter='latex',FontSize=12)
-
-figure(13)
-plot(t/3600,errOeB(3,:),t/3600,errOeF(3,:))
-legend('Brouwer','Fourier')
-xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
-xlim([0,nDay*24])
-xticks(linspace(0,nDay*24,5*nDay))
-ylabel('$ \delta i \ Error \left[\rm{rad}\right]$',Interpreter='latex',FontSize=12)
-
-figure(14)
-plot(t/3600,errOeB(4,:),t/3600,errOeF(4,:))
-legend('Brouwer','Fourier')
-xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
-xlim([0,nDay*24])
-xticks(linspace(0,nDay*24,5*nDay))
-ylabel('$ \delta \Omega \ Error \left[\rm{rad}\right]$',Interpreter='latex',FontSize=12)
-
-figure(15)
-plot(t/3600,errOeB(5,:),t/3600,errOeF(5,:))
-legend('Brouwer','Fourier')
-xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
-xlim([0,nDay*24])
-xticks(linspace(0,nDay*24,5*nDay))
-ylabel('$ \delta \omega \ Error \left[\rm{rad}\right]$',Interpreter='latex',FontSize=12)
-
-figure(16)
-plot(t/3600,errOeB(6,:),t/3600,errOeF(6,:))
-legend('Brouwer','Fourier')
-xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
-xlim([0,nDay*24])
-xticks(linspace(0,nDay*24,5*nDay))
-ylabel('$ \delta M \ Error \left[\rm{rad}\right]$',Interpreter='latex',FontSize=12)
+%% orbital Elements
+% figure(11)
+% plot(t/3600,errOeB(1,:),t/3600,errOeF(1,:))
+% legend('Brouwer','Fourier')
+% xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+% xlim([0,nDay*24])
+% xticks(linspace(0,nDay*24,5*nDay))
+% ylabel('$ \delta a \ Error$',Interpreter='latex',FontSize=12)
+% 
+% figure(12)
+% plot(t/3600,errOeB(2,:),t/3600,errOeF(2,:))
+% legend('Brouwer','Fourier')
+% xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+% xlim([0,nDay*24])
+% xticks(linspace(0,nDay*24,5*nDay))
+% ylabel('$ \delta e \ Error$',Interpreter='latex',FontSize=12)
+% 
+% figure(13)
+% plot(t/3600,errOeB(3,:),t/3600,errOeF(3,:))
+% legend('Brouwer','Fourier')
+% xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+% xlim([0,nDay*24])
+% xticks(linspace(0,nDay*24,5*nDay))
+% ylabel('$ \delta i \ Error \left[\rm{rad}\right]$',Interpreter='latex',FontSize=12)
+% 
+% figure(14)
+% plot(t/3600,errOeB(4,:),t/3600,errOeF(4,:))
+% legend('Brouwer','Fourier')
+% xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+% xlim([0,nDay*24])
+% xticks(linspace(0,nDay*24,5*nDay))
+% ylabel('$ \delta \Omega \ Error \left[\rm{rad}\right]$',Interpreter='latex',FontSize=12)
+% 
+% figure(15)
+% plot(t/3600,errOeB(5,:),t/3600,errOeF(5,:))
+% legend('Brouwer','Fourier')
+% xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+% xlim([0,nDay*24])
+% xticks(linspace(0,nDay*24,5*nDay))
+% ylabel('$ \delta \omega \ Error \left[\rm{rad}\right]$',Interpreter='latex',FontSize=12)
+% 
+% figure(16)
+% plot(t/3600,errOeB(6,:),t/3600,errOeF(6,:))
+% legend('Brouwer','Fourier')
+% xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+% xlim([0,nDay*24])
+% xticks(linspace(0,nDay*24,5*nDay))
+% ylabel('$ \delta M \ Error \left[\rm{rad}\right]$',Interpreter='latex',FontSize=12)
 
 %% Init Difference - Doesn't work
 % % Calculate osc elements w/ Brouwer & w/ Fourier

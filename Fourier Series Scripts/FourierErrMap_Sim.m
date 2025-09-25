@@ -1,18 +1,19 @@
 clear
 TurnOffPCWhenDone = false;
-TurnOffPCWhenDone = true;
+% TurnOffPCWhenDone = true;
 %% Define Parameters
 dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping';
 dbPath = 'C:\Users\User\Google Drive'; % ASRI
-Description = 'Test if pre-adjusting M improves actually improves performance';
+Description = 'LEO Test: ha<1000, hp>400';
 primary = earth();
 k1 = 5;
-k2 = 5; % k for alternate Fourier
-% k2 = []; % No comparison with different Fourier Methods
+% k2 = 5; % k for alternate Fourier
+k2 = []; % No comparison with different Fourier Methods
 nOrb = 1;
 dT = 100; % sec only used if Deprit is not being tested
 depritFlag = 0; % Probably forget about this part?
 nT = 80; % Only used if Deprit is being tested
+
 % Region Params
 nInc = 361;
 nEcc = 100;
@@ -26,7 +27,8 @@ nMonte = 500; % 10000 trials is about 3.63 minute (not parallel, 2nd order)
 incRange = linspace(0,90,nInc);
 % eccRange = linspace(0.01,0.5,nEcc);
 eccRange = logspace(log10(0.002),log10(0.1),nEcc);
-maxSma = 10000;
+% maxSma = 10000;
+% maxSma = primary.Re + 1000; % LEO test
 
 %% Initialize Error Tensors
 errTenF = inf(nEcc,nInc,6);
@@ -54,7 +56,8 @@ end
 totalTime = tic;
 parfor iEcc = 1:nEcc
     ecc = eccRange(iEcc);
-    minSma = (primary.Re+100)/(1-ecc); % Can change to not go through the atmosphere
+    maxSma = (primary.Re+1000)/(1+ecc); % Strict LEO - h<1000
+    minSma = (primary.Re+400)/(1-ecc); % Can change to not go through the atmosphere
     for iInc = 1:nInc
         inc = incRange(iInc);
         % Average Error Vectors
@@ -204,10 +207,10 @@ eTime = toc(totalTime);
 reportIFTTT(dbPath,eTime);
 %% Save Data
 MapData = struct();
-MapData.disc = Description;
+MapData.desc = Description;
 MapData.eccRange = eccRange;
 MapData.incRange = incRange;
-MapData.maxSma = maxSma;
+% MapData.maxSma = maxSma;
 MapData.k1 = k1;
 MapData.k2 = k2;
 MapData.nOrb = nOrb;

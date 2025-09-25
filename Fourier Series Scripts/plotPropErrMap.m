@@ -1,4 +1,4 @@
-function plotPropErrMap(eccRange,incRange,errTen1,errTen2,label1,label2,nFig,rswFlag)
+function plotPropErrMap(eccRange,incRange,errTen1,errTen2,label1,label2,nFig,oeOrRsw,saveFolder)
 %plotPropErrMap plots error maps for comaprison of propagation methods
 %
 % ~~~~~~~~~~~~~~  Inputs  ~~~~~~~~~~~~~~~
@@ -6,9 +6,11 @@ function plotPropErrMap(eccRange,incRange,errTen1,errTen2,label1,label2,nFig,rsw
 % label1, label2: label strings - optional
 % nFig - 10s digit for figure numbering - default 0
 % logE - flag to use logarithmic e Axis - no longer input
-
+if nargin < 9
+    saveFolder = [];
+end
 if nargin < 8
-    rswFlag = false;
+    oeOrRsw = 'oe';
 end
 if nargin < 7
     nFig = 0;
@@ -32,13 +34,14 @@ elseif ~logE
     eccLabel = '$\rm{Eccentricity}$';
 end
 
-if ~rswFlag% Orbital element comparison
+if strcmp(oeOrRsw,'oe') % Orbital element comparison
         titleSet = {'a','e','i','\Omega','\omega','M'};
         unitSet = {'\backslash','\backslash','rad','rad','rad','rad'};
 else % RSW comparison
     titleSet = {'r','s','w','\dot{r}','\dot{s}','\dot{w}'};
     unitSet = {'km','km','km','\frac{km}{s}','\frac{km}{s}','\frac{km}{s}'};
 end
+fontSizeAll = 14;
 
 if ~isempty(errTen2) % errTen2 exists - Comparison
     % Create Mesh
@@ -75,16 +78,16 @@ if ~isempty(errTen2) % errTen2 exists - Comparison
     contourf(xV,yV,levelsOe(iOe,end)*[1,0;0,-1],levelsOe(iOe,:))
     c = colorbar;
     c.Label.Interpreter = 'latex';
-    c.Label.String = ['$\delta ' titleSet{iOe} ' \left[\mathrm{' unitSet{iOe} '}\right]$'];
-    c.Label.FontSize = 12;
+    c.Label.String = ['$\Delta\tilde{' titleSet{iOe} '} \left[\mathrm{' unitSet{iOe} '}\right]$'];
+    c.Label.FontSize = fontSizeAll;
     colormap jet
     shading interp
     hold on
     contourf(incMesh,eccMesh,errTen1(:,:,iOe)-errTen2(:,:,iOe),levelsOe(iOe,:),'LineColor','none')
     xlim([incRange(1),incRange(end)])
     ylim([eccRange(1),eccRange(end)])
-    xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
-    ylabel(eccLabel,'interpreter','latex','fontsize',12)
+    xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',fontSizeAll)
+    ylabel(eccLabel,'interpreter','latex','fontsize',fontSizeAll)
     if logE
         yticks(eTicks)
         yticklabels(eTickLabels)
@@ -118,16 +121,16 @@ else % no ErrTen2 - Absolute Error
     contourf(xV,yV,levelsOe(iOe,end)*[1,0;0,-1],levelsOe(iOe,:))
     c = colorbar;
     c.Label.Interpreter = 'latex';
-    c.Label.String = ['$\delta ' titleSet{iOe} ' \left[\mathrm{' unitSet{iOe} '}\right]$'];
-    c.Label.FontSize = 12;
+    c.Label.String = ['$\tilde{' titleSet{iOe} '} \left[\mathrm{' unitSet{iOe} '}\right]$'];
+    c.Label.FontSize = fontSizeAll;
     colormap jet
     shading interp
     hold on
     contourf(incMesh,eccMesh,errTen1(:,:,iOe),levelsOe(iOe,:),'LineColor','none')
     xlim([incRange(1),incRange(end)])
     ylim([eccRange(1),eccRange(end)])
-    xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',12)
-    ylabel(eccLabel,'interpreter','latex','fontsize',12)
+    xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',fontSizeAll)
+    ylabel(eccLabel,'interpreter','latex','fontsize',fontSizeAll)
     if logE
         yticks(eTicks)
         yticklabels(eTickLabels)

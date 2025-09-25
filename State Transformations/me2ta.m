@@ -4,6 +4,7 @@ function [ th ] = me2ta( X1 , X2, tol)
 
 % X1 = M
 % X2 = e
+% if no X2 is provided, X1 is instead the full state
 
 maxIter = 20;
 if nargin < 2
