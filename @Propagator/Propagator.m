@@ -5,26 +5,33 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         relTol
         absTol
         Con     % Constellation object to propagate
+        Control % Controller object
     end
 
     methods
-        function P = Propagator(Constellation, relTol, absTol)
+        function P = Propagator(Constellation, Controller, relTol, absTol)
             switch nargin
-                case 0 % default tolerances, GPS constellation
+                case 0 % default tolerances, GPS constellation, uncontrolled
                     relTol     = 1e-11;
                     absTol     = 1e-12;
                     Constellation = WalkerConstellation;
-                case 1 % default tolerances
+                    Controller = ConstantThrust; % change to uncontrolled
+                case 1 % default tolerances, uncontrolled
                     relTol     = 1e-11;
                     absTol     = 1e-12;
-                case 3 % arbitrary orbit & tolerances
+                    Controller = ConstantThrust; % change to uncontrolled
+                case 2 % default tolerances, Controlled
+                    relTol     = 1e-11;
+                    absTol     = 1e-12;
+                case 4 % arbitrary orbit & tolerances
 
                 otherwise
                     error('Wrong number of input arguments')
             end
-            P.relTol = relTol;
-            P.absTol = absTol;
-            P.Con    = Constellation;
+            P.relTol  = relTol;
+            P.absTol  = absTol;
+            P.Con     = Constellation;
+            P.Control = Controller;
         end
 
         function [Time, X] = PropEciTb(P,T)
@@ -53,6 +60,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             Time = Time*tScale;
             X = X.*eciScale.';
         end
+
 
         function [Time, X] = PropOeMean(P,T)
             % Directly calculates linear solution without numerical
@@ -179,6 +187,31 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             T = T/tScale;
             % Prop Normalized
             [Time, X] = ode78(@P.DynOeOsc3,T,IC,opts);
+            inddeg = reshape((3:6).'+(0:P.Con.nSats-1)*6,4*P.Con.nSats,1);
+            indWrap = reshape((3:5).'+(0:P.Con.nSats-1)*6,3*P.Con.nSats,1);
+            X(:,inddeg) = (180/pi*X(:,inddeg));
+            X(:,indWrap) = wrapTo360(X(:,indWrap));
+            % De-Normalize
+            Time = Time*tScale;
+            X = X.*oeScale.';
+        end
+
+        function [Time, X] = PropConOeOsc(P,T)
+            % Numerically propagate LPE for osculating elements
+            % Singular in e, not i
+            % Use this I think
+            opts = odeset('reltol',P.relTol,'abstol',P.absTol);
+            % Normalize
+            dScale = P.Con.Re;
+            tScale = sqrt(P.Con.Re^3/P.Con.mu);
+            oeScale = repmat([dScale;ones(5,1)],P.Con.nSats,1);
+
+            OE = P.Con.InitialOeOsc;
+            OE(3:end,:) = OE(3:end,:)*pi/180;
+            IC = reshape(OE,[6*P.Con.nSats,1])./oeScale;
+            T = T/tScale;
+            % Prop Normalized
+            [Time, X] = ode78(@P.ConDynOeOsc,T,IC,opts);
             inddeg = reshape((3:6).'+(0:P.Con.nSats-1)*6,4*P.Con.nSats,1);
             indWrap = reshape((3:5).'+(0:P.Con.nSats-1)*6,3*P.Con.nSats,1);
             X(:,inddeg) = (180/pi*X(:,inddeg));
@@ -656,6 +689,8 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         dX = DynOeOsc2(P,t,X) 
 
         dX = DynOeOsc3(P,t,X)
+
+        dX = ConDynOeOsc(P,t,X)
 
         dX = DynOePns(P,t,X) 
 

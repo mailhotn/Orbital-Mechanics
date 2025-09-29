@@ -1,4 +1,6 @@
-function dX = DynEciJ2(P,t,X) %#ok<INUSL>
+function dX = ConDynEciJ2(P,t,X) %#ok<INUSL>
+% Controlled J2 Dynamics
+
 % Normalized Parameters
 mu = 1;
 Re = 1;
