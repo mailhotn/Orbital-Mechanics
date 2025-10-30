@@ -323,10 +323,10 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             % multiple satellites, not sure if worth the effort though
             for iSat = 1:P.Con.nSats
                 icOsc = icVec((1:6)+6*(iSat-1));
-                [freq0,lpeSpec] = P.DynOeFourier([],icOsc,kMax);
                 icM = osc2meNum(icOsc);
                 icM(3:end) = icM(3:end)*pi/180;
                 icOsc(3:end) = icOsc(3:end)*pi/180;
+                [freq0,lpeSpec] = P.DynOeFourier([],icM,kMax);
 
                 smaM = icM(1);
 

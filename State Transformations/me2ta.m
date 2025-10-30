@@ -24,7 +24,7 @@ else % no X2 => X1 is full state
     e = X1(2,:);
 end
 
-M = wrapTo2Pi(M*pi/180);
+M = mod(M*pi/180,2*pi);
 
 E = (M < pi).*(M+e) + (M >= pi).*(M-e);
 dE = inf(1,length(M));
@@ -35,9 +35,9 @@ while (norm(dE,inf) > tol) && (iter < maxIter)
     iter = iter + 1;
 end
 
-E = wrapTo2Pi(E);
+E = mod(E,2*pi);
 th = 2*atan(sqrt((1+e)./(1-e)).*tan(E/2));
-th = wrapTo360(th*180/pi);
+th = mod(th*180/pi,360);
 if ~isempty(X2)
     th = th;
 else

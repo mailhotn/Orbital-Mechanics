@@ -120,3 +120,6 @@ plotPropErrMap(eccRange,incRange,errTenRswF,errTenRswB,[],[],1,'rsw') % Final Re
 
 plotPropErrMap(eccRange,incRange,errTenRswF,[],[],[],10,'rsw') % Final Fourier Abs
 plotPropErrMap(eccRange,incRange,errTenRswB,[],[],[],20,'rsw') % Final Brouwer Abs
+%% Plot for Paper - Review comments
+plotPropErrMapPaper(eccRange,incRange,errTenRswF,errTenRswB,'Fourier','Kozai')
+plotPropErrMapPaper(eccRange,incRange,errTenRswF,errTenRswB,'Fourier','Kozai',imageFolder)

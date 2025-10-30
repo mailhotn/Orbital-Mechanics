@@ -1,10 +1,10 @@
 clear
-TurnOffPCWhenDone = false;
-% TurnOffPCWhenDone = true;
+% TurnOffPCWhenDone = false;
+TurnOffPCWhenDone = true;
 %% Define Parameters
 dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping';
 dbPath = 'C:\Users\User\Google Drive'; % ASRI
-Description = 'LEO Test: ha<1000, hp>400';
+Description = 'LEO Test: ha<1000, hp>400, nMax = k+2';
 primary = earth();
 k1 = 5;
 % k2 = 5; % k for alternate Fourier
