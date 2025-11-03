@@ -128,7 +128,7 @@ parfor iEcc = 1:nEcc
 
                 % Cartesian
                 errRswB = abs(eci2rsw(eciB-eciC,oeC));
-                errVecRswB = errVecRswB + max(errRswB,2);
+                errVecRswB = errVecRswB + max(errRswB,[],2);
             catch
                 % Error remains infinite
                 errVecB = errVecB + inf(6,1);
@@ -150,7 +150,7 @@ parfor iEcc = 1:nEcc
 
                 % Cartesian
                 errRswF = abs(eci2rsw(eciF-eciC,oeC));
-                errVecRswF = errVecRswF + max(errRswF,2);
+                errVecRswF = errVecRswF + max(errRswF,[],2);
             catch
                 errVecF = errVecF+inf(6,1);
             end
@@ -171,7 +171,7 @@ parfor iEcc = 1:nEcc
                     errVecF2 = errVecF2 + trapz(t.',errF2,2)/t(end);
                     % Cartesian
                 errRswF2 = abs(eci2rsw(eciF2-eciC,oeC));
-                errVecRswF2 = errVecRswF2 + max(errRswF2,2);
+                errVecRswF2 = errVecRswF2 + max(errRswF2,[],2);
                 catch
                     errVecF2 = errVecF2+inf(6,1);
                 end
