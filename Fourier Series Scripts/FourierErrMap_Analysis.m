@@ -69,8 +69,8 @@ imageFolder = 'C:\Users\User\Google Drive\Doc Publications\2025 LPE Fourier Pape
 % Comparison to no M fix
 % load([dataFolder '\ErrMaps_23-5-2025_16-29.mat']); % F2 is no M fix - USE IN PAPER?
 % load([dataFolder '\ErrMaps_8-7-2025_18-35.mat']); % Strict LEO - better?
-load([dataFolder '\ErrMaps_10-7-2025_17-24.mat']); % Stricter LEO - better?
-
+load([dataFolder '\ErrMaps_10-7-2025_17-24.mat']); % Paper 1
+% load([dataFolder '\ErrMaps_31-10-2025_6-10.mat']); % nMax = k+2
 
 
 incRange = MapData.incRange;
@@ -122,4 +122,4 @@ plotPropErrMap(eccRange,incRange,errTenRswF,[],[],[],10,'rsw') % Final Fourier A
 plotPropErrMap(eccRange,incRange,errTenRswB,[],[],[],20,'rsw') % Final Brouwer Abs
 %% Plot for Paper - Review comments
 plotPropErrMapPaper(eccRange,incRange,errTenRswF,errTenRswB,'Fourier','Kozai')
-plotPropErrMapPaper(eccRange,incRange,errTenRswF,errTenRswB,'Fourier','Kozai',imageFolder)
+plotPropErrMapPaper2(eccRange,incRange,errTenRswF,errTenRswB,'Fourier','Kozai',imageFolder)

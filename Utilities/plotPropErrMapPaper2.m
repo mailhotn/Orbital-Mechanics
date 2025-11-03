@@ -1,7 +1,8 @@
-function plotPropErrMapPaper(eccRange,incRange,errTen1,errTen2,label1,label2,saveFolder)
+function plotPropErrMapPaper2(eccRange,incRange,errTen1,errTen2,label1,label2,saveFolder)
 %plotPropErrMap plots error maps for comaprison of propagation methods
 % Changes based on first review, same colorbar for K & F in abs, save
 % images directly & create total error map
+% use subfigures
 %
 % ~~~~~~~~~~~~~~  Inputs  ~~~~~~~~~~~~~~~
 % errTen1, errTen2: nEcc x nInc x 6 Tensors
@@ -25,7 +26,7 @@ logE = true; % Removed Option to select log scale for e, no reason to ever
 if logE
     eccRange = log10(eccRange);
     eccLabel = '$\rm{Eccentricity}$'; % switched to labeling ecc directly
-    eTicks = flip(eccRange(end):-0.2:eccRange(1)).';
+    eTicks = flip(eccRange(end):-0.5:eccRange(1)).';
     eTicks(1) = eccRange(1);
     eTickLabels = num2str(10.^eTicks,2);
 elseif ~logE
@@ -80,9 +81,11 @@ levelsOe = [levelsOe1;levelsOe2;levelsOe3;levelsOe4;levelsOe5;levelsOe6;levelsOe
 % range of colors so we consistently get 0 as the same color
 [xV,yV] = meshgrid([1,2],[1,2]);
 
-for iOe = 1:8
+figure("Units","centimeters","Position",[0,0,16,19])
+tiledlayout(4,2,"Padding","compact","TileSpacing","tight")
+for iOe = [1,4,2,5,3,6,7,8]
     % Plot all
-    figure(nFig*10+iOe)
+    nexttile
     contourf(xV,yV,levelsOe(iOe,end)*[1,0;0,-1],levelsOe(iOe,:))
     c = colorbar;
     c.Label.Interpreter = 'latex';
@@ -94,93 +97,139 @@ for iOe = 1:8
     contourf(incMesh,eccMesh,errTen1(:,:,iOe)-errTen2(:,:,iOe),levelsOe(iOe,:),'LineColor','none')
     xlim([incRange(1),incRange(end)])
     ylim([eccRange(1),eccRange(end)])
-    xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',fontSizeAll)
-    ylabel(eccLabel,'interpreter','latex','fontsize',fontSizeAll)
-    if logE
+    if iOe >=7
+        xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',fontSizeAll)
+        xticks(0:30:90)
+    else
+        xticks([])
+    end
+    if any(iOe==[1,2,3,7])
+        ylabel(eccLabel,'interpreter','latex','fontsize',fontSizeAll)
         yticks(eTicks)
         yticklabels(eTickLabels)
-    end
-    if isempty(saveFolder)
-        title(['$' titleSet{iOe} ': ' label1 '-' label2 '$'],Interpreter='latex')
     else
-        exportgraphics(gcf,[saveFolder '\RelMap' fileNameSet{iOe} '.eps'],"Resolution",600)
+        yticks([]);
     end
     hold off
 end
+if ~isempty(saveFolder)
+    exportgraphics(gcf,[saveFolder '\RelMapsAll.eps'],...
+        "ContentType","vector","Resolution",600)
+end
 
+%% Distance Errors
+% Create error tensor of distance errors only
+errTenD = nan(length(eccRange),length(incRange),8);
+errTenD(:,:,[1,3,5,7]) = errTen1(:,:,[1:3,7]);
+errTenD(:,:,[2,4,6,8]) = errTen2(:,:,[1:3,7]);
 % Create Mesh
 [incMesh, eccMesh] = meshgrid(incRange,eccRange);
-% Level Vectors for colorbar - take into account both 1 & 2
-levelsOe1 = linspace(0,max([max(errTen1(:,:,1),[],'all'),max(errTen2(:,:,1),[],'all')]),20);
-levelsOe2 = linspace(0,max([max(errTen1(:,:,2),[],'all'),max(errTen2(:,:,2),[],'all')]),20);
-levelsOe3 = linspace(0,max([max(errTen1(:,:,3),[],'all'),max(errTen2(:,:,3),[],'all')]),20);
-levelsOe4 = linspace(0,max([max(errTen1(:,:,4),[],'all'),max(errTen2(:,:,4),[],'all')]),20);
-levelsOe5 = linspace(0,max([max(errTen1(:,:,5),[],'all'),max(errTen2(:,:,5),[],'all')]),20);
-levelsOe6 = linspace(0,max([max(errTen1(:,:,6),[],'all'),max(errTen2(:,:,6),[],'all')]),20);
-levelsOe7 = linspace(0,max([max(errTen1(:,:,7),[],'all'),max(errTen2(:,:,7),[],'all')]),20);
-levelsOe8 = linspace(0,max([max(errTen1(:,:,8),[],'all'),max(errTen2(:,:,8),[],'all')]),20);
+% Level Vectors for colorbar - take into account both K & F
+levelsDistR = linspace(0,max(errTenD(:,:,1:2),[],'all'),20);
+levelsDistS = linspace(0,max(errTenD(:,:,3:4),[],'all'),20);
+levelsDistW = linspace(0,max(errTenD(:,:,5:6),[],'all'),20);
+levelsDistT = linspace(0,max(errTenD(:,:,7:8),[],'all'),20);
+
 % setup for loop
-levelsOe = [levelsOe1;levelsOe2;levelsOe3;levelsOe4;levelsOe5;levelsOe6;levelsOe7;levelsOe8];
+levelsOe = [levelsDistR;levelsDistS;levelsDistW;levelsDistT];
+titleSet = {'r','s','w','d'};
 
 % Virtual colorfix mesh - makes a small mesh off screen with the full
 % range of colors so we consistently get 0 as the same color
 [xV,yV] = meshgrid([1,2],[1,2]);
 
-% Abs Errors 1
+figure("Units","centimeters","Position",[0,0,16,18])
+tiledlayout(4,2,"Padding","compact","TileSpacing","tight")
 for iOe = 1:8
     % Plot all
-    figure(nFig*20+iOe)
-    contourf(xV,yV,levelsOe(iOe,end)*[1,0;0,-1],levelsOe(iOe,:))
-    c = colorbar;
-    c.Label.Interpreter = 'latex';
-    c.Label.String = ['$\tilde{' titleSet{iOe} '} \left[\mathrm{' unitSet{iOe} '}\right]$'];
-    c.Label.FontSize = fontSizeAll;
+    nexttile
+    contourf(xV,yV,levelsOe(ceil(iOe/2),end)*[1,0;0,-1],levelsOe(ceil(iOe/2),:))
+    if mod(iOe,2) == 0
+        c = colorbar;
+        c.Label.Interpreter = 'latex';
+        c.Label.String = ['$\tilde{' titleSet{ceil(iOe/2)} '} \left[\mathrm{km}\right]$'];
+        c.Label.FontSize = fontSizeAll;
+    end
     colormap jet
     shading interp
     hold on
-    contourf(incMesh,eccMesh,errTen1(:,:,iOe),levelsOe(iOe,:),'LineColor','none')
+    contourf(incMesh,eccMesh,errTenD(:,:,iOe),levelsOe(ceil(iOe/2),:),'LineColor','none')
     xlim([incRange(1),incRange(end)])
     ylim([eccRange(1),eccRange(end)])
-    xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',fontSizeAll)
-    ylabel(eccLabel,'interpreter','latex','fontsize',fontSizeAll)
-    if logE
+    if iOe >=7
+        xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',fontSizeAll)
+        xticks(0:15:90)
+    else
+        xticks([])
+    end
+    if mod(iOe,2) == 1
+        ylabel(eccLabel,'interpreter','latex','fontsize',fontSizeAll)
         yticks(eTicks)
         yticklabels(eTickLabels)
-    end
-    if isempty(saveFolder)
-        title(['$' titleSet{iOe} ': ' label1 '$'],Interpreter='latex')
     else
-        exportgraphics(gcf,[saveFolder '\ForAbsMap' fileNameSet{iOe} '.eps'],"Resolution",600)
+        yticks([]);
     end
-    hold off
 end
-% Abs Errors 2
+if ~isempty(saveFolder)
+    exportgraphics(gcf,[saveFolder '\DistAbsMapsAll.eps'],...
+        "ContentType","vector","Resolution",600)
+end
+
+%% Velocity Errors
+% Create error tensor of distance errors only
+errTenV = nan(length(eccRange),length(incRange),8);
+errTenV(:,:,[1,3,5,7]) = errTen1(:,:,[4:6,8]);
+errTenV(:,:,[2,4,6,8]) = errTen2(:,:,[4:6,8]);
+% Create Mesh
+[incMesh, eccMesh] = meshgrid(incRange,eccRange);
+% Level Vectors for colorbar - take into account both K & F
+levelsVelR = linspace(0,max(errTenV(:,:,1:2),[],'all'),20);
+levelsVelS = linspace(0,max(errTenV(:,:,3:4),[],'all'),20);
+levelsVelW = linspace(0,max(errTenV(:,:,5:6),[],'all'),20);
+levelsVelT = linspace(0,max(errTenV(:,:,7:8),[],'all'),20);
+
+% setup for loop
+levelsOe = [levelsVelR;levelsVelS;levelsVelW;levelsVelT];
+titleSet = {'\dot{r}','\dot{s}','\dot{w}','v'};
+
+% Virtual colorfix mesh - makes a small mesh off screen with the full
+% range of colors so we consistently get 0 as the same color
+[xV,yV] = meshgrid([1,2],[1,2]);
+
+figure("Units","centimeters","Position",[0,0,16,18])
+tiledlayout(4,2,"Padding","compact","TileSpacing","tight")
 for iOe = 1:8
     % Plot all
-    figure(nFig*30+iOe)
-    contourf(xV,yV,levelsOe(iOe,end)*[1,0;0,-1],levelsOe(iOe,:))
-    c = colorbar;
-    c.Label.Interpreter = 'latex';
-    c.Label.String = ['$\tilde{' titleSet{iOe} '} \left[\mathrm{' unitSet{iOe} '}\right]$'];
-    c.Label.FontSize = fontSizeAll;
+    nexttile
+    contourf(xV,yV,levelsOe(ceil(iOe/2),end)*[1,0;0,-1],levelsOe(ceil(iOe/2),:))
+    if mod(iOe,2) == 0
+        c = colorbar;
+        c.Label.Interpreter = 'latex';
+        c.Label.String = ['$\tilde{' titleSet{ceil(iOe/2)} '} \left[\mathrm{km}\right]$'];
+        c.Label.FontSize = fontSizeAll;
+    end
     colormap jet
     shading interp
     hold on
-    contourf(incMesh,eccMesh,errTen2(:,:,iOe),levelsOe(iOe,:),'LineColor','none')
+    contourf(incMesh,eccMesh,errTenV(:,:,iOe),levelsOe(ceil(iOe/2),:),'LineColor','none')
     xlim([incRange(1),incRange(end)])
     ylim([eccRange(1),eccRange(end)])
-    xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',fontSizeAll)
-    ylabel(eccLabel,'interpreter','latex','fontsize',fontSizeAll)
-    if logE
+    if iOe >=7
+        xlabel('$\rm{Inclination} \left[deg\right]$','interpreter','latex','fontsize',fontSizeAll)
+        xticks(0:15:90)
+    else
+        xticks([])
+    end
+    if mod(iOe,2) == 1
+        ylabel(eccLabel,'interpreter','latex','fontsize',fontSizeAll)
         yticks(eTicks)
         yticklabels(eTickLabels)
-    end
-    if isempty(saveFolder)
-        title(['$' titleSet{iOe} ': ' label2 '$'],Interpreter='latex')
     else
-        exportgraphics(gcf,[saveFolder '\KozAbsMap' fileNameSet{iOe} '.eps'],...
-            "ContentType","vector","Resolution",600)
+        yticks([]);
     end
-    hold off
+end
+if ~isempty(saveFolder)
+    exportgraphics(gcf,[saveFolder '\VelAbsMapsAll.eps'],...
+        "ContentType","vector","Resolution",600)
 end
 end
