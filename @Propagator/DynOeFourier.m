@@ -197,7 +197,7 @@
                     Jn_e2*[b1.'*dg2deXe; b2.'*dg3deXe; b3.'*dg4deXe; b4.'*dg5deXe];
 
                 n = 1;
-                while n <= k + 2
+                while n <= k + 3
                     % positive n
                     g2 = b.^abs(m2+n+k-2);
                     g3 = abs(m3+n+k-2).*b.^abs(m3+n+k-3) + e/sqrt(1-e^2)*b.^abs(m3+n+k-2);

@@ -58,6 +58,13 @@ errDF = distF-distC;
 
 errVB = relVB-relVC;
 errVF = relVF-relVC;
+
+% Total error
+errPosTotF = vecnorm(dRswF(1:3,:)-dRswC(1:3,:));
+errPosTotB = vecnorm(dRswB(1:3,:)-dRswC(1:3,:));
+errVelTotF = vecnorm(dRswF(4:6,:)-dRswC(4:6,:));
+errVelTotB = vecnorm(dRswB(4:6,:)-dRswC(4:6,:));
+
 % oe Error
 trapz(t,abs(errOeB),2)/t(end)
 trapz(t,abs(errOeF),2)/t(end)
@@ -70,14 +77,18 @@ trapz(t,abs(errDF))/t(end)*1000
 % Vel error
 trapz(t,abs(errVB))/t(end)*1000*100
 trapz(t,abs(errVF))/t(end)*1000*100
-% rsw overall (norm of diff vector)
-norm(dRswMeanB(1:3))
-norm(dRswMeanB(4:6))
-norm(dRswMeanF(1:3))
-norm(dRswMeanF(4:6))
+% rsw overall (average of total error)
+trapz(t,errPosTotB)/t(end)*1000
+trapz(t,errPosTotF)/t(end)*1000
+trapz(t,errVelTotB)/t(end)*1000*100
+trapz(t,errVelTotF)/t(end)*1000*100
+% norm(dRswMeanB(1:3))
+% norm(dRswMeanB(4:6))
+% norm(dRswMeanF(1:3))
+% norm(dRswMeanF(4:6))
 %% Plot
 % Relative Distance & Velocity
-figure(1)
+figure
 plot(t/3600,errDB,t/3600,errDF)
 legend('Kozai','Fourier')
 xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
@@ -85,61 +96,74 @@ xlim([0,nDay*24])
 xticks(linspace(0,nDay*24,5*nDay))
 ylabel('$\delta r \ Error \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
 
-figure(2)
+figure
 plot(t/3600,errVB,t/3600,errVF)
 legend('Kozai','Fourier')
 xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
 xlim([0,nDay*24])
 xticks(linspace(0,nDay*24,5*nDay))
 ylabel('$\delta v \ Error \left[\rm{\frac{km}{s}}\right]$',Interpreter='latex',FontSize=12)
+%%
+figure("Units","centimeters","Position",[0,0,16,19])
+tiledlayout(4,2,"Padding","compact","TileSpacing","tight")
 
-figure(3) %r
+nexttile %r
 plot(t/3600,dRswB(1,:)-dRswC(1,:),t/3600,dRswF(1,:)-dRswC(1,:),LineWidth=1.2)
-legend('Kozai','Fourier')
-xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+% legend('Kozai','Fourier')
 xlim([0,nDay*24])
-xticks(linspace(0,nDay*24,5*nDay))
+xticks([])
 ylabel('$\delta r\; \rm{Error}  \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
 
-figure(4) %s
-plot(t/3600,dRswB(2,:)-dRswC(2,:),t/3600,dRswF(2,:)-dRswC(2,:),LineWidth=1.2)
-legend('Kozai','Fourier')
-xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
-xlim([0,nDay*24])
-xticks(linspace(0,nDay*24,5*nDay))
-ylabel('$\delta s\; \rm{Error}  \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
-
-figure(5) %w
-plot(t/3600,dRswB(3,:)-dRswC(3,:),t/3600,dRswF(3,:)-dRswC(3,:),LineWidth=1.2)
-legend('Kozai','Fourier')
-xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
-xlim([0,nDay*24])
-xticks(linspace(0,nDay*24,5*nDay))
-ylabel('$\delta w\; \rm{Error}  \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
-
-figure(6) %dr
+nexttile %dr
 plot(t/3600,(dRswB(4,:)-dRswC(4,:))*1,t/3600,(dRswF(4,:)-dRswC(4,:))*1,LineWidth=1.2)
 legend('Kozai','Fourier')
-xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
 xlim([0,nDay*24])
-xticks(linspace(0,nDay*24,5*nDay))
+xticks([])
 ylabel('$\delta \dot{r} \; \rm{Error} \left[{\rm{km}}/\rm{s}\right]$',Interpreter='latex',FontSize=12)
 
-figure(7) %ds
-plot(t/3600,dRswB(5,:)-dRswC(5,:),t/3600,dRswF(5,:)-dRswC(5,:),LineWidth=1.2)
-legend('Kozai','Fourier')
-xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+nexttile %s
+plot(t/3600,dRswB(2,:)-dRswC(2,:),t/3600,dRswF(2,:)-dRswC(2,:),LineWidth=1.2)
+% legend('Kozai','Fourier')
 xlim([0,nDay*24])
-xticks(linspace(0,nDay*24,5*nDay))
+xticks([])
+ylabel('$\delta s\; \rm{Error}  \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
+
+nexttile %ds
+plot(t/3600,dRswB(5,:)-dRswC(5,:),t/3600,dRswF(5,:)-dRswC(5,:),LineWidth=1.2)
+% legend('Kozai','Fourier')
+xlim([0,nDay*24])
+xticks([])
 ylabel('$\delta \dot{s}\; \rm{Error}  \left[\rm{km}/\rm{s}\right]$',Interpreter='latex',FontSize=12)
 
-figure(8)% dw
+nexttile %w
+plot(t/3600,dRswB(3,:)-dRswC(3,:),t/3600,dRswF(3,:)-dRswC(3,:),LineWidth=1.2)
+% legend('Kozai','Fourier')
+xlim([0,nDay*24])
+xticks([])
+ylabel('$\delta w\; \rm{Error}  \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
+
+nexttile % dw
 plot(t/3600,dRswB(6,:)-dRswC(6,:),t/3600,dRswF(6,:)-dRswC(6,:),LineWidth=1.2)
-legend('Kozai','Fourier')
+% legend('Kozai','Fourier')
+xlim([0,nDay*24])
+xticks([])
+ylabel('$\delta \dot{w}\; \rm{Error} \left[\rm{km}/\rm{s}\right]$',Interpreter='latex',FontSize=12)
+
+nexttile % total position
+plot(t/3600,errPosTotB,t/3600,errPosTotF,LineWidth=1.2)
+% legend('Kozai','Fourier')
 xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
 xlim([0,nDay*24])
 xticks(linspace(0,nDay*24,5*nDay))
-ylabel('$\delta \dot{w}\; \rm{Error} \left[\rm{km}/\rm{s}\right]$',Interpreter='latex',FontSize=12)
+ylabel('$\delta d\; \rm{Error}  \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
+
+nexttile % total velocity
+plot(t/3600,errVelTotB,t/3600,errVelTotF,LineWidth=1.2)
+% legend('Kozai','Fourier')
+xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+xlim([0,nDay*24])
+xticks(linspace(0,nDay*24,5*nDay))
+ylabel('$\delta v\; \rm{Error} \left[\rm{km}/\rm{s}\right]$',Interpreter='latex',FontSize=12)
 
 
 %% orbital Elements
