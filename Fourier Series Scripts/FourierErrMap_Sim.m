@@ -4,7 +4,7 @@ TurnOffPCWhenDone = true;
 %% Define Parameters
 dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping';
 dbPath = 'C:\Users\User\Google Drive'; % ASRI
-Description = 'LEO Test: ha<1000, hp>400, nMax = k+2';
+Description = 'LEO Test: ha<1000, hp>400, nMax = k+3, non parallel';
 primary = earth();
 k1 = 5;
 % k2 = 5; % k for alternate Fourier
@@ -54,7 +54,7 @@ else
     disp(['Starting Mapping' newline 'Estimated runtime: ' num2str(nInc*nEcc*nMonte*5.56/10000/4/60) 'h'])
 end
 totalTime = tic;
-parfor iEcc = 1:nEcc
+for iEcc = 1:nEcc
     ecc = eccRange(iEcc);
     maxSma = (primary.Re+1000)/(1+ecc); % Strict LEO - h<1000
     minSma = (primary.Re+400)/(1-ecc); % Can change to not go through the atmosphere

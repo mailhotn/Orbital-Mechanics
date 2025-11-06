@@ -6,11 +6,11 @@ if nargin < 2
 end
 % tN = 2*pi*sqrt(oeOsc(1)^3/primary.mu)*(1-1.5*primary.J2*(primary.Re/oeOsc(1))^2*(3-4*sind(oeOsc(3))^2));
 T = 2*pi*sqrt(oeOsc(1)^3/primary.mu);
-nT = floor(T/100);
-tSpan = linspace(0,T,nT);
+% nT = floor(T/100);
+tSpan = [0,T];
 
 Sat = SingleSat(oeOsc,primary);
-Prop = Propagator(Sat);
+Prop = Propagator(Sat,[],1e-5,1e-6);
 [tVec,xOsc] = Prop.PropOeOsc3(tSpan);
 xM = nan(1,6);
 % Unwrap O, w, M before averaging
