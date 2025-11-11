@@ -2,6 +2,10 @@ clear
 %% Load Data
 dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping'; % ASRI
 imageFolder = 'C:\Users\User\Google Drive\Doc Publications\2025 LPE Fourier Paper\Figures\AutoGen';
+
+dataFolder = 'C:\Users\mailh\My Drive\Doc Data\Error Mapping'; % Home
+imageFolder = 'C:\Users\mailh\My Drive\Doc Publications\2025 LPE Fourier Paper\Figures\AutoGen'; % home
+
 % dataFolder = 'D:\Dropbox\Doc Fourier Data\Error Mapping'; % Laptop???
 % load([dataFolder '\ErrMaps_15-6-2022_9-52.mat']); % First run e:0.005-0.55, i:0.4-90
 % load([dataFolder '\ErrMaps_15-6-2022_11-13.mat']); % Singularity test e:0.5-0.7, i:60-70
@@ -69,8 +73,11 @@ imageFolder = 'C:\Users\User\Google Drive\Doc Publications\2025 LPE Fourier Pape
 % Comparison to no M fix
 % load([dataFolder '\ErrMaps_23-5-2025_16-29.mat']); % F2 is no M fix - USE IN PAPER?
 % load([dataFolder '\ErrMaps_8-7-2025_18-35.mat']); % Strict LEO - better?
-load([dataFolder '\ErrMaps_10-7-2025_17-24.mat']); % Paper 1
+% load([dataFolder '\ErrMaps_10-7-2025_17-24.mat']); % Paper 1
 % load([dataFolder '\ErrMaps_31-10-2025_6-10.mat']); % nMax = k+2
+% load([dataFolder '\ErrMapsMax_4-11-2025_7-8.mat']); % Max error
+load([dataFolder '\ErrMaps_8-11-2025_14-29.mat']); % nMax = k+3, lower me2oscNum accuracy
+
 
 
 incRange = MapData.incRange;
@@ -121,5 +128,5 @@ plotPropErrMap(eccRange,incRange,errTenRswF,errTenRswB,[],[],1,'rsw') % Final Re
 plotPropErrMap(eccRange,incRange,errTenRswF,[],[],[],10,'rsw') % Final Fourier Abs
 plotPropErrMap(eccRange,incRange,errTenRswB,[],[],[],20,'rsw') % Final Brouwer Abs
 %% Plot for Paper - Review comments
-plotPropErrMapPaper(eccRange,incRange,errTenRswF,errTenRswB,'Fourier','Kozai')
+plotPropErrMapPaper2(eccRange,incRange,errTenRswF,errTenRswB,'Fourier','Kozai')
 plotPropErrMapPaper2(eccRange,incRange,errTenRswF,errTenRswB,'Fourier','Kozai',imageFolder)

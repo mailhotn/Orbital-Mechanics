@@ -11,7 +11,7 @@ classdef ConstantThrust < OrbitControl
             %%%% Pre Initialization %%%%
             switch nargin
                 case 0 % default tangential
-                    ThrustMagnitude = 0.001; % 1 m/s^2
+                    ThrustMagnitude = 0.00001; % 0.001 m/s^2
                     ThrustDirection = [0,1,0].'; % s
                     primary = earth();
                 case 1 % tangential

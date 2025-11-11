@@ -1,9 +1,12 @@
 clear
-% TurnOffPCWhenDone = false;
-TurnOffPCWhenDone = true;
+TurnOffPCWhenDone = false;
+% TurnOffPCWhenDone = true;
 %% Define Parameters
-dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping';
-dbPath = 'C:\Users\User\Google Drive'; % ASRI
+% dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping';
+% dbPath = 'C:\Users\User\Google Drive'; % ASRI
+dataFolder = 'C:\Users\mailh\My Drive\Doc Data\Error Mapping';
+dbPath = 'C:\Users\mailh\My Drive'; % home
+%
 Description = 'LEO Test: ha<1000, hp>400, nMax = k+3, non parallel';
 primary = earth();
 k1 = 5;
@@ -15,14 +18,14 @@ depritFlag = 0; % Probably forget about this part?
 nT = 80; % Only used if Deprit is being tested
 
 % Region Params
-nInc = 361;
-nEcc = 100;
-nMonte = 500; % 10000 trials is about 3.63 minute (not parallel, 2nd order)
+% nInc = 361;
+% nEcc = 100;
+% nMonte = 500; % 10000 trials is about 3.63 minute (not parallel, 2nd order)
 
 % Region parameters for speed test - 10000 runs
-% nInc = 10;
-% nEcc = 10;
-% nMonte = 100;
+nInc = 10;
+nEcc = 10;
+nMonte = 100;
 
 incRange = linspace(0,90,nInc);
 % eccRange = linspace(0.01,0.5,nEcc);
@@ -105,10 +108,10 @@ for iEcc = 1:nEcc
             % Prop Numerical
             tic
             [~,oeC] = Prop.PropOeOsc3(t);
-            testT = toc;
-            cTime = cTime + testT;
             oeC = oeC.';
             eciC = oe2eci(oeC,primary,'me');
+            testT = toc;
+            cTime = cTime + testT;
 
             try
                 % Prop Brouwer
