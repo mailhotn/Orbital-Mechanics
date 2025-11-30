@@ -366,6 +366,61 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             Time = T;
         end
 
+        function [Time, X] = PropOeFourier2(P,T,kMax)
+            % Propagate for time T using Fourier LPE
+            % Use simplified equations
+            % Assume constant coefficients
+
+            %% Handle Initial conditions
+            icVec = reshape(P.Con.InitialOeOsc,[6*P.Con.nSats,1]); % ic of all sats
+            X = nan(6*P.Con.nSats,length(T));
+            % for satellites - inefficient, could maybe get spectrum of
+            % multiple satellites, not sure if worth the effort though
+            for iSat = 1:P.Con.nSats
+                icOsc = icVec((1:6)+6*(iSat-1));
+                icM = osc2meNum(icOsc);
+                icM(3:end) = icM(3:end)*pi/180;
+                icOsc(3:end) = icOsc(3:end)*pi/180;
+                [freq0,lpeSpec] = P.DynOeFourierSimplified([],icM,kMax);
+
+                smaM = icM(1);
+
+                nM = sqrt(P.Con.primary.mu/smaM^3);
+                %             n = sqrt(P.Con.primary.mu/a^3)*(1+3*g2*(1-1.5*sin(i)^2)/eta^3); % kozai Fix
+                %                         n = n + lpeSpec(11,1); % <-------------------  Work on this
+                M = nM*T+icOsc(6);
+                k = 1:kMax;
+
+                Xi = nan(6,length(T));
+
+                % Fix M - add first Fourier variations
+                Sk = sin(k.'*M)./k.'/nM;
+                Ck = -cos(k.'*M)./k.'/nM;
+                AkM = lpeSpec(11,:);
+                BkM = lpeSpec(12,:);
+                fourIntSolM = AkM*Sk + BkM*Ck;
+                M2 = freq0(6)*T + fourIntSolM - fourIntSolM(1) + M;
+
+                % Calculate all other elements
+                Sk = sin(k.'*M2)./k.'/nM;
+                Ck = -cos(k.'*M2)./k.'/nM;
+                Ak = lpeSpec(1:2:11,:);
+                Bk = lpeSpec(2:2:12,:);
+                fourIntSolAll = Ak*Sk + Bk*Ck;
+
+                Xi = icOsc + freq0*T + fourIntSolAll - fourIntSolAll(:,1);
+                Xi(6,:) = Xi(6,:) + M - icOsc(6);
+
+
+                Xi(3:5,:) = wrapTo360(Xi(3:5,:)*180/pi);
+                Xi(6,:) = Xi(6,:)*180/pi;
+                % finished Xi, assign then iterate
+                X((1:6)+6*(iSat-1),:) = Xi;
+            end
+            X = X.';
+            Time = T;
+        end
+
         function [Time, X] = PropOeFourier2Ord(P,T,kMax)
             % Propagate for time T using Fourier LPE
             % Assume coefficients varying in AOP up to first order
