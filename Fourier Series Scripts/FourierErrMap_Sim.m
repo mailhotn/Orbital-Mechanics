@@ -1,31 +1,31 @@
 clear
-TurnOffPCWhenDone = false;
-% TurnOffPCWhenDone = true;
+% TurnOffPCWhenDone = false;
+TurnOffPCWhenDone = true;
 %% Define Parameters
-% dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping';
-% dbPath = 'C:\Users\User\Google Drive'; % ASRI
-dataFolder = 'C:\Users\mailh\My Drive\Doc Data\Error Mapping';
-dbPath = 'C:\Users\mailh\My Drive'; % home
+dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping';
+dbPath = 'C:\Users\User\Google Drive'; % ASRI
+% dataFolder = 'C:\Users\mailh\My Drive\Doc Data\Error Mapping';
+% dbPath = 'C:\Users\mailh\My Drive'; % home
 %
-Description = 'LEO Test: ha<1000, hp>400, nMax = k+3, non parallel';
+Description = 'LEO Test: ha<1000, hp>400, nMax = k+3, simplified big test';
 primary = earth();
 k1 = 5;
-% k2 = 5; % k for alternate Fourier
-k2 = []; % No comparison with different Fourier Methods
+k2 = 5; % k for alternate Fourier
+% k2 = []; % No comparison with different Fourier Methods
 nOrb = 1;
 dT = 100; % sec only used if Deprit is not being tested
 depritFlag = 0; % Probably forget about this part?
 nT = 80; % Only used if Deprit is being tested
 
 % Region Params
-% nInc = 361;
-% nEcc = 100;
-% nMonte = 500; % 10000 trials is about 3.63 minute (not parallel, 2nd order)
+nInc = 361;
+nEcc = 100;
+nMonte = 500; % 10000 trials is about 3.63 minute (not parallel, 2nd order)
 
 % Region parameters for speed test - 10000 runs
-nInc = 10;
-nEcc = 10;
-nMonte = 100;
+% nInc = 10;
+% nEcc = 10;
+% nMonte = 100;
 
 incRange = linspace(0,90,nInc);
 % eccRange = linspace(0.01,0.5,nEcc);
@@ -57,7 +57,7 @@ else
     disp(['Starting Mapping' newline 'Estimated runtime: ' num2str(nInc*nEcc*nMonte*5.56/10000/4/60) 'h'])
 end
 totalTime = tic;
-for iEcc = 1:nEcc
+parfor iEcc = 1:nEcc
     ecc = eccRange(iEcc);
     maxSma = (primary.Re+1000)/(1+ecc); % Strict LEO - h<1000
     minSma = (primary.Re+400)/(1-ecc); % Can change to not go through the atmosphere
@@ -162,7 +162,7 @@ for iEcc = 1:nEcc
                 try
                     % Prop Fourier - Variant
                     tic
-                    [~,oeF2] = Prop.PropOeFourierNoMFix(t,k2); 
+                    [~,oeF2] = Prop.PropOeFourier2(t,k2); 
                     eciF2 = oe2eci(oeF2,primary,'me');
                     testT = toc;
                     f2Time = f2Time + testT;

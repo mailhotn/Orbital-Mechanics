@@ -120,7 +120,7 @@ while k <= kMax
 
     Ck = Jn*g3;
     Ck_e = Jn_e*g3;
-    Ckde_e = dJnde_e*g3 + Jn_e*g3 + Jn_e2*dg3deXe;
+    Ckde_e = dJnde_e*g3  + Jn_e2*dg3deXe;
 
 
     n = 1;
@@ -178,7 +178,7 @@ while k <= kMax
 
         dCk = Jn*g3;
         dCk_e = Jn_e*g3;
-        dCkde_e = dJnde_e*g3 + Jn_e*g3 + Jn_e2*dg3deXe;
+        dCkde_e = dJnde_e*g3  + Jn_e2*dg3deXe;
 
         % negative n
         n = -n;
@@ -234,7 +234,7 @@ while k <= kMax
 
         dCk = dCk + Jn*g3;
         dCk_e = dCk_e + Jn_e*g3;
-        dCkde_e = dCkde_e + dJnde_e*g3 + Jn_e*g3 + Jn_e2*dg3deXe;
+        dCkde_e = dCkde_e + dJnde_e*g3  + Jn_e2*dg3deXe;
 
         Ak = Ak + dAk;
         Ak_e = Ak_e + dAk_e;
@@ -252,17 +252,17 @@ while k <= kMax
         n = n+1;
     end
 
-    AkM(:,k) = Ak;
-    Ak_eM(:,k) = Ak_e;
-    Akde_eM(:,k) = Akde_e;
+    AkM(:,k) = 1/2/(1-e^2)^2*Ak;
+    Ak_eM(:,k) = 1/2/(1-e^2)^2*Ak_e;
+    Akde_eM(:,k) = 2/(1-e^2)^3*Ak + 1/2/(1-e^2)^2*Akde_e;
 
-    BkM(:,k) = Bk;
-    Bk_eM(:,k) = Bk_e;
-    Bkde_eM(:,k) = Bkde_e;
+    BkM(:,k) = -1/2/(1-e^2)^1.5*Bk;
+    Bk_eM(:,k) = -1/2/(1-e^2)^1.5*Bk_e;
+    Bkde_eM(:,k) = -3/2/(1-e^2)^2.5*Bk - 1/2/(1-e^2)^1.5*Bkde_e;
     
-    CkM(:,k) = Ck;
-    Ck_eM(:,k) = Ck_e;
-    Ckde_eM(:,k) = Ckde_e;
+    CkM(:,k) = 2/(1-e^2)*Ck;
+    Ck_eM(:,k) = 2/(1-e^2)*Ck_e;
+    Ckde_eM(:,k) = 4/(1-e^2)^2*Ck + 2/(1-e^2)*Ckde_e;
     
     k = k+1;
 end
@@ -288,7 +288,7 @@ k = 1:kMax;
 lpeSpec = nan(12,kMax);
 
 lpeSpec(1:2,:) = Rsma*[s1*(BkM.*k);
-    -(c1*(AkM.*k)+c0*CkM.*k)];
+    -(c1*AkM.*k+c0*CkM.*k)];
 lpeSpec(3:4,:) = Recc*[eta*s1*(Bk_eM.*k) - (dc1do*Ak_eM+dc0do*Ck_eM);
     -eta*(c1*Ak_eM.*k+c0*Ck_eM.*k) - ds1do*Bk_eM];
 lpeSpec(5:6,:) = Rinc*[dc1do_si*AkM + dc0do_si*CkM;

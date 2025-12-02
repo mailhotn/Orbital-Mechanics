@@ -323,7 +323,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             % multiple satellites, not sure if worth the effort though
             for iSat = 1:P.Con.nSats
                 icOsc = icVec((1:6)+6*(iSat-1));
-                icM = osc2meNum(icOsc);
+                icM = osc2me(icOsc);
                 icM(3:end) = icM(3:end)*pi/180;
                 icOsc(3:end) = icOsc(3:end)*pi/180;
                 [freq0,lpeSpec] = P.DynOeFourier([],icM,kMax);
@@ -378,7 +378,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             % multiple satellites, not sure if worth the effort though
             for iSat = 1:P.Con.nSats
                 icOsc = icVec((1:6)+6*(iSat-1));
-                icM = osc2meNum(icOsc);
+                icM = osc2me(icOsc);
                 icM(3:end) = icM(3:end)*pi/180;
                 icOsc(3:end) = icOsc(3:end)*pi/180;
                 [freq0,lpeSpec] = P.DynOeFourierSimplified([],icM,kMax);
@@ -751,7 +751,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
 
         dX = DynEciJ3(P,t,X)
         
-        [freq0,lpeSpec] = DynOeFourier(P,t,icOsc,kMax)
+        % [freq0,lpeSpec] = DynOeFourier(P,t,icOsc,kMax)
 
         [freq0, lpeSpec] = DynOeFourier2Ord(P,t,icOsc,kMax)
     
