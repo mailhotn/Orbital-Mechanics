@@ -1,4 +1,4 @@
-function earthstruct = earth()
+function earthStruct = earth()
 %earth Returns a struct containing Earth physical characteristics
 % all values are taken from Vallado
 % ~~~~~~~~~~~ Might be better as a Class ~~~~~~~~~~~
@@ -11,16 +11,22 @@ function earthstruct = earth()
 % Tday - length of sidereal day (s)
 % Tyear - length of year (s)
 % ExpAtmoModel - [h_b h_c rho_b(kg/m^3)
+%
+%  ~~~~~~~~~~   Third-Body Attributes    ~~~~~~~~~~~
+% sma - semimajor axis (km)
+% ecc - eccentricity
+% inc - inclination (deg)
+% nMo - mean motion (1/s)
 
-earthstruct.mu = 398600.4415;
-earthstruct.Re = 6378.1363;
-earthstruct.J2 = 1.08262617385222e-3;
-earthstruct.J3 = -2.53241051856772e-6;
-earthstruct.we = 180/pi*7.29211585530e-5;
-earthstruct.Tday = 2*pi/7.29211585530e-5;
-earthstruct.Tyear = 365.2421897*24*60*60;
-earthstruct.dOs = 2*pi/(365.2421897*24*60*60);
-earthstruct.ExpAtmoModel = ...
+earthStruct.mu = 398600.4415;
+earthStruct.Re = 6378.1363;
+earthStruct.J2 = 1.08262617385222e-3;
+earthStruct.J3 = -2.53241051856772e-6;
+earthStruct.we = 180/pi*7.29211585530e-5;
+earthStruct.Tday = 2*pi/7.29211585530e-5;
+earthStruct.Tyear = 365.2421897*24*60*60;
+earthStruct.dOs = 2*pi/(365.2421897*24*60*60);
+earthStruct.ExpAtmoModel = ...
      [ 0   25 1.225e-00  7.249;
       25   30 3.899e-02  6.349;
       30   40 1.774e-02  6.682;
@@ -49,5 +55,12 @@ earthstruct.ExpAtmoModel = ...
      800  900 1.170e-14 124.64;
      900 1000 5.245e-15 181.05;
     1000  inf 3.019e-15 268.00];
+
+% Third-body Atributes (moon primary)
+earthStruct.sma = 384400;
+earthStruct.ecc = 0.05490;
+earthStruct.inc = 5.145396+6.68;
+earthStruct.nMo = 2*pi/(27.321582*86400);
+earthStruct.mass = 5.9742e24;
 
 end

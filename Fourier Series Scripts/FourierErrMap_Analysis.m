@@ -80,7 +80,8 @@ imageFolder = 'C:\Users\User\Google Drive\Doc Publications\2025 LPE Fourier Pape
 
 % Simplified J2
 % load([dataFolder '\ErrMaps_2-12-2025_12-27.mat']); % J2 Simp test, me2oscNum
-load([dataFolder '\ErrMaps_2-12-2025_12-31.mat']); % J2 Simp test, me2osc
+% load([dataFolder '\ErrMaps_2-12-2025_12-31.mat']); % J2 Simp test, me2osc
+load([dataFolder '\ErrMaps_3-12-2025_5-31.mat']); % J2 Simp big test, me2osc
 
 
 

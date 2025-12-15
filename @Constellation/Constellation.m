@@ -9,19 +9,22 @@ classdef Constellation < handle  &  matlab.mixin.CustomDisplay
         Re % primary radius [km]
         J2 % primary J2 harmonic
         primary % More general - should use this
+        third % Third Body
     end
     
     methods (Access = protected)
         % Access protected as a Constellation without a type is
         % meaningless. Constructor must be called only by subclasses,
         % never independently.
-        function C = Constellation(nSats, primary)
+        function C = Constellation(nSats, primary, third)
             switch nargin
                 case 0 % single satellite constellation
                     nSats   = 1;
                     primary = earth();
+                    third = moon();
                 case 1 % Earth orbit
                     primary = earth();
+                    third = moon();
                 case 2 % Arbitrary
                     
                 otherwise
@@ -32,6 +35,7 @@ classdef Constellation < handle  &  matlab.mixin.CustomDisplay
             C.Re       = primary.Re;
             C.J2       = primary.J2;
             C.primary  = primary;
+            C.third = third;
         end
     end
 %     ~~~~~~~~~~~~~ Moved To Subclasses ~~~~~~~~~~~~~
