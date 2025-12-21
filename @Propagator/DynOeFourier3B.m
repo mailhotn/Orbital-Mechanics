@@ -110,10 +110,16 @@ Rinc = k3/nMo/eta/sin(i);
 Rran = k3/nMo/eta/sin(i);
 Raop = k3/nMo;
 Rman = -k3/nMo;
-
+% Freq 0 Ak, Bk, Ck
+AkM = [(4*e^2+1)/2, AkM];
+AkdeM = [4*e, AkdeM];
+BkM = [0, BkM];
+BkdeM = [0, BkdeM];
+CkM = [(3*e^2+2)/2, CkM];
+CkdeM = [3*e,CkdeM];
 % Calculate Spectrum of Elements
-k = 1:kMax;
-lpeSpec = nan(12,kMax);
+k = 0:kMax;
+lpeSpec = nan(12,kMax+1);
 
 lpeSpec(1:2,:) = Rsma*[s1*(BkM.*k);
     -(c1*AkM.*k+c0*CkM.*k)]; %same
@@ -127,3 +133,7 @@ lpeSpec(9:10,:) = Raop*[eta/e*(c1*AkdeM + c0*CkdeM) - cos(i)/sin(i)/eta*(dc1di*A
     eta/e*(s1*BkdeM) - cos(i)/sin(i)/eta*ds1di*BkM];
 lpeSpec(11:12,:) = Rman*[eta^2/e*(c1*AkdeM + c0*CkdeM) + 4*(c1*AkM + c0*CkM);
     eta^2/e*(s1*BkdeM) + 4*s1*BkM];
+
+freq0 = lpeSpec(1:2:11,1);
+lpeSpec = lpeSpec(:,2:end);
+

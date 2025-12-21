@@ -506,7 +506,8 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             % multiple satellites, not sure if worth the effort though
             for iSat = 1:P.Con.nSats
                 icOsc = icVec((1:6)+6*(iSat-1));
-                icM = osc2me(icOsc);
+                % icM = osc2me(icOsc); % dont use brouwer - J2 negligble
+                icM = icOsc;
                 icM(3:end) = icM(3:end)*pi/180;
                 icOsc(3:end) = icOsc(3:end)*pi/180;
 
