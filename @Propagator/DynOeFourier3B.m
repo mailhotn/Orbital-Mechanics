@@ -1,5 +1,4 @@
 function [freq0,lpeSpec] = DynOeFourier3B(P,t,icM,kMax,oe3)
-
 %% Handle Input
 J2 = P.Con.primary.J2;
 Re = P.Con.primary.Re;
@@ -8,10 +7,6 @@ mu = P.Con.primary.mu;
 % handle elements vector
 nT = length(t);
 
-% Propagator now gives Mean elements
-% icM = osc2meNum(icOsc); % change to numerical mean
-% icM(3:end) = icM(3:end)*pi/180;
-% icOsc(3:end) = icOsc(3:end)*pi/180;
 % handle elements vector
 a = icM(1);
 e = icM(2);
@@ -105,16 +100,16 @@ for k = 1:kMax
     CkdeM(k) = -0.25*(dcVec*jVec + cVec*djVec);
 end
 
-k3 = third.mass/(primary.mass+third.mass)*third.nMo^2/2; % assuming r3 = a3 circular orbit
+k3 = P.Con.third.mass/(P.Con.primary.mass+P.Con.third.mass)*P.Con.third.nMo^2/2; % assuming r3 = a3 circular orbit
 
 
 % Common factors
 Rsma = 2*k3*a/nMo;
-Recc = k3*eta/nMo/ecc;
+Recc = k3*eta/nMo/e;
 Rinc = k3/nMo/eta/sin(i);
 Rran = k3/nMo/eta/sin(i);
-Raop = k3/n;
-Rman = -k3/n;
+Raop = k3/nMo;
+Rman = -k3/nMo;
 
 % Calculate Spectrum of Elements
 k = 1:kMax;
@@ -122,13 +117,13 @@ lpeSpec = nan(12,kMax);
 
 lpeSpec(1:2,:) = Rsma*[s1*(BkM.*k);
     -(c1*AkM.*k+c0*CkM.*k)]; %same
-lpeSpec(3:4,:) = Recc*[eta*s1*(BkM.*k) - (dc1do*Ak_eM+dc0do*Ck_eM);
+lpeSpec(3:4,:) = Recc*[eta*s1*(BkM.*k) - (dc1do*AkM+dc0do*CkM);
     -eta*(c1*AkM.*k+c0*CkM.*k) - ds1do*BkM];
-lpeSpec(5:6,:) = Rinc*[cos(i)*(dc1do*AkM + dc0do*CkM) -(dc1dO*AkM + dc0dO*CkM);
-    cos(i)*ds1do*BkM -ds1dO*BkM];
+lpeSpec(5:6,:) = Rinc*[cos(i)*(dc1do*AkM + dc0do*CkM) - (dc1dO*AkM + dc0dO*CkM);
+    cos(i)*ds1do*BkM - ds1dO*BkM];
 lpeSpec(7:8,:) = Rran*[dc1di*AkM + dc0di*CkM;
     ds1di*BkM];
 lpeSpec(9:10,:) = Raop*[eta/e*(c1*AkdeM + c0*CkdeM) - cos(i)/sin(i)/eta*(dc1di*AkM + dc0di*CkM);
-    eta/e*(s1*Bkde_eM) - cos(i)/sin(i)/eta*ds1di*BkM];
+    eta/e*(s1*BkdeM) - cos(i)/sin(i)/eta*ds1di*BkM];
 lpeSpec(11:12,:) = Rman*[eta^2/e*(c1*AkdeM + c0*CkdeM) + 4*(c1*AkM + c0*CkM);
     eta^2/e*(s1*BkdeM) + 4*s1*BkM];

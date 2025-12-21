@@ -12,23 +12,27 @@ classdef SingleSat < Constellation
     end
     
     methods
-        function Sat = SingleSat(OE,primary)
+        function Sat = SingleSat(OE,primary,third)
             %%%% Pre Initialization %%%%
             switch nargin
                 case 0 % default - Hubble
                     OE = [6917.5, 0.000287, 28.47,...
                           176.23, 82.61, 319.41].';
                     primary = earth();
+                    third = [];
                 case 1 % earth orbit
                     primary = earth();
+                    third = [];
                 case 2
-                    
+                    third = [];
+                case 3
+
                 otherwise
                     error('Wrong number of input arguments')
             end
             %%%% Object Initialization %%%%
             % Call superclass constructor before accessing object
-            Sat = Sat@Constellation(1,primary);
+            Sat = Sat@Constellation(1,primary,third);
             
             %%%% Post Initialization %%%%
             % property assignment

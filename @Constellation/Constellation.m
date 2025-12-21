@@ -25,7 +25,9 @@ classdef Constellation < handle  &  matlab.mixin.CustomDisplay
                 case 1 % Earth orbit
                     primary = earth();
                     third = moon();
-                case 2 % Arbitrary
+                case 2 % Arbitrary, no third
+                    third = [];
+                case 3 % arbitrary
                     
                 otherwise
                     error('Wrong number of input arguments')
