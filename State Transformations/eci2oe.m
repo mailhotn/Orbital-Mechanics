@@ -41,7 +41,8 @@ if size(V,1) ~= 3
     V = V.'; % Make sure V is a wide matrix
 end
 r = vecnorm(R,2);
-vr = dot(R,V,1)./r;
+vr = dot(R ...
+    ,V,1)./r;
 H = cross(R,V);
 h = vecnorm(H,2);
 E = (cross(V,H)-mu*R./r)/mu;

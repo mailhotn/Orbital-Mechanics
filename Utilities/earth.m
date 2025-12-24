@@ -18,6 +18,8 @@ function earthStruct = earth()
 % inc - inclination (deg)
 % nMo - mean motion (1/s)
 
+earthStruct.name = 'Earth';
+
 earthStruct.mu = 398600.4415;
 earthStruct.Re = 6378.1363;
 earthStruct.J2 = 1.08262617385222e-3;

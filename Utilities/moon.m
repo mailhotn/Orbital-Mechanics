@@ -17,6 +17,7 @@ function moonStruct = moon()
 % inc - inclination (deg)
 % nMo - mean motion (1/s)
 
+moonStruct.name = 'Moon';
 
 % Primary Attributes
 moonStruct.mu = 4902.799;
