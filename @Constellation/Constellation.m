@@ -9,25 +9,31 @@ classdef Constellation < handle  &  matlab.mixin.CustomDisplay
         Re % primary radius [km]
         J2 % primary J2 harmonic
         primary % More general - should use this
-        third % Third Body
+        third % Third Bodies
+        epoch % Start epoch in Julian date
     end
     
     methods (Access = protected)
         % Access protected as a Constellation without a type is
         % meaningless. Constructor must be called only by subclasses,
         % never independently.
-        function C = Constellation(nSats, primary, third)
+        function C = Constellation(nSats, primary, third, epoch)
             switch nargin
                 case 0 % single satellite constellation
                     nSats   = 1;
-                    primary = earth();
-                    third = moon();
+                    primary = Earth;
+                    third  = {Moon,Sun};
+                    epoch = juliandate(2000,1,1);
                 case 1 % Earth orbit
-                    primary = earth();
-                    third = moon();
+                    primary = Earth;
+                    third = {Moon,Sun};
+                    epoch = juliandate(2000,1,1);
                 case 2 % Arbitrary, no third
-                    third = [];
-                case 3 % arbitrary
+                    third = {};
+                    epoch = juliandate(2000,1,1);
+                case 3 % arbitrary bodies, default epoch
+                    epoch = juliandate(2000,1,1);
+                case 4 % arbitrary 
                     
                 otherwise
                     error('Wrong number of input arguments')
@@ -38,6 +44,7 @@ classdef Constellation < handle  &  matlab.mixin.CustomDisplay
             C.J2       = primary.J2;
             C.primary  = primary;
             C.third = third;
+            C.epoch = epoch;
         end
     end
 %     ~~~~~~~~~~~~~ Moved To Subclasses ~~~~~~~~~~~~~

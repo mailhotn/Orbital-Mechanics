@@ -21,13 +21,13 @@ classdef WalkerConstellation < Constellation
                     phasingF = 2;
                     inc      = 55;
                     alt      = 20180;
-                    primary  = earth();
+                    primary  = Earth;
                     raan0    = 0;
                 case 5 % Legacy Option
-                    primary  = earth();
+                    primary  = Earth;
                     raan0 = 0;
                 case 6 % Earth Orbit
-                    primary  = earth();
+                    primary  = Earth;
                 case 7 
                     % Do Nothing
                 otherwise

@@ -54,13 +54,13 @@ classdef FlowerConstellation < Constellation
                     Initial.raan0 = 0;
                     Initial.M0 = 0;
                     
-                    primary = earth();
+                    primary = Earth;
                 case 3
                     Initial.raan0 = 0;
                     Initial.M0 = 0;
-                    primary = earth();
+                    primary = Earth;
                 case 4
-                    primary = earth();         
+                    primary = Earth;         
                 
                 otherwise
                     error('Wrong number of input arguments')

@@ -29,12 +29,12 @@ classdef GeneralFormation < Constellation
                     oeChief = [7100, 0.05, 90, 0, 30, 0].';
                     dOeDeputy = [0,0,0,0,0,1].';
                     oeAreMean = true;
-                    primary = earth();
+                    primary = Earth;
                 case 2
                     oeAreMean = true;
-                    primary = earth();
+                    primary = Earth;
                 case 3
-                    primary = earth();
+                    primary = Earth;
                 case 4
                     
             end

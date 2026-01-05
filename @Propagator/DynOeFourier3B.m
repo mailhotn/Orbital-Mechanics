@@ -1,4 +1,4 @@
-function [freq0,lpeSpec] = DynOeFourier3B(P,t,icM,kMax,oe3)
+function [freq0,lpeSpec] = DynOeFourier3B(P,t,icM,kMax)
 %% Handle Input
 J2 = P.Con.primary.J2;
 Re = P.Con.primary.Re;
@@ -18,17 +18,10 @@ nMo = sqrt(mu/a^3);
 p = a*(1-e^2);
 eta = sqrt(1-e^2);
 
-i3 = oe3(1);
-O3 = oe3(2);
-u3 = oe3(3);
 
-th = ran-O3;
+lpeSpec = zeros(12,kMax+1);
 
-
-
-
-%% constants
-
+%% Calculate Fourier coefficients independant of 3B
 aVec = [e, -4*e^2-2, 4*e^3+11*e, -16*e^2-4, 4*e^3+11*e, -4*e^2-2, e];
 bVec = [e, -2*e^2-2, 5*e, 0, -5*e, 2*e^2+2, -e];
 cVec = [e^3, -6*e^2, 3*e^3+12*e, -12*e^2-8, 3*e^3+12*e, -6*e^2, e^3];
@@ -36,46 +29,6 @@ cVec = [e^3, -6*e^2, 3*e^3+12*e, -12*e^2-8, 3*e^3+12*e, -6*e^2, e^3];
 daVec = [1, -8*e, 12*e^2+11, -32*e, 12*e^2+11, -8*e, 1];
 dbVec = [1, -4*e, 5, 0, -5, 4*e, -1];
 dcVec = [3*e^2, -12*e, 9*e^2+12, -24*e, 9*e^2+12, -12*e, 3*e^2];
-
-alpha = (cos(aop)*cos(th) - sin(aop)*cos(i)*sin(th))*cos(u3) + ...
-    (sin(aop)*sin(i)*sin(i3) + cos(aop)*cos(i3)*sin(th) + sin(aop)*cos(i)*cos(i3)*cos(th))*sin(u3);
-
-beta = (-sin(aop)*cos(th) - cos(aop)*cos(i)*sin(th))*cos(u3) + ...
-    (cos(aop)*sin(i)*sin(i3) - sin(aop)*cos(i3)*sin(th) + cos(aop)*cos(i)*cos(i3)*cos(th))*sin(u3);
-
-dadi = ((-sin(u3)*cos(th)*cos(i3) + sin(th)*cos(u3))*sin(i) + cos(i)*sin(i3)*sin(u3))*sin(aop);
-dbdi = ((-cos(th)*sin(i)*cos(i3) + cos(i)*sin(i3))*sin(u3) + sin(i)*sin(th)*cos(u3))*cos(aop);
-
-dado = ((cos(th)*cos(i)*cos(i3) + sin(i3)*sin(i))*sin(u3) - sin(th)*cos(i)*cos(u3))*cos(aop)...
-    - sin(aop)*(sin(th)*cos(i3)*sin(u3) + cos(th)*cos(u3));
-dbdo = ((-cos(th)*cos(i)*cos(i3) - sin(i3)*sin(i))*sin(u3) + sin(th)*cos(i)*cos(u3))*sin(aop)...
-    - cos(aop)*(sin(th)*cos(i3)*sin(u3) + cos(th)*cos(u3));
-
-dadth = cos(aop)*(sin(u3)*cos(th)*cos(i3) - sin(th)*cos(u3)) ...
-    - cos(i)*(sin(th)*cos(i3)*sin(u3) + cos(th)*cos(u3))*sin(aop);
-dbdth = -sin(aop)*(sin(u3)*cos(th)*cos(i3) - sin(th)*cos(u3)) ...
-    - cos(i)*(sin(th)*cos(i3)*sin(u3) + cos(th)*cos(u3))*cos(aop);
-
-
-% coefficients of series & derivatives
-
-c1 = 3*(alpha^2-beta^2);
-s1 = 6*alpha*beta;
-c0 = (3*beta^2-1);
-
-dc1di = 6*(alpha*dadi - beta*dbdi);
-ds1di = 6*(alpha*dbdi + beta*dadi);
-dc0di = 6*beta*dbdi;
-
-dc1do = 6*(alpha*dado - beta*dbdo);
-ds1do = 6*(alpha*dbdo + beta*dado);
-dc0do = 6*beta*dbdo;
-
-dc1dO = 6*(alpha*dadth - beta*dbdth);
-ds1dO = 6*(alpha*dbdth + beta*dadth);
-dc0dO = 6*beta*dbdth;
-
-
 
 AkM = nan(1,kMax);
 AkdeM = nan(1,kMax);
@@ -99,17 +52,6 @@ for k = 1:kMax
     BkdeM(k) = e/4/eta*bVec*jVec-eta/4*(dbVec*jVec + bVec*djVec);
     CkdeM(k) = -0.25*(dcVec*jVec + cVec*djVec);
 end
-
-k3 = P.Con.third.mass/(P.Con.primary.mass+P.Con.third.mass)*P.Con.third.nMo^2/2; % assuming r3 = a3 circular orbit
-
-
-% Common factors
-Rsma = 2*k3*a/nMo;
-Recc = k3*eta/nMo/e;
-Rinc = k3/nMo/eta/sin(i);
-Rran = k3/nMo/eta/sin(i);
-Raop = k3/nMo;
-Rman = -k3/nMo;
 % Freq 0 Ak, Bk, Ck
 AkM = [(4*e^2+1)/2, AkM];
 AkdeM = [4*e, AkdeM];
@@ -117,23 +59,89 @@ BkM = [0, BkM];
 BkdeM = [0, BkdeM];
 CkM = [(3*e^2+2)/2, CkM];
 CkdeM = [3*e,CkdeM];
-% Calculate Spectrum of Elements
-k = 0:kMax;
-lpeSpec = nan(12,kMax+1);
 
-lpeSpec(1:2,:) = Rsma*[s1*(BkM.*k);
-    -(c1*AkM.*k+c0*CkM.*k)]; %same
-lpeSpec(3:4,:) = Recc*[eta*s1*(BkM.*k) - (dc1do*AkM+dc0do*CkM);
-    -eta*(c1*AkM.*k+c0*CkM.*k) - ds1do*BkM];
-lpeSpec(5:6,:) = Rinc*[cos(i)*(dc1do*AkM + dc0do*CkM) - (dc1dO*AkM + dc0dO*CkM);
-    cos(i)*ds1do*BkM - ds1dO*BkM];
-lpeSpec(7:8,:) = Rran*[dc1di*AkM + dc0di*CkM;
-    ds1di*BkM];
-lpeSpec(9:10,:) = Raop*[eta/e*(c1*AkdeM + c0*CkdeM) - cos(i)/sin(i)/eta*(dc1di*AkM + dc0di*CkM);
-    eta/e*(s1*BkdeM) - cos(i)/sin(i)/eta*ds1di*BkM];
-lpeSpec(11:12,:) = Rman*[eta^2/e*(c1*AkdeM + c0*CkdeM) + 4*(c1*AkM + c0*CkM);
-    eta^2/e*(s1*BkdeM) + 4*s1*BkM];
+%% Calculate spectrum for each third body
+n3 = length(P.Con.third);
+for j3 = 1:n3
+    mu3 = P.Con.third{j3}.mu;
+    [r3b,v3b] = planetEphemeris(P.Con.epoch,P.Con.primary.name,P.Con.third{j3}.name);
+    oe3 = eci2oe3b(r3b.',v3b.',P.Con.primary,P.Con.third{j3});
 
+    i3 = oe3(1);
+    O3 = oe3(2);
+    u3 = oe3(3);
+
+    th = ran-O3;
+
+    alpha = (cos(aop)*cos(th) - sin(aop)*cos(i)*sin(th))*cos(u3) + ...
+        (sin(aop)*sin(i)*sin(i3) + cos(aop)*cos(i3)*sin(th) + sin(aop)*cos(i)*cos(i3)*cos(th))*sin(u3);
+
+    beta = (-sin(aop)*cos(th) - cos(aop)*cos(i)*sin(th))*cos(u3) + ...
+        (cos(aop)*sin(i)*sin(i3) - sin(aop)*cos(i3)*sin(th) + cos(aop)*cos(i)*cos(i3)*cos(th))*sin(u3);
+
+    dadi = ((-sin(u3)*cos(th)*cos(i3) + sin(th)*cos(u3))*sin(i) + cos(i)*sin(i3)*sin(u3))*sin(aop);
+    dbdi = ((-cos(th)*sin(i)*cos(i3) + cos(i)*sin(i3))*sin(u3) + sin(i)*sin(th)*cos(u3))*cos(aop);
+
+    dado = ((cos(th)*cos(i)*cos(i3) + sin(i3)*sin(i))*sin(u3) - sin(th)*cos(i)*cos(u3))*cos(aop)...
+        - sin(aop)*(sin(th)*cos(i3)*sin(u3) + cos(th)*cos(u3));
+    dbdo = ((-cos(th)*cos(i)*cos(i3) - sin(i3)*sin(i))*sin(u3) + sin(th)*cos(i)*cos(u3))*sin(aop)...
+        - cos(aop)*(sin(th)*cos(i3)*sin(u3) + cos(th)*cos(u3));
+
+    dadth = cos(aop)*(sin(u3)*cos(th)*cos(i3) - sin(th)*cos(u3)) ...
+        - cos(i)*(sin(th)*cos(i3)*sin(u3) + cos(th)*cos(u3))*sin(aop);
+    dbdth = -sin(aop)*(sin(u3)*cos(th)*cos(i3) - sin(th)*cos(u3)) ...
+        - cos(i)*(sin(th)*cos(i3)*sin(u3) + cos(th)*cos(u3))*cos(aop);
+
+
+    % coefficients of series & derivatives
+
+    c1 = 3*(alpha^2-beta^2);
+    s1 = 6*alpha*beta;
+    c0 = (3*beta^2-1);
+
+    dc1di = 6*(alpha*dadi - beta*dbdi);
+    ds1di = 6*(alpha*dbdi + beta*dadi);
+    dc0di = 6*beta*dbdi;
+
+    dc1do = 6*(alpha*dado - beta*dbdo);
+    ds1do = 6*(alpha*dbdo + beta*dado);
+    dc0do = 6*beta*dbdo;
+
+    dc1dO = 6*(alpha*dadth - beta*dbdth);
+    ds1dO = 6*(alpha*dbdth + beta*dadth);
+    dc0dO = 6*beta*dbdth;
+
+    k3 = P.Con.third{j3}.mass/(P.Con.primary.mass+P.Con.third{j3}.mass)*P.Con.third{j3}.nMo^2/2; % assuming r3 = a3 circular orbit
+
+    % Common factors
+    Rsma = 2*k3*a/nMo;
+    Recc = k3*eta/nMo/e;
+    Rinc = k3/nMo/eta/sin(i);
+    Rran = k3/nMo/eta/sin(i);
+    Raop = k3/nMo;
+    Rman = -k3/nMo;
+    % Calculate Spectrum of Elements
+    k = 0:kMax;
+
+    lpeSpec(1:2,:) = lpeSpec(1:2,:) + ...
+        Rsma*[s1*(BkM.*k);
+        -(c1*AkM.*k+c0*CkM.*k)]; %same
+    lpeSpec(3:4,:) = lpeSpec(3:4,:) + ...
+        Recc*[eta*s1*(BkM.*k) - (dc1do*AkM+dc0do*CkM);
+        -eta*(c1*AkM.*k+c0*CkM.*k) - ds1do*BkM];
+    lpeSpec(5:6,:) = lpeSpec(5:6,:) + ...
+        Rinc*[cos(i)*(dc1do*AkM + dc0do*CkM) - (dc1dO*AkM + dc0dO*CkM);
+        cos(i)*ds1do*BkM - ds1dO*BkM];
+    lpeSpec(7:8,:) = lpeSpec(7:8,:) + ...
+        Rran*[dc1di*AkM + dc0di*CkM;
+        ds1di*BkM];
+    lpeSpec(9:10,:) = lpeSpec(9:10,:) + ...
+        Raop*[eta/e*(c1*AkdeM + c0*CkdeM) - cos(i)/sin(i)/eta*(dc1di*AkM + dc0di*CkM);
+        eta/e*(s1*BkdeM) - cos(i)/sin(i)/eta*ds1di*BkM];
+    lpeSpec(11:12,:) = lpeSpec(11:12,:) + ...
+        Rman*[eta^2/e*(c1*AkdeM + c0*CkdeM) + 4*(c1*AkM + c0*CkM);
+        eta^2/e*(s1*BkdeM) + 4*s1*BkM];
+end
 freq0 = lpeSpec(1:2:11,1);
 lpeSpec = lpeSpec(:,2:end);
 

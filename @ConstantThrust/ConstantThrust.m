@@ -13,12 +13,12 @@ classdef ConstantThrust < OrbitControl
                 case 0 % default tangential
                     ThrustMagnitude = 0.00001; % 0.001 m/s^2
                     ThrustDirection = [0,1,0].'; % s
-                    primary = earth();
+                    primary = Earth;
                 case 1 % tangential
                     ThrustDirection = [0,1,0].'; % s
-                    primary = earth();
+                    primary = Earth;
                 case 2 % arbitrary
-                    primary = earth();
+                    primary = Earth;
                 case 3
 
                 otherwise

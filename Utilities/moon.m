@@ -1,7 +1,6 @@
-function moonStruct = moon()
-%moon Returns a struct containing Moon physical characteristics
+classdef Moon
+%Moon defines a class containing Moon physical characteristics
 % all values are taken from Vallado
-% ~~~~~~~~~~~ Might be better as a Class ~~~~~~~~~~~
 %
 %  ~~~~~~~~~~   Primary Attributes    ~~~~~~~~~~~
 % mu - gravitational parameter (km^3/s^2)
@@ -16,24 +15,26 @@ function moonStruct = moon()
 % ecc - eccentricity
 % inc - inclination (deg)
 % nMo - mean motion (1/s)
-
-moonStruct.name = 'Moon';
+properties (Constant)
+name = 'Moon';
 
 % Primary Attributes
-moonStruct.mu = 4902.799;
-moonStruct.Re = 1738.0;
-moonStruct.J2 = 2.027e-4;
-moonStruct.we = 360/27.32166/86400;
-moonStruct.Tday = 27.32166*86400;
-moonStruct.Tyear = 27.321582*86400;
+mu = 4902.799;
+Re = 1738.0;
+R = 1738.0;
+J2 = 2.027e-4;
+we = 360/27.32166/86400;
+Tday = 27.32166*86400;
+Tyear = 27.321582*86400;
 
 % Third-body Atributes (earth primary)
-moonStruct.sma = 384400;
-moonStruct.ecc = 0.05490;
-moonStruct.inc = 5.145396;
-moonStruct.nMo = 2*pi/moonStruct.Tyear;
-moonStruct.mass = 7.3483e22;
+sma = 384400;
+ecc = 0.05490;
+inc = 5.145396;
+nMo = 2*pi/27.321582/86400;
+mass = 7.3483e22;
 
 
 
+end
 end

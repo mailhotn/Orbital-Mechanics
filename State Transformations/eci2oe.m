@@ -17,7 +17,7 @@ if nargin < 2
     X2 = [];
 end
 if nargin < 3
-    primary = earth();
+    primary = Earth;
      % default is earth orbit of satellite with negligible mass
 end
 if nargin < 4 % default is true anomaly, for backwards compatibility

@@ -1,7 +1,6 @@
-function earthStruct = earth()
-%earth Returns a struct containing Earth physical characteristics
+classdef Earth
+%Earth defines a class containing Earth physical characteristics
 % all values are taken from Vallado
-% ~~~~~~~~~~~ Might be better as a Class ~~~~~~~~~~~
 %
 %  ~~~~~~~~~~   Attributes    ~~~~~~~~~~~
 % mu - gravitational parameter (km^3/s^2)
@@ -17,18 +16,19 @@ function earthStruct = earth()
 % ecc - eccentricity
 % inc - inclination (deg)
 % nMo - mean motion (1/s)
+properties (Constant)
+name = 'Earth';
 
-earthStruct.name = 'Earth';
-
-earthStruct.mu = 398600.4415;
-earthStruct.Re = 6378.1363;
-earthStruct.J2 = 1.08262617385222e-3;
-earthStruct.J3 = -2.53241051856772e-6;
-earthStruct.we = 180/pi*7.29211585530e-5;
-earthStruct.Tday = 2*pi/7.29211585530e-5;
-earthStruct.Tyear = 365.2421897*24*60*60;
-earthStruct.dOs = 2*pi/(365.2421897*24*60*60);
-earthStruct.ExpAtmoModel = ...
+mu = 398600.4415;
+Re = 6378.1363;
+R = 6378.1363;
+J2 = 1.08262617385222e-3;
+J3 = -2.53241051856772e-6;
+we = 180/pi*7.29211585530e-5;
+Tday = 2*pi/7.29211585530e-5;
+Tyear = 365.2421897*24*60*60;
+dOs = 2*pi/(365.2421897*24*60*60);
+ExpAtmoModel = ...
      [ 0   25 1.225e-00  7.249;
       25   30 3.899e-02  6.349;
       30   40 1.774e-02  6.682;
@@ -59,10 +59,11 @@ earthStruct.ExpAtmoModel = ...
     1000  inf 3.019e-15 268.00];
 
 % Third-body Atributes (moon primary)
-earthStruct.sma = 384400;
-earthStruct.ecc = 0.05490;
-earthStruct.inc = 5.145396+6.68;
-earthStruct.nMo = 2*pi/(27.321582*86400);
-earthStruct.mass = 5.9742e24;
+sma = 384400;
+ecc = 0.05490;
+inc = 5.145396+6.68;
+nMo = 2*pi/(27.321582*86400);
+mass = 5.9742e24;
 
+end
 end

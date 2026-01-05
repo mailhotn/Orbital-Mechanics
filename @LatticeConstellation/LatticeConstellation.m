@@ -57,14 +57,14 @@ classdef LatticeConstellation < Constellation
                     InitCon.M1    = 0;
                     InitCon.raan1 = 0;
                     InitCon.aop1  = 90;
-                    primary = earth();
+                    primary = Earth;
                 case 3
-                    primary = earth();
+                    primary = Earth;
                     InitCon.M1    = 0;
                     InitCon.raan1 = 0;
                     InitCon.aop1  = 0;
                 case 4
-                    primary = earth();
+                    primary = Earth;
                 case 5
             end
             Arch.nSats = Arch.nPlanes*Arch.nAops*Arch.nSatsPerAop;

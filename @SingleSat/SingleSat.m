@@ -18,13 +18,13 @@ classdef SingleSat < Constellation
                 case 0 % default - Hubble
                     OE = [6917.5, 0.000287, 28.47,...
                           176.23, 82.61, 319.41].';
-                    primary = earth();
-                    third = [];
+                    primary = Earth;
+                    third = {Moon,Sun};
                 case 1 % earth orbit
-                    primary = earth();
-                    third = [];
+                    primary = Earth;
+                    third = {Moon,Sun};
                 case 2
-                    third = [];
+                    third = {};
                 case 3
 
                 otherwise
@@ -73,6 +73,8 @@ classdef SingleSat < Constellation
             propgroups(1).PropertyList = {'sma','e','inc','raan','aop','me'};
             propgroups(2).Title = 'Primary Body Characteristics';
             propgroups(2).PropertyList = {'mu','R','J2'};
+            propgroups(3).Title = 'Third Bodies';
+            propgroups(3).PropertyList = {'third'};
         end
     end
 end

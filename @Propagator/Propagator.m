@@ -268,7 +268,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             %             X(3:end,:) = wrapTo360(X(3:end,:));
         end
 
-        function [Time, X] = PropEci3B(P,T,r3b)
+        function [Time, X] = PropEci3B(P,T)
             % Propagate for time T in ECI frame with J2 perturbation
             % Complexity ~O(T)
             opts = odeset('reltol',P.relTol,'abstol',P.absTol);
@@ -280,7 +280,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             IC = reshape(P.Con.InitialStateEci,[6*P.Con.nSats,1])./eciScale;
             T = T/tScale;
             % Prop Normalized
-            [Time, X] = ode78(@(T,X) P.DynEci3B(T,X,r3b),T,IC,opts);
+            [Time, X] = ode78(@(T,X) P.DynEci3B(T,X),T,IC,opts);
             % De-Normalize
             Time = Time*tScale;
             X = X.*eciScale.';
@@ -513,7 +513,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             Time = T;
         end
 
-        function [Time, X] = PropOeFourier3B(P,T,kMax,oe3)
+        function [Time, X] = PropOeFourier3B(P,T,kMax)
             % Propagate for time T using Fourier 3Body LPE
             % Assume constant coefficients
 
@@ -530,8 +530,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 icOsc(3:end) = icOsc(3:end)*pi/180;
 
                 % third body elements
-                % oe3 = pi/180*[0,0,0];
-                [freq0,lpeSpec] = P.DynOeFourier3B([],icM,kMax, oe3);
+                [freq0,lpeSpec] = P.DynOeFourier3B([],icM,kMax);
 
                 smaM = icM(1);
 
