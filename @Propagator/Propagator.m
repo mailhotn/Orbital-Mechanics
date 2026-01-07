@@ -535,8 +535,6 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 smaM = icM(1);
 
                 nM = sqrt(P.Con.primary.mu/smaM^3);
-                %             n = sqrt(P.Con.primary.mu/a^3)*(1+3*g2*(1-1.5*sin(i)^2)/eta^3); % kozai Fix
-                %                         n = n + lpeSpec(11,1); % <-------------------  Work on this
                 M = nM*T+icOsc(6);
                 k = 1:kMax;
 
