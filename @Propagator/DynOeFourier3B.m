@@ -45,11 +45,11 @@ for k = 1:kMax
     djVec = -0.5*k*(besselj(n-1,-k*e) - besselj(n+1,-k*e)).';
 
     AkM(k) = -0.25*aVec*jVec;
-    BkM(k) = -eta/4*bVec*jVec;
+    BkM(k) = eta/4*bVec*jVec;
     CkM(k) = -0.25*cVec*jVec;
 
     AkdeM(k) = -0.25*(daVec*jVec + aVec*djVec);
-    BkdeM(k) = e/4/eta*bVec*jVec-eta/4*(dbVec*jVec + bVec*djVec);
+    BkdeM(k) = -e/4/eta*bVec*jVec+eta/4*(dbVec*jVec + bVec*djVec);
     CkdeM(k) = -0.25*(dcVec*jVec + cVec*djVec);
 end
 % Freq 0 Ak, Bk, Ck

@@ -823,10 +823,14 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         dX = DynOePns(P,t,X) 
 
         dX = DynEciJ3(P,t,X)
-        
-        % [freq0,lpeSpec] = DynOeFourier(P,t,icOsc,kMax)
 
-        [freq0, lpeSpec] = DynOeFourier2Ord(P,t,icOsc,kMax)
+        dX = DynEci3B(P,t,X)
+        
+        [freq0,lpeSpec] = DynOeFourier(P,t,icM,kMax)
+
+        [freq0,lpeSpec] = DynOeFourier3B(P,t,icM,kMax)
+
+        [freq0, lpeSpec] = DynOeFourier2Ord(P,t,icM,kMax)
     
     end
 

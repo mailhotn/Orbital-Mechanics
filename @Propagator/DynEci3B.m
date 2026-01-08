@@ -34,8 +34,8 @@ for i3 = 1:n3
     rSatDotRSat3 = reshape(repmat(dot(Rv,RSat3M,1),6,1),order,1); % sat pos 1 dot sat pos 3b repeated 6nx1
 
     Q = (r.^2 + 2*(rSatDotRSat3)).*(r3b^2 + r3b*rSat3 + rSat3.^2)./(r3b^3*rSat3.^3.*(r3b + rSat3));
-    % f3B = -mu3./r3b.^3.*(R2 - 3*R3b.*rSatDotR3/r3b^2 - 15/2*(rSatDotR3/r3b^2).^2.*R3b); % approx (8-35)
-    f3B = f3B +  mu3*(Q.*RSat3 - R2/r3b^3); % (8-34)
+    f3B = -mu3./r3b.^3.*(R2 - 3*R3b.*rSatDotR3/r3b^2 - 15/2*(rSatDotR3/r3b^2).^2.*R3b); % approx (8-35)
+    % f3B = f3B +  mu3*(Q.*RSat3 - R2/r3b^3); % (8-34)
 end
 % equation of motion
 
