@@ -268,8 +268,8 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             %             X(3:end,:) = wrapTo360(X(3:end,:));
         end
 
-        function [Time, X] = PropEci3B(P,T)
-            % Propagate for time T in ECI frame with J2 perturbation
+        function [Time, X] = PropEci3B(P,T,ForceModel)
+            % Propagate for time T in ECI frame with third body(ies) perturbation
             % Complexity ~O(T)
             opts = odeset('reltol',P.relTol,'abstol',P.absTol);
             % don't Normalize
@@ -280,7 +280,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             IC = reshape(P.Con.InitialStateEci,[6*P.Con.nSats,1])./eciScale;
             T = T/tScale;
             % Prop Normalized
-            [Time, X] = ode78(@(T,X) P.DynEci3B(T,X),T,IC,opts);
+            [Time, X] = ode78(@(T,X) P.DynEci3B(T,X,ForceModel),T,IC,opts);
             % De-Normalize
             Time = Time*tScale;
             X = X.*eciScale.';
@@ -531,15 +531,22 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
 
                 % third body elements
                 [freq0,lpeSpec] = P.DynOeFourier3B([],icM,kMax);
-
+                
                 smaM = icM(1);
-
                 nM = sqrt(P.Con.primary.mu/smaM^3);
+                
+                % Weird averaging "fix"
+                % icM = icOsc+freq0*pi/nM;
+                % [freq0,lpeSpec] = P.DynOeFourier3B([],icM,kMax);
+                % smaM = icM(1);
+                % nM = sqrt(P.Con.primary.mu/smaM^3);
+                % Continue
                 M = nM*T+icOsc(6);
                 k = 1:kMax;
 
                 Xi = nan(6,length(T));
-
+                
+                
                 % Fix M - add first Fourier variations
                 Sk = sin(k.'*M)./k.'/nM;
                 Ck = -cos(k.'*M)./k.'/nM;
@@ -547,6 +554,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 BkM = lpeSpec(12,:);
                 fourIntSolM = AkM*Sk + BkM*Ck;
                 M2 = freq0(6)*T + fourIntSolM - fourIntSolM(1) + M;
+                % M2 = M;
 
                 % Calculate all other elements
                 Sk = sin(k.'*M2)./k.'/nM;
@@ -824,7 +832,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
 
         dX = DynEciJ3(P,t,X)
 
-        dX = DynEci3B(P,t,X)
+        dX = DynEci3B(P,t,X,ForceModel)
         
         [freq0,lpeSpec] = DynOeFourier(P,t,icM,kMax)
 

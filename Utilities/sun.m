@@ -19,10 +19,12 @@ mu = 1.32712428e11;
 Re = 696000;
 R = 696000;
 
-% Third-body Atributes
+% Third-body Attributes
 sma = 149598023.0;
 ecc = 0.016708617;
 inc = 0;
+nMo = 2*pi/(365.2421897*86400);
 mass = 1.9891e30;
+
 end
 end

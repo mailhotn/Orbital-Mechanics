@@ -1,4 +1,4 @@
-function dX = DynEci3B(P,t,X) %#ok<INUSL>
+function dX = DynEci3B(P,t,X,ForceModel) %#ok<INUSL>
 % 3b acceleration from Vallado (8-34) fifth edition
 % Normalized Parameters
 mu = P.Con.primary.mu;
@@ -22,7 +22,8 @@ n3 = length(P.Con.third);
 f3B = zeros(order,1);
 for i3 = 1:n3
     mu3 = P.Con.third{i3}.mu;
-    r3bVec = planetEphemeris(P.Con.epoch,P.Con.primary.name,P.Con.third{i3}.name).';
+    % r3bVec = planetEphemeris(P.Con.epoch,P.Con.primary.name,P.Con.third{i3}.name).'; % Call PE each time
+    r3bVec = P.Con.x3AtEpoch(1:3,i3); % call PE at startup
     r3b = norm(r3bVec); % scalar - 3b dist from primary
     R3b = repmat([r3bVec;zeros(3,1)],P.Con.nSats,1);  % 3b pos from primary; 6nx1 for dx
     R3bM = reshape(R3b,6,P.Con.nSats); % 6xn for dot
@@ -34,8 +35,14 @@ for i3 = 1:n3
     rSatDotRSat3 = reshape(repmat(dot(Rv,RSat3M,1),6,1),order,1); % sat pos 1 dot sat pos 3b repeated 6nx1
 
     Q = (r.^2 + 2*(rSatDotRSat3)).*(r3b^2 + r3b*rSat3 + rSat3.^2)./(r3b^3*rSat3.^3.*(r3b + rSat3));
-    f3B = -mu3./r3b.^3.*(R2 - 3*R3b.*rSatDotR3/r3b^2 - 15/2*(rSatDotR3/r3b^2).^2.*R3b); % approx (8-35)
-    % f3B = f3B +  mu3*(Q.*RSat3 - R2/r3b^3); % (8-34)
+    switch ForceModel
+        case 'Taylor'
+            f3B = -mu3./r3b.^3.*(R2 - 3*R3b.*rSatDotR3/r3b^2 - 15/2*(rSatDotR3/r3b^2).^2.*R3b); % approx (8-35)
+        case 'Stable'
+            f3B = f3B +  mu3*(Q.*RSat3 - R2/r3b^3); % (8-34)
+        case 'Direct'
+            f3B = f3B + mu3*(RSat3./rSat3.^3 -R3b/r3b^3); % (8-33)
+    end
 end
 % equation of motion
 

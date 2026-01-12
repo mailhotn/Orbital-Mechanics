@@ -58,7 +58,7 @@ ExpAtmoModel = ...
      900 1000 5.245e-15 181.05;
     1000  inf 3.019e-15 268.00];
 
-% Third-body Atributes (moon primary)
+% Third-body Attributes (moon primary)
 sma = 384400;
 ecc = 0.05490;
 inc = 5.145396+6.68;

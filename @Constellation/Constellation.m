@@ -11,6 +11,7 @@ classdef Constellation < handle  &  matlab.mixin.CustomDisplay
         primary % More general - should use this
         third % Third Bodies
         epoch % Start epoch in Julian date
+        x3AtEpoch % 6xn3 matrix of third body states at Epoch
     end
     
     methods (Access = protected)
@@ -45,6 +46,11 @@ classdef Constellation < handle  &  matlab.mixin.CustomDisplay
             C.primary  = primary;
             C.third = third;
             C.epoch = epoch;
+            C.x3AtEpoch = nan(6,length(third));
+            for i3 = 1:length(third)
+                [r3,v3] = planetEphemeris(epoch,primary.name,third{i3}.name);
+                C.x3AtEpoch(:,i3) = [r3.';v3.'];
+            end
         end
     end
 %     ~~~~~~~~~~~~~ Moved To Subclasses ~~~~~~~~~~~~~

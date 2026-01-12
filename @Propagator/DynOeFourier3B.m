@@ -64,8 +64,12 @@ CkdeM = [3*e,CkdeM];
 n3 = length(P.Con.third);
 for j3 = 1:n3
     mu3 = P.Con.third{j3}.mu;
-    [r3b,v3b] = planetEphemeris(P.Con.epoch,P.Con.primary.name,P.Con.third{j3}.name);
-    oe3 = eci2oe3b(r3b.',v3b.',P.Con.primary,P.Con.third{j3});
+    % [r3b,v3b] = planetEphemeris(P.Con.epoch,P.Con.primary.name,P.Con.third{j3}.name);
+    % oe3 = eci2oe3b(r3b.',v3b.',P.Con.primary,P.Con.third{j3});
+    x3b = P.Con.x3AtEpoch;
+    r3b = x3b(1:3,j3);
+    v3b = x3b(4:6,j3);
+    oe3 = eci2oe3b(r3b,v3b,P.Con.primary,P.Con.third{j3});
     
     r3 = norm(r3b);
     a3 = oe3(1);
