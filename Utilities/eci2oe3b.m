@@ -26,8 +26,8 @@ tan = (vr>=0).*acos(dot(E./ecc,rEci3b./r,1)) + ...
     (vr<0).*(2*pi - acos(dot(E./ecc,rEci3b./r,1)));
 
 sma = h.^2./(mu*(1-ecc.^2));
-sma = third.sma;
-ecc = third.ecc;
+% sma = third.sma;
+% ecc = third.ecc;
 
 
 oe3b = [sma;ecc;inc;ran;aop;tan];

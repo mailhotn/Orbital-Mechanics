@@ -27,4 +27,14 @@ nMo = 2*pi/(365.2421897*86400);
 mass = 1.9891e30;
 
 end
+
+methods
+
+    function xSun = PosJ2000(t)
+        %outputs Sun state relative to Earth for given time(s)
+
+        
+
+    end
+end
 end
