@@ -1,5 +1,14 @@
-function oe3b = eci2oe3b(rEci3b,vEci3b,primary,third)
+function [oe3b,E] = eci2oe3b(rEci3b,vEci3b,primary,third)
 % converts a position vector of third body to orbital elements
+
+% Make sure the matrices are wide
+if size(rEci3b,1) ~=3
+    rEci3b = rEci3b.';
+end
+if size(vEci3b,1) ~=3
+    vEci3b = vEci3b.';
+end
+nT = size(rEci3b,2);
 
 mu = primary.mu+third.mu;
 sma = third.sma;
@@ -26,8 +35,8 @@ tan = (vr>=0).*acos(dot(E./ecc,rEci3b./r,1)) + ...
     (vr<0).*(2*pi - acos(dot(E./ecc,rEci3b./r,1)));
 
 sma = h.^2./(mu*(1-ecc.^2));
-% sma = third.sma;
-% ecc = third.ecc;
+sma = third.sma*ones(1,nT);
+ecc = third.ecc*ones(1,nT);
 
 
 oe3b = [sma;ecc;inc;ran;aop;tan];
