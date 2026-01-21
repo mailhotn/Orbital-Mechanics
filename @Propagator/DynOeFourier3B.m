@@ -18,8 +18,9 @@ nMo = sqrt(mu/sma^3);
 p = sma*(1-e^2);
 eta = sqrt(1-e^2);
 
+nOrd = 2*6*(kMax+1); % Number of Fourier Coefficients (including b0==0)
+lpeSpec = zeros(nOrd,nT);
 
-lpeSpec = zeros(12,kMax+1);
 
 %% Calculate Fourier coefficients independant of 3B
 aVec = [e, -4*e^2-2, 4*e^3+11*e, -16*e^2-4, 4*e^3+11*e, -4*e^2-2, e];
@@ -66,58 +67,62 @@ for j3 = 1:n3
     mu3 = P.Con.third{j3}.mu;
     % [r3b,v3b] = planetEphemeris(P.Con.epoch,P.Con.primary.name,P.Con.third{j3}.name);
     % oe3 = eci2oe3b(r3b.',v3b.',P.Con.primary,P.Con.third{j3});
-    x3b = P.Con.x3AtEpoch;
-    r3b = x3b(1:3,j3);
-    v3b = x3b(4:6,j3);
-    oe3 = eci2oe3b(r3b,v3b,P.Con.primary,P.Con.third{j3});
+    % x3b = P.Con.x3AtEpoch;
+    [r3bMat, v3bMat] = P.Con.third{j3}.PosJ2000(t);
+    % r3b = x3b(1:3,j3);
+    % v3b = x3b(4:6,j3);
+    oe3 = eci2oe3b(r3bMat,v3bMat,P.Con.primary,P.Con.third{j3});
     
-    r3 = norm(r3b);
-    a3 = oe3(1);
-    e3 = oe3(2);
-    i3 = oe3(3);
-    O3 = oe3(4);
-    u3 = oe3(5)+oe3(6);
+    r3 = vecnorm(r3bMat,2,1);
+    a3 = oe3(1,:);
+    e3 = oe3(2,:);
+    i3 = oe3(3,:);
+    O3 = oe3(4,:);
+    u3 = oe3(5,:)+oe3(6,:);
 
     th = ran-O3;
 
-    alpha = (cos(aop)*cos(th) - sin(aop)*cos(inc)*sin(th))*cos(u3) + ...
-        (sin(aop)*sin(inc)*sin(i3) + cos(aop)*cos(i3)*sin(th) + sin(aop)*cos(inc)*cos(i3)*cos(th))*sin(u3);
+    alpha = (cos(aop).*cos(th) - sin(aop).*cos(inc).*sin(th)).*cos(u3) + ...
+        (sin(aop).*sin(inc).*sin(i3) + cos(aop).*cos(i3).*sin(th) + sin(aop).*cos(inc).*cos(i3).*cos(th)).*sin(u3);
 
-    beta = (-sin(aop)*cos(th) - cos(aop)*cos(inc)*sin(th))*cos(u3) + ...
-        (cos(aop)*sin(inc)*sin(i3) - sin(aop)*cos(i3)*sin(th) + cos(aop)*cos(inc)*cos(i3)*cos(th))*sin(u3);
+    beta = (-sin(aop).*cos(th) - cos(aop).*cos(inc).*sin(th)).*cos(u3) + ...
+        (cos(aop).*sin(inc).*sin(i3) - sin(aop).*cos(i3).*sin(th) + cos(aop).*cos(inc).*cos(i3).*cos(th)).*sin(u3);
 
-    dadi = sin(aop)*((-sin(u3)*cos(i3)*cos(th) + sin(th)*cos(u3))*sin(inc) + cos(inc)*sin(i3)*sin(u3));
-    dbdi = cos(aop)*((-sin(u3)*cos(i3)*cos(th) + sin(th)*cos(u3))*sin(inc) + cos(inc)*sin(i3)*sin(u3));
+    dadi = sin(aop).*((-sin(u3).*cos(i3).*cos(th) + sin(th).*cos(u3)).*sin(inc) + cos(inc).*sin(i3).*sin(u3));
+    dbdi = cos(aop).*((-sin(u3).*cos(i3).*cos(th) + sin(th).*cos(u3)).*sin(inc) + cos(inc).*sin(i3).*sin(u3));
 
-    dado = ((cos(inc)*cos(i3)*cos(th) + sin(inc)*sin(i3))*sin(u3) - sin(th)*cos(inc)*cos(u3))*cos(aop) - sin(aop)*(sin(th)*sin(u3)*cos(i3) + cos(th)*cos(u3));
-    dbdo = ((-cos(inc)*cos(i3)*cos(th) - sin(inc)*sin(i3))*sin(u3) + sin(th)*cos(inc)*cos(u3))*sin(aop) - cos(aop)*(sin(th)*sin(u3)*cos(i3) + cos(th)*cos(u3));
+    dado = ((cos(inc).*cos(i3).*cos(th) + sin(inc).*sin(i3)).*sin(u3) - sin(th).*cos(inc).*cos(u3)).*cos(aop) - sin(aop).*(sin(th).*sin(u3).*cos(i3) + cos(th).*cos(u3));
+    dbdo = ((-cos(inc).*cos(i3).*cos(th) - sin(inc).*sin(i3)).*sin(u3) + sin(th).*cos(inc).*cos(u3)).*sin(aop) - cos(aop).*(sin(th).*sin(u3).*cos(i3) + cos(th).*cos(u3));
 
-    dadth = (sin(u3)*cos(i3)*cos(th) - sin(th)*cos(u3))*cos(aop) - cos(inc)*sin(aop)*(sin(th)*sin(u3)*cos(i3) + cos(th)*cos(u3));
-    dbdth = -cos(inc)*(sin(th)*sin(u3)*cos(i3) + cos(th)*cos(u3))*cos(aop) - sin(aop)*(sin(u3)*cos(i3)*cos(th) - sin(th)*cos(u3));
+    dadth = (sin(u3).*cos(i3).*cos(th) - sin(th).*cos(u3)).*cos(aop) - cos(inc).*sin(aop).*(sin(th).*sin(u3).*cos(i3) + cos(th).*cos(u3));
+    dbdth = -cos(inc).*(sin(th).*sin(u3).*cos(i3) + cos(th).*cos(u3)).*cos(aop) - sin(aop).*(sin(u3).*cos(i3).*cos(th) - sin(th).*cos(u3));
 
 
 
-    % coefficients of series & derivatives
+    % coefficients of series & derivatives - 1xnT
 
-    c1 = 3*(alpha^2-beta^2);
-    s1 = 6*alpha*beta;
-    c0 = (3*beta^2-1);
+    c1 = 3*(alpha.^2-beta.^2);
+    s1 = 6*alpha.*beta;
+    c0 = (3*beta.^2-1);
 
-    dc1di = 6*(alpha*dadi - beta*dbdi);
-    ds1di = 6*(alpha*dbdi + beta*dadi);
-    dc0di = 6*beta*dbdi;
+    dc1di = 6*(alpha.*dadi - beta.*dbdi);
+    ds1di = 6*(alpha.*dbdi + beta.*dadi);
+    dc0di = 6*beta.*dbdi;
 
-    dc1do = 6*(alpha*dado - beta*dbdo);
-    ds1do = 6*(alpha*dbdo + beta*dado);
-    dc0do = 6*beta*dbdo;
+    dc1do = 6*(alpha.*dado - beta.*dbdo);
+    ds1do = 6*(alpha.*dbdo + beta.*dado);
+    dc0do = 6*beta.*dbdo;
 
-    dc1dO = 6*(alpha*dadth - beta*dbdth);
-    ds1dO = 6*(alpha*dbdth + beta*dadth);
-    dc0dO = 6*beta*dbdth;
+    dc1dO = 6*(alpha.*dadth - beta.*dbdth);
+    ds1dO = 6*(alpha.*dbdth + beta.*dadth);
+    dc0dO = 6*beta.*dbdth;
 
-    k3 = P.Con.third{j3}.mass/(P.Con.primary.mass+P.Con.third{j3}.mass)*P.Con.third{j3}.nMo^2/2*a3^3/r3^3;
+    % k3 = P.Con.third{j3}.mass/(P.Con.primary.mass+P.Con.third{j3}.mass)*P.Con.third{j3}.nMo^2/2.*a3.^3./r3.^3; % constant 3B mean motion
+    % nMo3 = sqrt((P.Con.primary.mu+P.Con.third{j3}.mu)./a3.^3);
+    k3 = P.Con.third{j3}.mu/2./r3.^3; % Skip mean motion, just use mu
 
-    % Common factors
+
+    % Common factors - all 1xnT
     Rsma = 2*k3*sma/nMo;
     Recc = k3*eta/nMo/e;
     Rinc = k3/nMo/eta/sin(inc);
@@ -127,25 +132,32 @@ for j3 = 1:n3
     % Calculate Spectrum of Elements
     k = 0:kMax;
 
-    lpeSpec(1:2,:) = lpeSpec(1:2,:) + ...
-        Rsma*[s1*(BkM.*k);
-        -(c1*AkM.*k+c0*CkM.*k)]; 
-    lpeSpec(3:4,:) = lpeSpec(3:4,:) + ...
-        Recc*[eta*s1*(BkM.*k) - (dc1do*AkM+dc0do*CkM);
-        -eta*(c1*AkM.*k+c0*CkM.*k) - ds1do*BkM];
-    lpeSpec(5:6,:) = lpeSpec(5:6,:) + ...
-        Rinc*[cos(inc)*(dc1do*AkM + dc0do*CkM) - (dc1dO*AkM + dc0dO*CkM);
-        cos(inc)*ds1do*BkM - ds1dO*BkM];
-    lpeSpec(7:8,:) = lpeSpec(7:8,:) + ...
-        Rran*[dc1di*AkM + dc0di*CkM;
-        ds1di*BkM];
-    lpeSpec(9:10,:) = lpeSpec(9:10,:) + ...
-        Raop*[eta/e*(c1*AkdeM + c0*CkdeM) - cos(inc)/sin(inc)/eta*(dc1di*AkM + dc0di*CkM);
-        eta/e*(s1*BkdeM) - cos(inc)/sin(inc)/eta*ds1di*BkM];
-    lpeSpec(11:12,:) = lpeSpec(11:12,:) + ...
-        Rman*[eta^2/e*(c1*AkdeM + c0*CkdeM) + 4*(c1*AkM + c0*CkM);
-        eta^2/e*(s1*BkdeM) + 4*s1*BkM];
+    lpeSpec(1:2*(kMax+1),:) = lpeSpec(1:2*(kMax+1),:) + ...
+        Rsma.*[s1.'*(BkM.*k),...
+        -(c1.'*AkM.*k+c0.'*CkM.*k)].'; 
+
+    lpeSpec(2*(kMax+1)+1:4*(kMax+1),:) = lpeSpec(2*(kMax+1)+1:4*(kMax+1),:) + ...
+        Recc.*[eta*s1.'*(BkM.*k) - (dc1do.'*AkM+dc0do.'*CkM),...
+        -eta*(c1.'*AkM.*k+c0.'*CkM.*k) - ds1do.'*BkM].';
+
+    lpeSpec(4*(kMax+1)+1:6*(kMax+1),:) = lpeSpec(4*(kMax+1)+1:6*(kMax+1),:) + ...
+        Rinc.*[cos(inc)*(dc1do.'*AkM + dc0do.'*CkM) - (dc1dO.'*AkM + dc0dO.'*CkM),...
+        cos(inc)*ds1do.'*BkM - ds1dO.'*BkM].';
+
+    lpeSpec(6*(kMax+1)+1:8*(kMax+1),:) = lpeSpec(6*(kMax+1)+1:8*(kMax+1),:) + ...
+        Rran.*[dc1di.'*AkM + dc0di.'*CkM,...
+        ds1di.'*BkM].';
+
+    lpeSpec(8*(kMax+1)+1:10*(kMax+1),:) = lpeSpec(8*(kMax+1)+1:10*(kMax+1),:) + ...
+        Raop.*[eta/e*(c1.'*AkdeM + c0.'*CkdeM) - cos(inc)/sin(inc)/eta*(dc1di.'*AkM + dc0di.'*CkM),...
+        eta/e*(s1.'*BkdeM) - cos(inc)/sin(inc)/eta*ds1di.'*BkM].';
+
+    lpeSpec(10*(kMax+1)+1:12*(kMax+1),:) = lpeSpec(10*(kMax+1)+1:12*(kMax+1),:) + ...
+        Rman.*[eta^2/e*(c1.'*AkdeM + c0.'*CkdeM) + 4*(c1.'*AkM + c0.'*CkM),...
+        eta^2/e*(s1.'*BkdeM) + 4*s1.'*BkM].';
 end
-freq0 = lpeSpec(1:2:11,1);
-lpeSpec = lpeSpec(:,2:end);
+freq0 = lpeSpec(1:2*(kMax+1):10*(kMax+1)+1,:);
+iSpec = [2:kMax+1,(kMax+3:2*(kMax+1))];
+iSpec = [iSpec,iSpec+2*(kMax+1),iSpec+4*(kMax+1),iSpec+6*(kMax+1),iSpec+8*(kMax+1),iSpec+10*(kMax+1)];
+lpeSpec = lpeSpec(iSpec,:);
 

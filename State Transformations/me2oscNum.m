@@ -7,7 +7,7 @@ function [oeOsc1,fVal,exitflag,output] = me2oscNum(oeM)
 
 % *******  May be inaccurate for e<1e-3  *******
 
-primary = earth();
+primary = Earth;
 eta = sqrt(1-oeM(2)^2);
 % set bounds
 boundVec = oeM*primary.J2;
@@ -65,7 +65,7 @@ function [oeError] = meanSim(x,oeM)
 % simulate 1 orbit with proposed elements, average elements, output square
 % error between average and target mean
 
-primary = earth();
+primary = Earth;
 % tN = 2*pi*sqrt(x(1)^3/primary.mu)*(1-1.5*primary.J2*(primary.Re/x(1))^2*(3-4*sind(x(3))^2));
 T = 2*pi*sqrt(x(1)^3/primary.mu);
 nT = floor(T/100);

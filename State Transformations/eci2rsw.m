@@ -17,7 +17,7 @@ function [xRsw] = eci2rsw(xEci,oe,primary)
 %  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %
 if nargin < 3
-    primary = earth();
+    primary = Earth;
 end
 if nargin < 2
     oe = eci2oe(xEci,[],primary,'me');

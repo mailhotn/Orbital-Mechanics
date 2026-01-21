@@ -13,7 +13,7 @@ function [OE_m] = osc2me(OE_osc,J2,Re)
 % Outputs a 6xN Matrix on mean elements in the same order
 
 if nargin == 1
-    primary = earth();
+    primary = Earth;
     J2 = primary.J2;
     Re = primary.Re;
 end

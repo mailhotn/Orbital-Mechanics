@@ -12,7 +12,7 @@ function [oeM] = osc2meSP(oeOsc,primary)
 % Outputs a 6xN Matrix on mean elements in the same order
 
 if nargin == 1
-    primary = earth();
+    primary = Earth;
 end
     
 

@@ -372,6 +372,8 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 fourIntSolAll = Ak*Sk + Bk*Ck;
 
                 Xi = icOsc + freq0*T + fourIntSolAll - fourIntSolAll(:,1);
+                % nM = sqrt(P.Con.primary.mu./Xi(1,:).^3);
+                % Xi(6,:) = Xi(6,:) + cumtrapz(T,nM);
                 Xi(6,:) = Xi(6,:) + M - icOsc(6);
 
 
@@ -530,7 +532,7 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 icOsc(3:end) = icOsc(3:end)*pi/180;
 
                 % third body elements
-                [freq0,lpeSpec] = P.DynOeFourier3B([],icM,kMax);
+                [freq0,lpeSpec] = P.DynOeFourier3B(T,icM,kMax);
                 
                 smaM = icM(1);
                 nM = sqrt(P.Con.primary.mu/smaM^3);
@@ -547,24 +549,28 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
                 Xi = nan(6,length(T));
                 
                 
-                % Fix M - add first Fourier variations
-                Sk = sin(k.'*M)./k.'/nM;
-                Ck = -cos(k.'*M)./k.'/nM;
-                AkM = lpeSpec(11,:);
-                BkM = lpeSpec(12,:);
-                fourIntSolM = AkM*Sk + BkM*Ck;
-                M2 = freq0(6)*T + fourIntSolM - fourIntSolM(1) + M;
-                % M2 = M;
+                % Fix M - add first Fourier variations - seems unnecessary here
+                % Sk = sin(k.'*M)./k.'/nM;
+                % Ck = -cos(k.'*M)./k.'/nM;
+                % AkM = lpeSpec((10*kMax+1):11*kMax,:);
+                % BkM = lpeSpec((11*kMax+1):12*kMax,:);
+                % fourIntSolM = sum(AkM.*Sk + BkM.*Ck);
+                % M2 = cumtrapz(T,freq0(6,:)) + fourIntSolM - fourIntSolM(1) + M;
+                M2 = M;
 
                 % Calculate all other elements
-                Sk = sin(k.'*M2)./k.'/nM;
-                Ck = -cos(k.'*M2)./k.'/nM;
-                Ak = lpeSpec(1:2:11,:);
-                Bk = lpeSpec(2:2:12,:);
-                fourIntSolAll = Ak*Sk + Bk*Ck;
-
-                Xi = icOsc + freq0*T + fourIntSolAll - fourIntSolAll(:,1);
-                Xi(6,:) = Xi(6,:) + M - icOsc(6);
+                Sk = repmat(sin(k.'*M2)./k.'/nM,6,1);
+                Ck = repmat(-cos(k.'*M2)./k.'/nM,6,1);
+                iAk = (1:(6*kMax)) + reshape(repmat((0:5)*kMax,kMax,1),1,kMax*6); % Indices for Ak in Spectrum
+                iBk = (1:(6*kMax)) + reshape(repmat((1:6)*kMax,kMax,1),1,kMax*6);
+                Ak = lpeSpec(iAk,:);
+                Bk = lpeSpec(iBk,:);
+                sumMat = blkdiag(ones(1,kMax),ones(1,kMax),ones(1,kMax),ones(1,kMax),ones(1,kMax),ones(1,kMax));
+                fourIntSolAll = sumMat*(Ak.*Sk + Bk.*Ck); % Solution to integral of LPE in Fourier Form
+                
+                Xi = icOsc + cumtrapz(T,freq0,2) + fourIntSolAll - fourIntSolAll(:,1);
+                nM = sqrt(P.Con.primary.mu./Xi(1,:).^3);
+                Xi(6,:) = Xi(6,:) + cumtrapz(T,nM);
 
 
                 Xi(3:5,:) = wrapTo360(Xi(3:5,:)*180/pi);

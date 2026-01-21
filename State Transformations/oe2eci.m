@@ -18,7 +18,7 @@ function [R, V] = oe2eci (OE, primary, fastParam)
 %  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %
 if nargin < 2
-    primary = earth();
+    primary = Earth;
     % default is earth orbit of satellite with negligible mass
 end
 if nargin < 3

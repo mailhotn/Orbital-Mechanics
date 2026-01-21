@@ -11,7 +11,7 @@ Prop = Propagator(Form);
 % followSat = SingleSat(oeLead+dOe);
 % followProp = Propagator(followSat);
 
-primary = earth();
+primary = Earth;
 mu = primary.mu;
 
 nDay = 1;
