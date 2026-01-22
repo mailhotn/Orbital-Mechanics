@@ -1,11 +1,17 @@
 clear
 %% Setup
-ic = [42164, 0.01, 60, 40, 30, 10].';
 primary = Earth;
 third = {Moon,Sun};
+T = 86164/2;
+sma = ((T/2/pi)^2*primary.mu)^(1/3);
+ic = [sma, 0.74, 63.4, 30, 270, 10].'; % Molniya
+
+% T = 86164;
+% sma = ((T/2/pi)^2*primary.mu)^(1/3);
+% ic = [sma, 0.001, 5, 30, 30, 10].'; % GEO
+
 Sat = SingleSat(ic,primary,third);
 Prop = Propagator(Sat);
-T = 2*pi*sqrt(ic(1)^3/primary.mu);
 t = 0:1000:86400*20;
 kMax = 4;
 %% Propagate
@@ -17,7 +23,7 @@ oe1 = eci2oe(X1.',[],primary,'me');
 oe1(6,:) = unwrap(oe1(6,:)*pi/180)*180/pi - sqrt(primary.mu./oe1(1,:).^3).*t*180/pi;
 stableTime = toc;
 
-lan1 = oe1(5,:) + oe1(6,:);
+lan1 = oe1(5,:) + oe1(6,:)+oe1(4,:);
 % oe1(6,:) = lan1;
 % Prop using Taylor solution
 tic
@@ -25,7 +31,7 @@ tic
 oe2 = eci2oe(X2.',[],primary,'me');
 oe2(6,:) = unwrap(oe2(6,:)*pi/180)*180/pi- sqrt(primary.mu./oe2(1,:).^3).*t*180/pi;
 taylorTime = toc;
-lan2 = oe2(5,:) + oe2(6,:);
+lan2 = oe2(5,:) + oe2(6,:)+oe2(4,:);
 % oe2(6,:) = lan2;
 % Prop using Naive solution
 tic
@@ -33,22 +39,22 @@ tic
 oe3 = eci2oe(X3.',[],primary,'me');
 oe3(6,:) = unwrap(oe3(6,:)*pi/180)*180/pi- sqrt(primary.mu./oe3(1,:).^3).*t*180/pi;
 directTime = toc;
-lan3 = oe3(5,:) + oe3(6,:);
+lan3 = oe3(5,:) + oe3(6,:)+oe3(4,:);
 % oe3(6,:) = lan3;
 % Prop using Fourier solution
 tic
 [~,oeF] = Prop.PropOeFourier3B(t,kMax);
 oeF = oeF.';
 fourTime = toc;
-
+% oeF(6,:) = me2ta(oeF(6,:),oeF(2,:));
 oeF(6,:) = oeF(6,:) - sqrt(primary.mu./oeF(1,:).^3).*t*180/pi;
-lanF = oeF(5,:) + oeF(6,:);
+lanF = oeF(5,:) + oeF(6,:)+ oeF(4,:);
 % oeF(6,:) = lanF;
 %% Calculate relative errors
-err2 = abs(oe2-oe1)./oe1;
-err3 = abs(oe3-oe1)./oe1;
-errF = abs(oeF-oe1)./oe1;
-
+err2 = abs(oe2-oe1);
+err3 = abs(oe3-oe1);
+errF = abs(oeF-oe1)./abs(oe1);
+meanErr = trapz(t,errF,2)/t(end)
 %% Plot
 lWidth = 1.5;
 tD = t/86400;
@@ -105,10 +111,13 @@ ylabel('\omega')
 xlabel('t [day]')
 nexttile
 plot(tD,err2(6,:),tD,err3(6,:),'--',tD,errF(6,:),LineWidth=lWidth)
-ylabel('M')
+ylabel('M - nt')
 xlabel('t [day]')
 figure(3)
 bar([stableTime,taylorTime,directTime,fourTime])
 
 figure(4)
-plot(tD,lan1,tD,lanF,'--',LineWidth=lWidth)
+plot(tD,lan1,tD,lan2,tD,lanF,'--',LineWidth=lWidth)
+ylabel('L - nt [deg]')
+xlabel('t [day]')
+legend('Numerical - Stable','Numerical - Taylor','Fourier')

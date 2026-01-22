@@ -1,4 +1,4 @@
-function dX = ConDynOeOsc(P,t,X)  %#ok<INUSL>
+function dX = ConDynOeOsc(P,t,X)
             % rewrite with LPE, Controlled
             OE  = reshape(X,6,P.Con.nSats);
             % Normalized Parameters

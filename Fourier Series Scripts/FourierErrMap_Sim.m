@@ -8,7 +8,7 @@ dbPath = 'C:\Users\User\Google Drive'; % ASRI
 % dbPath = 'C:\Users\mailh\My Drive'; % home
 %
 Description = 'LEO Test: ha<1000, hp>400, nMax = k+3, simplified big test';
-primary = earth();
+primary = Earth;
 k1 = 5;
 k2 = 5; % k for alternate Fourier
 % k2 = []; % No comparison with different Fourier Methods
