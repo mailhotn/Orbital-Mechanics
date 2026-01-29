@@ -1,4 +1,4 @@
-function dX = DynEci3B(P,t,X,ForceModel) %#ok<INUSL>
+function dX = DynEci3B(P,t,X,ForceModel) 
 % 3b acceleration from Vallado (8-34) fifth edition
 % Normalized Parameters
 mu = P.Con.primary.mu;
