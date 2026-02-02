@@ -81,14 +81,16 @@ classdef ZhangInverse < OrbitControl
             % B31 = zeros(1,nT);
             % B32 = zeros(1,nT);
             B33 = 1/sqrt(mu)*sqrt(sma).*eta.*cos(tan+aop)./(ecc.*cos(tan)+1);
+            
+            D1 = diag(reshape([B11;B22;B33],1,nT*3));
+            D2 = reshape([B12;zeros(2,nT)],1,nT*3);
+            D2(end) = [];
+            D2 = diag(D2,1);
+            D3 = reshape([B21;zeros(2,nT)],1,nT*3);
+            D3(end) = [];
+            D3 = diag(D3,-1);
+            B = D1+D2+D3;
 
-            B = zeros(3*nT,3*nT);
-            iT = 3*(0:(nT-1));
-            B(1+iT,1+iT) = B11;
-            B(1+iT,2+iT) = B12;
-            B(2+iT,1+iT) = B21;
-            B(2+iT,2+iT) = B22;
-            B(3+iT,3+iT) = B33;
             % Calculate control acceleration
             fRsw = -B\dOe; % 3*nT x 1
             fRsw = reshape(fRsw,3,nT);
