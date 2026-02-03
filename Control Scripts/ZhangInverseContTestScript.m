@@ -1,24 +1,25 @@
 clear
 %% Setup
-icM = [7000,0.005,0.175*180/pi,10,10,0].';
-tOe = [7191.1,0.005,0.175*180/pi].';
+icM = [7000,0.005,0.175*180/pi,10,10,0].'; % initial mean state
+tOe = [7191.1,0.005,0.175*180/pi].'; % target mean state
 icOsc = me2osc(icM);
 
+% Primary & state scaling
 primary = Earth;
 dScale = primary.Re;
 tScale = sqrt(primary.Re^3/primary.mu);
 fScale = dScale/tScale^2;
-
 T = 2*pi*sqrt(icM(1)^3/primary.mu);
-thrustMag = 6e-6;
+% Controller parameters
+thrustMag = 6e-6; % km/s^2
 tol = 1e-5;
-
+% Initialize
 Sat = SingleSat(icOsc,primary);
 Control = ZhangInverse(tOe,thrustMag,tol);
 Prop = Propagator(Sat,Control);
 
-t = 0:10:T*10;
-
+% Propagate
+t = 0:100:T*10;
 [~,X] = Prop.PropConOeOsc(t);
 X = X.';
 XM = osc2me(X);
@@ -27,7 +28,7 @@ XM = osc2me(X);
 lWidth = 1.5;
 tD = t/T;
 % X = XM;
-figure(1)
+figure()
 tiledlayout(3,2,"Padding","compact","Tilespacing","tight")
 
 nexttile
