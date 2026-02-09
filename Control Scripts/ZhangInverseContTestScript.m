@@ -1,7 +1,11 @@
 clear
 %% Setup
+% sma control
 icM = [7000,0.005,0.175*180/pi,10,10,0].'; % initial mean state
 tOe = [7191.1,0.005,0.175*180/pi].'; % target mean state
+% inc control
+icM = [7489,0.001,1.5*180/pi,10,10,0].'; % initial mean state
+tOe = [7489.1,0.001,1.745*180/pi].'; % target mean state
 icOsc = me2osc(icM);
 
 % Primary & state scaling
@@ -19,7 +23,7 @@ Control = ZhangInverse(tOe,thrustMag,tol);
 Prop = Propagator(Sat,Control);
 
 % Propagate
-t = 0:100:T*10;
+t = 0:100:T*100;
 [~,X] = Prop.PropConOeOsc(t);
 X = X.';
 XM = osc2me(X);

@@ -286,6 +286,26 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
             X = X.*eciScale.';
         end
 
+        function [Time, X] = PropOeMeanSingle3B(P,T)
+            % Propagate for time T classical elements with third bodies
+            % Based on T. Nie and P. Gurfil, “Long-term evolution of 
+            % orbital inclination due to third-body inclination,”  Jan. 2021
+
+            % Real units
+            opts = odeset('reltol',P.relTol,'abstol',P.absTol);
+            % handle Initial Conditions
+            OE = P.Con.InitialOeOsc;
+            OE(3:end,:) = OE(3:end,:)*pi/180;
+            IC = reshape(OE,[6*P.Con.nSats,1]);
+            % Prop 
+            [Time, X] = ode78(@P.DynOeMeanSingle3B,T,IC,opts);
+            inddeg = reshape((3:6).'+(0:P.Con.nSats-1)*6,4*P.Con.nSats,1);
+            indWrap = reshape((3:5).'+(0:P.Con.nSats-1)*6,3*P.Con.nSats,1);
+            X(:,inddeg) = (180/pi*X(:,inddeg));
+            X(:,indWrap) = wrapTo360(X(:,indWrap));
+            
+        end
+
         function [Time, X] = PropOeFourierNoMFix(P,T,kMax)
             % Retest if sequential M is good. It's less rigorous?
             % Propagate for time T using Fourier LPE
@@ -839,6 +859,8 @@ classdef Propagator < handle &  matlab.mixin.CustomDisplay
         dX = DynEciJ3(P,t,X)
 
         dX = DynEci3B(P,t,X,ForceModel)
+        
+        dX = DynOeMeanSingle3B(P,t,X)
         
         [freq0,lpeSpec] = DynOeFourier(P,t,icM,kMax)
 

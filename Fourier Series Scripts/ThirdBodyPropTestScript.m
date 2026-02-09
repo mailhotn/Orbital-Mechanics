@@ -2,17 +2,17 @@ clear
 %% Setup
 primary = Earth;
 third = {Moon,Sun};
-T = 86164/2;
-sma = ((T/2/pi)^2*primary.mu)^(1/3);
-ic = [sma, 0.74, 63.4, 30, 270, 10].'; % Molniya
-
-% T = 86164;
+% T = 86164/2;
 % sma = ((T/2/pi)^2*primary.mu)^(1/3);
-% ic = [sma, 0.001, 5, 30, 30, 10].'; % GEO
+% ic = [sma, 0.74, 63.4, 30, 270, 10].'; % Molniya
+
+T = 86164;
+sma = ((T/2/pi)^2*primary.mu)^(1/3);
+ic = [sma, 0.001, 5, 30, 30, 10].'; % GEO
 
 Sat = SingleSat(ic,primary,third);
 Prop = Propagator(Sat);
-t = 0:1000:86400*20;
+t = 0:1000:86400*200;
 kMax = 4;
 %% Propagate
 
@@ -24,7 +24,7 @@ oe1(6,:) = unwrap(oe1(6,:)*pi/180)*180/pi - sqrt(primary.mu./oe1(1,:).^3).*t*180
 stableTime = toc;
 
 lan1 = oe1(5,:) + oe1(6,:)+oe1(4,:);
-% oe1(6,:) = lan1;
+oe1(6,:) = lan1;
 % Prop using Taylor solution
 tic
 [~,X2] = Prop.PropEci3B(t,'Taylor');
@@ -49,10 +49,20 @@ fourTime = toc;
 % oeF(6,:) = me2ta(oeF(6,:),oeF(2,:));
 oeF(6,:) = oeF(6,:) - sqrt(primary.mu./oeF(1,:).^3).*t*180/pi;
 lanF = oeF(5,:) + oeF(6,:)+ oeF(4,:);
-% oeF(6,:) = lanF;
+oeF(6,:) = lanF;
+% Prop using singly averaged
+tic
+[~,oeS] = Prop.PropOeMeanSingle3B(t);
+oeS = oeS.';
+singleTime = toc;
+oeS(6,:) = oeS(6,:) - sqrt(primary.mu./oeS(1,:).^3).*t*180/pi;
+lanS =  oeS(5,:) + oeS(6,:) + oeS(4,:);
+oe2 = oeS;
+lan2 = lanS;
+oe2(6,:) = lan2;
 %% Calculate relative errors
-err2 = abs(oe2-oe1);
-err3 = abs(oe3-oe1);
+err2 = abs(oe2-oe1)./abs(oe1);
+err3 = abs(oe3-oe1)*0;
 errF = abs(oeF-oe1)./abs(oe1);
 meanErr = trapz(t,errF,2)/t(end)
 %% Plot
@@ -90,31 +100,31 @@ xlabel('t [day]')
 figure(2)
 tiledlayout(3,2,"Padding","compact","Tilespacing","tight")
 nexttile
-plot(tD,err2(1,:),tD,err3(1,:),'--',tD,errF(1,:),LineWidth=lWidth)
+plot(tD,err3(1,:),tD,err2(1,:),'--',tD,errF(1,:),LineWidth=lWidth)
 ylabel('a')
 xlabel('t [day]')
 nexttile
-plot(tD,err2(2,:),tD,err3(2,:),'--',tD,errF(2,:),LineWidth=lWidth)
+plot(tD,err3(2,:),tD,err2(2,:),'--',tD,errF(2,:),LineWidth=lWidth)
 ylabel('e')
 xlabel('t [day]')
 nexttile
-plot(tD,err2(3,:),tD,err3(3,:),'--',tD,errF(3,:),LineWidth=lWidth)
+plot(tD,err3(3,:),tD,err2(3,:),'--',tD,errF(3,:),LineWidth=lWidth)
 ylabel('i')
 xlabel('t [day]')
 nexttile
-plot(tD,err2(4,:),tD,err3(4,:),'--',tD,errF(4,:),LineWidth=lWidth)
+plot(tD,err3(4,:),tD,err2(4,:),'--',tD,errF(4,:),LineWidth=lWidth)
 ylabel('\Omega')
 xlabel('t [day]')
 nexttile
-plot(tD,err2(5,:),tD,err3(5,:),'--',tD,errF(5,:),LineWidth=lWidth)
+plot(tD,err3(5,:),tD,err2(5,:),'--',tD,errF(5,:),LineWidth=lWidth)
 ylabel('\omega')
 xlabel('t [day]')
 nexttile
-plot(tD,err2(6,:),tD,err3(6,:),'--',tD,errF(6,:),LineWidth=lWidth)
+plot(tD,err3(6,:),tD,err2(6,:),'--',tD,errF(6,:),LineWidth=lWidth)
 ylabel('M - nt')
 xlabel('t [day]')
 figure(3)
-bar([stableTime,taylorTime,directTime,fourTime])
+bar([stableTime,taylorTime,directTime,fourTime,singleTime])
 
 figure(4)
 plot(tD,lan1,tD,lan2,tD,lanF,'--',LineWidth=lWidth)
