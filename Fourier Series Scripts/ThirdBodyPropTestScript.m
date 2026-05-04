@@ -111,28 +111,28 @@ tiledlayout(3,2,"Padding","compact","Tilespacing","tight")
 nexttile
 plot(tD,errF(1,:),tD,errS(1,:),'--',LineWidth=lWidth)
 ylabel('$\delta a \;[\rm{km}]$',Interpreter='latex',FontSize=12)
-xlabel('$t [\rm{day}]$',Interpreter='latex',FontSize=12)
+xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
 plot(tD,errF(2,:),tD,errS(2,:),'--',LineWidth=lWidth)
 ylabel('$\delta e $',Interpreter='latex',FontSize=12)
-xlabel('$t [\rm{day}]$',Interpreter='latex',FontSize=12)
+xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 legend('Fourier','Singly Averaged')
 nexttile
 plot(tD,errF(3,:),tD,errS(3,:),'--',LineWidth=lWidth)
 ylabel('$\delta i \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
-xlabel('$t [\rm{day}]$',Interpreter='latex',FontSize=12)
+xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
 plot(tD,errF(4,:),tD,errS(4,:),'--',LineWidth=lWidth)
 ylabel('$\delta \Omega \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
-xlabel('$t [\rm{day}]$',Interpreter='latex',FontSize=12)
+xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
 plot(tD,errF(5,:),tD,errS(5,:),'--',LineWidth=lWidth)
 ylabel('$\delta \omega \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
-xlabel('$t [\rm{day}]$',Interpreter='latex',FontSize=12)
+xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
 plot(tD,errF(6,:),tD,errS(6,:),'--',LineWidth=lWidth)
 ylabel('$\delta M_0 \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
-xlabel('$t [\rm{day}]$',Interpreter='latex',FontSize=12)
+xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 
 if ~isempty(saveFolder)
 exportgraphics(gcf,[saveFolder '\MolniyaErrors.eps'],...
@@ -226,20 +226,20 @@ tiledlayout(2,2,"Padding","compact","Tilespacing","tight")
 nexttile
 plot(tD,errF(1,:),tD,errS(1,:),'--',LineWidth=lWidth)
 ylabel('$\delta a \;[\rm{km}]$',Interpreter='latex',FontSize=12)
-xlabel('$t [\rm{day}]$',Interpreter='latex',FontSize=12)
+xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
 plot(tD,errF(2,:),tD,errS(2,:),'--',LineWidth=lWidth)
 ylabel('$\delta e $',Interpreter='latex',FontSize=12)
-xlabel('$t [\rm{day}]$',Interpreter='latex',FontSize=12)
+xlabel('$t \;[\rm{day}]$',Interpreter='latex',FontSize=12)
 legend('Fourier','Singly Averaged')
 nexttile
 plot(tD,errF(3,:),tD,errS(3,:),'--',LineWidth=lWidth)
 ylabel('$\delta i \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
-xlabel('$t [\rm{day}]$',Interpreter='latex',FontSize=12)
+xlabel('$t \;[\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
 plot(tD,errF(4,:),tD,errS(4,:),'--',LineWidth=lWidth)
 ylabel('$\delta L \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
-xlabel('$t [\rm{day}]$',Interpreter='latex',FontSize=12)
+xlabel('$t \;[\rm{day}]$',Interpreter='latex',FontSize=12)
 
 if ~isempty(saveFolder)
 exportgraphics(gcf,[saveFolder '\GeoErrors.eps'],...
