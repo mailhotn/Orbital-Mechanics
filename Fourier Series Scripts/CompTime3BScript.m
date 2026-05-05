@@ -12,7 +12,7 @@ ic = [sma, 0.001, 5, 30, 30, 10].'; % GEO
 
 Sat = SingleSat(ic,primary,third);
 Prop = Propagator(Sat);
-t = 0:1000:86400*30;
+t = 0:1800:86400*30;
 kMax = 4;
 
 nTest = 100;

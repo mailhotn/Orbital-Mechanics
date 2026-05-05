@@ -1,21 +1,20 @@
 clear
+%%
 saveFolder = 'G:\My Drive\Doc Publications\2026 3 Body Fourier Paper\Figures';
-% saveFolder = [];
-%% Setup
+saveFolder = [];
 primary = Earth;
 third = {Moon,Sun};
+kMax = 4;
+dT = 1800; % 
+nDay = 30;
+t = 0:dT:86400*nDay;
+%% Setup Molniya
 T = 86164/2;
 sma = ((T/2/pi)^2*primary.mu)^(1/3);
 ic = [sma, 0.74, 63.4, 30, 270, 10].'; % Molniya
 
-% T = 86164;
-% sma = ((T/2/pi)^2*primary.mu)^(1/3);
-% ic = [sma, 0.001, 5, 30, 30, 10].'; % GEO
-
 MolSat = SingleSat(ic,primary,third);
 MolProp = Propagator(MolSat);
-t = 0:1000:86400*30;
-kMax = 4;
 %% Propagate Molniya
 % Prop using Good solution
 tic
@@ -146,17 +145,13 @@ end
 % ylabel('L - nt [\rm{deg}]')
 % xlabel('t [\rm{day}]')
 % legend('Numerical - Stable','Numerical - Taylor','Fourier')
-%% Setup
-primary = Earth;
-third = {Moon,Sun};
+%% Setup GEO
 T = 86164;
 sma = ((T/2/pi)^2*primary.mu)^(1/3);
 ic = [sma, 0.001, 5, 30, 30, 10].'; % GEO
 
 GeoSat = SingleSat(ic,primary,third);
 GeoProp = Propagator(GeoSat);
-t = 0:1000:86400*30;
-kMax = 4;
 %% Propagate Geo
 % Prop using Good solution
 tic
