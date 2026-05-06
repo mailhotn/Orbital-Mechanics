@@ -1,25 +1,25 @@
 clear
-%% Setup Molniya
+%% Setup
 primary = Earth;
 third = {Moon,Sun};
-% T = 86164/2;
-% sma = ((T/2/pi)^2*primary.mu)^(1/3);
-% ic = [sma, 0.74, 63.4, 30, 270, 10].'; % Molniya
-
-T = 86164;
+T = 86164/2;
 sma = ((T/2/pi)^2*primary.mu)^(1/3);
-ic = [sma, 0.001, 5, 30, 30, 10].'; % GEO
+ic = [sma, 0.74, 63.4, 30, 270, 10].'; % Molniya
+
+% T = 86164;
+% sma = ((T/2/pi)^2*primary.mu)^(1/3);
+% ic = [sma, 0.001, 5, 30, 30, 10].'; % GEO
 
 Sat = SingleSat(ic,primary,third);
 Prop = Propagator(Sat);
 t = 0:1800:86400*30;
 kMax = 4;
 
-nTest = 100;
+nTest = 10000;
 numTime = 0;
 fourTime = 0;
 singleTime = 0;
-%% Propagate Molniya
+%% Propagate 
 for iTest = 1:nTest
 % Prop using Good solution
 tic
@@ -42,7 +42,8 @@ oeS = oeS.';
 pTime = toc;
 singleTime = singleTime + pTime;
 end
-fourTime/numTime
-singleTime/numTime 
+fourTime
+singleTime
+numTime
 numTime/fourTime
 numTime/singleTime
