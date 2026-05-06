@@ -1,13 +1,15 @@
 clear
 %%
 saveFolder = 'G:\My Drive\Doc Publications\2026 3 Body Fourier Paper\Figures';
-saveFolder = [];
+saveFolder = []; % comment to overwrite saved images
+
 primary = Earth;
 third = {Moon,Sun};
 kMax = 4;
 dT = 1800; % 
 nDay = 30;
 t = 0:dT:86400*nDay;
+tS = (0:1800:30*86400)/86400;
 %% Setup Molniya
 T = 86164/2;
 sma = ((T/2/pi)^2*primary.mu)^(1/3);
@@ -47,6 +49,7 @@ tic
 [~,oeF] = MolProp.PropOeFourier3B(t,kMax);
 oeF = oeF.';
 fourTime = toc;
+xF = oe2eci(oeF,Earth,'me');
 % oeF(6,:) = me2ta(oeF(6,:),oeF(2,:));
 oeF(6,:) = oeF(6,:) - sqrt(primary.mu./oeF(1,:).^3).*t*180/pi;
 % lanF = oeF(5,:) + oeF(6,:)+ oeF(4,:);
@@ -54,18 +57,32 @@ oeF(6,:) = oeF(6,:) - sqrt(primary.mu./oeF(1,:).^3).*t*180/pi;
 
 % Prop using singly averaged
 tic
-[~,oeS] = MolProp.PropOeMeanSingle3B(t);
-oeS = oeS.';
+[~,oeA] = MolProp.PropOeMeanSingle3B(t);
+oeA = oeA.';
 singleTime = toc;
-oeS(6,:) = oeS(6,:) - sqrt(primary.mu./oeS(1,:).^3).*t*180/pi;
-% lanS =  oeS(5,:) + oeS(6,:) + oeS(4,:);
-% oeS(6,:) = lan2;
+xA = oe2eci(oeA,Earth,'me');
+oeA(6,:) = oeA(6,:) - sqrt(primary.mu./oeA(1,:).^3).*t*180/pi;
+%% Import Stela Data
+oeS = importdata('G:\My Drive\Doc Data\Stela 3B Sims\MolSimIcrf.mat').';
+xS = oe2eci(oeS,Earth,'me');
+xS(:,end) = nan(6,1);
+oeS(6,:) = unwrap(oeS(6,:)*pi/180)*180/pi - sqrt(primary.mu./oeS(1,:).^3).*t*180/pi;
+oeS(6,end) = nan; % weird outlier
+
 %% Calculate relative errors - Molniya
-errS = abs(oeS-oeN)./abs(oeN);
-% err3 = abs(oeN)*0;
-errF = abs(oeF-oeN)./abs(oeN);
+errA = abs(oeA-oeN);
+errS = abs(oeS-oeN);
+errS(6,end) = errS(6,end-1);
+errF = abs(oeF-oeN);
+dF = vecnorm((xF(1:3,:)-X1(:,1:3).'),2,1);
+dA = vecnorm((xA(1:3,:)-X1(:,1:3).'),2,1);
+dS = vecnorm((xS(1:3,:)-X1(:,1:3).'),2,1);
+vF = vecnorm((xF(4:6,:)-X1(:,4:6).'),2,1);
+vA = vecnorm((xA(4:6,:)-X1(:,4:6).'),2,1);
+vS = vecnorm((xS(4:6,:)-X1(:,4:6).'),2,1);
 meanErrFMol = trapz(t,errF,2)/t(end)
-meanErrSMol = trapz(t,errS,2)/t(end)
+meanErrSMol = trapz(t,errA,2)/t(end)
+meanErrStelaMol = trapz(t,errS,2)/t(end)
 molTimes = [stableTime,fourTime,singleTime]
 %% Plot Molniya
 % plot elements
@@ -74,28 +91,28 @@ tD = t/86400;
 figure("Units","centimeters","Position",[0,0,16,16])
 tiledlayout(3,2,"Padding","compact","Tilespacing","tight")
 nexttile
-plot(tD,oeF(1,:),tD,oeS(1,:),tD,oeN(1,:),'--',LineWidth=lWidth)
+plot(tD,oeF(1,:),tD,oeA(1,:),tS,oeS(1,:),':',tD,oeN(1,:),'--',LineWidth=lWidth)
 ylabel('$a \;[\rm{km}]$',Interpreter='latex',FontSize=12)
 xlabel('$t \;[\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,oeF(2,:),tD,oeS(2,:),tD,oeN(2,:),'--',LineWidth=lWidth)
+plot(tD,oeF(2,:),tD,oeA(2,:),tS,oeS(2,:),':',tD,oeN(2,:),'--',LineWidth=lWidth)
 ylabel('$e$',Interpreter='latex',FontSize=12)
 xlabel('$t \;[\rm{day}]$',Interpreter='latex',FontSize=12)
-legend('Fourier','Singly Averaged','Numerical',Location='southeast')
+legend('Fourier','Averaged','STELA','Numerical',Location='northwest')
 nexttile
-plot(tD,oeF(3,:),tD,oeS(3,:),tD,oeN(3,:),'--',LineWidth=lWidth)
+plot(tD,oeF(3,:),tD,oeA(3,:),tS,oeS(3,:),':',tD,oeN(3,:),'--',LineWidth=lWidth)
 ylabel('$i\; [\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,oeF(4,:),tD,oeS(4,:),tD,oeN(4,:),'--',LineWidth=lWidth)
+plot(tD,oeF(4,:),tD,oeA(4,:),tS,oeS(4,:),':',tD,oeN(4,:),'--',LineWidth=lWidth)
 ylabel('$\Omega \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,oeF(5,:),tD,oeS(5,:),tD,oeN(5,:),'--',LineWidth=lWidth)
+plot(tD,oeF(5,:),tD,oeA(5,:),tS,oeS(5,:),':',tD,oeN(5,:),'--',LineWidth=lWidth)
 ylabel('$\omega \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t \;[\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,oeF(6,:),tD,oeS(6,:),tD,oeN(6,:),'--',LineWidth=lWidth)
+plot(tD,oeF(6,:),tD,oeA(6,:),tS,oeS(6,:),':',tD,oeN(6,:),'--',LineWidth=lWidth)
 ylabel('$M_0 \; [\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 
@@ -108,28 +125,28 @@ end
 figure("Units","centimeters","Position",[0,0,16,16])
 tiledlayout(3,2,"Padding","compact","Tilespacing","tight")
 nexttile
-plot(tD,errF(1,:),tD,errS(1,:),'--',LineWidth=lWidth)
+plot(tD,errF(1,:),tD,errA(1,:),'--',tS,errS(1,:),':',LineWidth=lWidth)
 ylabel('$\delta a \;[\rm{km}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,errF(2,:),tD,errS(2,:),'--',LineWidth=lWidth)
+plot(tD,errF(2,:),tD,errA(2,:),'--',tS,errS(2,:),':',LineWidth=lWidth)
 ylabel('$\delta e $',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
-legend('Fourier','Singly Averaged')
+legend('Fourier','Averaged','STELA',Location='northwest')
 nexttile
-plot(tD,errF(3,:),tD,errS(3,:),'--',LineWidth=lWidth)
+plot(tD,errF(3,:),tD,errA(3,:),'--',tS,errS(3,:),':',LineWidth=lWidth)
 ylabel('$\delta i \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,errF(4,:),tD,errS(4,:),'--',LineWidth=lWidth)
+plot(tD,errF(4,:),tD,errA(4,:),'--',tS,errS(4,:),':',LineWidth=lWidth)
 ylabel('$\delta \Omega \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,errF(5,:),tD,errS(5,:),'--',LineWidth=lWidth)
+plot(tD,errF(5,:),tD,errA(5,:),'--',tS,errS(5,:),':',LineWidth=lWidth)
 ylabel('$\delta \omega \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,errF(6,:),tD,errS(6,:),'--',LineWidth=lWidth)
+plot(tD,errF(6,:),tD,errA(6,:),'--',tS,errS(6,:),':',LineWidth=lWidth)
 ylabel('$\delta M_0 \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 
@@ -137,14 +154,24 @@ if ~isempty(saveFolder)
 exportgraphics(gcf,[saveFolder '\MolniyaErrors.eps'],...
         "ContentType","vector","Resolution",600)
 end
-% figure(3)
-% bar([stableTime,fourTime,singleTime])
 
-% figure(4)
-% plot(tD,lan1,tD,lan2,tD,lanF,'--',LineWidth=lWidth)
-% ylabel('L - nt [\rm{deg}]')
-% xlabel('t [\rm{day}]')
-% legend('Numerical - Stable','Numerical - Taylor','Fourier')
+% plot dist vel errors
+figure("Units","centimeters","Position",[0,0,16,6])
+tiledlayout(1,2,"Padding","compact","Tilespacing","tight")
+nexttile
+plot(tD,dF,tD,dA,'--',tS,dS,':',LineWidth=lWidth)
+ylabel('$\delta d \;[\rm{km}]$',Interpreter='latex',FontSize=12)
+xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
+nexttile
+plot(tD,vF,tD,vA,'--',tS,vS,':',LineWidth=lWidth)
+ylabel('$\delta v \;\left[\rm{km}\rm{s}^{-1}\right]$',Interpreter='latex',FontSize=12)
+xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
+legend('Fourier','Averaged','STELA',Location='northwest')
+
+if ~isempty(saveFolder)
+exportgraphics(gcf,[saveFolder '\MolniyaPosVelErr.eps'],...
+        "ContentType","vector","Resolution",600)
+end
 %% Setup GEO
 T = 86164;
 sma = ((T/2/pi)^2*primary.mu)^(1/3);
@@ -167,24 +194,42 @@ tic
 [~,oeF] = GeoProp.PropOeFourier3B(t,kMax);
 oeF = oeF.';
 fourTime = toc;
+xF = oe2eci(oeF,Earth,'me');
 oeF(6,:) = oeF(6,:) - sqrt(primary.mu./oeF(1,:).^3).*t*180/pi;
 lanF = oeF(5,:) + oeF(6,:)+ oeF(4,:);
 oeF(4,:) = lanF;
 
 % Prop using singly averaged
 tic
-[~,oeS] = GeoProp.PropOeMeanSingle3B(t);
-oeS = oeS.';
+[~,oeA] = GeoProp.PropOeMeanSingle3B(t);
+oeA = oeA.';
 singleTime = toc;
-oeS(6,:) = oeS(6,:) - sqrt(primary.mu./oeS(1,:).^3).*t*180/pi;
-lanS =  oeS(5,:) + oeS(6,:) + oeS(4,:);
+xA = oe2eci(oeA,Earth,'me');
+oeA(6,:) = oeA(6,:) - sqrt(primary.mu./oeA(1,:).^3).*t*180/pi;
+lanA =  oeA(5,:) + oeA(6,:) + oeA(4,:);
+oeA(4,:) = lanA;
+%% Import Stela Data
+oeS = importdata('G:\My Drive\Doc Data\Stela 3B Sims\GeoSimIcrf.mat').';
+xS = oe2eci(oeS,Earth,'me');
+xS(:,end) = nan(6,1);
+oeS(6,:) = unwrap(oeS(6,:)*pi/180)*180/pi - sqrt(primary.mu./oeS(1,:).^3).*t*180/pi;
+lanS = oeS(5,:) + oeS(6,:)+oeS(4,:);
+lanS(end) = nan; % weird outlier
 oeS(4,:) = lanS;
 %% Calculate relative errors - GEO
-errS = abs(oeS-oeN)./abs(oeN);
-err3 = abs(oeN)*0;
-errF = abs(oeF-oeN)./abs(oeN);
+errA = abs(oeA-oeN);
+errS = abs(oeS-oeN);
+errS(4,end) = errS(4,end-1);
+errF = abs(oeF-oeN);
+dF = vecnorm((xF(1:3,:)-X1(:,1:3).'),2,1);
+dA = vecnorm((xA(1:3,:)-X1(:,1:3).'),2,1);
+dS = vecnorm((xS(1:3,:)-X1(:,1:3).'),2,1);
+vF = vecnorm((xF(4:6,:)-X1(:,4:6).'),2,1);
+vA = vecnorm((xA(4:6,:)-X1(:,4:6).'),2,1);
+vS = vecnorm((xS(4:6,:)-X1(:,4:6).'),2,1);
 meanErrFGeo = trapz(t,errF(1:4,:),2)/t(end)
-meanErrSGeo = trapz(t,errS(1:4,:),2)/t(end)
+meanErrSGeo = trapz(t,errA(1:4,:),2)/t(end)
+meanErrStelaGeo = trapz(t,errS(1:4,:),2)/t(end)
 geoTimes = [stableTime,fourTime,singleTime]
 %% Plot GEO
 % plot elements
@@ -193,20 +238,20 @@ tD = t/86400;
 figure("Units","centimeters","Position",[0,0,16,12])
 tiledlayout(2,2,"Padding","compact","Tilespacing","tight")
 nexttile
-plot(tD,oeF(1,:),tD,oeS(1,:),tD,oeN(1,:),'--',LineWidth=lWidth)
+plot(tD,oeF(1,:),tD,oeA(1,:),tS,oeS(1,:),':',tD,oeN(1,:),'--',LineWidth=lWidth)
 ylabel('$a \;[\rm{km}]$',Interpreter='latex',FontSize=12)
 xlabel('$t \;[\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,oeF(2,:),tD,oeS(2,:),tD,oeN(2,:),'--',LineWidth=lWidth)
+plot(tD,oeF(2,:),tD,oeA(2,:),tS,oeS(2,:),':',tD,oeN(2,:),'--',LineWidth=lWidth)
 ylabel('$e$',Interpreter='latex',FontSize=12)
 xlabel('$t \;[\rm{day}]$',Interpreter='latex',FontSize=12)
-legend('Fourier','Singly Averaged','Numerical',Location='southeast')
+legend('Fourier','Averaged','STELA','Numerical',Location='northwest')
 nexttile
-plot(tD,oeF(3,:),tD,oeS(3,:),tD,oeN(3,:),'--',LineWidth=lWidth)
+plot(tD,oeF(3,:),tD,oeA(3,:),tS,oeS(3,:),':',tD,oeN(3,:),'--',LineWidth=lWidth)
 ylabel('$i\; [\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,lanF,tD,lanS,tD,lanN,'--',LineWidth=lWidth)
+plot(tD,lanF,tD,lanA,tS,lanS,':',tD,lanN,'--',LineWidth=lWidth)
 ylabel('$L \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 
@@ -219,24 +264,42 @@ end
 figure("Units","centimeters","Position",[0,0,16,12])
 tiledlayout(2,2,"Padding","compact","Tilespacing","tight")
 nexttile
-plot(tD,errF(1,:),tD,errS(1,:),'--',LineWidth=lWidth)
+plot(tD,errF(1,:),tD,errA(1,:),'--',tS,errS(1,:),':',LineWidth=lWidth)
 ylabel('$\delta a \;[\rm{km}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,errF(2,:),tD,errS(2,:),'--',LineWidth=lWidth)
+plot(tD,errF(2,:),tD,errA(2,:),'--',tS,errS(2,:),':',LineWidth=lWidth)
 ylabel('$\delta e $',Interpreter='latex',FontSize=12)
 xlabel('$t \;[\rm{day}]$',Interpreter='latex',FontSize=12)
-legend('Fourier','Singly Averaged')
+legend('Fourier','Averaged','STELA',Location='northwest')
 nexttile
-plot(tD,errF(3,:),tD,errS(3,:),'--',LineWidth=lWidth)
+plot(tD,errF(3,:),tD,errA(3,:),'--',tS,errS(3,:),':',LineWidth=lWidth)
 ylabel('$\delta i \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t \;[\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,errF(4,:),tD,errS(4,:),'--',LineWidth=lWidth)
+plot(tD,errF(4,:),tD,errA(4,:),'--',tS,errS(4,:),':',LineWidth=lWidth)
 ylabel('$\delta L \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t \;[\rm{day}]$',Interpreter='latex',FontSize=12)
 
 if ~isempty(saveFolder)
 exportgraphics(gcf,[saveFolder '\GeoErrors.eps'],...
+        "ContentType","vector","Resolution",600)
+end
+
+% plot dist vel errors
+figure("Units","centimeters","Position",[0,0,16,6])
+tiledlayout(1,2,"Padding","compact","Tilespacing","tight")
+nexttile
+plot(tD,dF,tD,dA,'--',tS,dS,':',LineWidth=lWidth)
+ylabel('$\delta d \;[\rm{km}]$',Interpreter='latex',FontSize=12)
+xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
+nexttile
+plot(tD,vF,tD,vA,'--',tS,vS,':',LineWidth=lWidth)
+ylabel('$\delta v \;\left[\rm{km}\rm{s}^{-1}\right]$',Interpreter='latex',FontSize=12)
+xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
+legend('Fourier','Averaged','STELA',Location='northwest')
+
+if ~isempty(saveFolder)
+exportgraphics(gcf,[saveFolder '\GeoPosVelErr.eps'],...
         "ContentType","vector","Resolution",600)
 end
