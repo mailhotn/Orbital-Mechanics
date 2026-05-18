@@ -1,7 +1,7 @@
 clear
 %%
 saveFolder = 'G:\My Drive\Doc Publications\2026 3 Body Fourier Paper\Figures';
-saveFolder = []; % comment to overwrite saved images
+% saveFolder = []; % comment to overwrite saved images
 
 primary = Earth;
 third = {Moon,Sun};
@@ -9,7 +9,6 @@ kMax = 4;
 dT = 1800; % 
 nDay = 30;
 t = 0:dT:86400*nDay;
-tS = (0:1800:30*86400)/86400;
 %% Setup Molniya
 T = 86164/2;
 sma = ((T/2/pi)^2*primary.mu)^(1/3);
@@ -91,28 +90,28 @@ tD = t/86400;
 figure("Units","centimeters","Position",[0,0,16,16])
 tiledlayout(3,2,"Padding","compact","Tilespacing","tight")
 nexttile
-plot(tD,oeF(1,:),tD,oeA(1,:),tS,oeS(1,:),':',tD,oeN(1,:),'--',LineWidth=lWidth)
+plot(tD,oeF(1,:),tD,oeA(1,:),tD,oeS(1,:),':',tD,oeN(1,:),'--',LineWidth=lWidth)
 ylabel('$a \;[\rm{km}]$',Interpreter='latex',FontSize=12)
 xlabel('$t \;[\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,oeF(2,:),tD,oeA(2,:),tS,oeS(2,:),':',tD,oeN(2,:),'--',LineWidth=lWidth)
+plot(tD,oeF(2,:),tD,oeA(2,:),tD,oeS(2,:),':',tD,oeN(2,:),'--',LineWidth=lWidth)
 ylabel('$e$',Interpreter='latex',FontSize=12)
 xlabel('$t \;[\rm{day}]$',Interpreter='latex',FontSize=12)
 legend('Fourier','Averaged','STELA','Numerical',Location='northwest')
 nexttile
-plot(tD,oeF(3,:),tD,oeA(3,:),tS,oeS(3,:),':',tD,oeN(3,:),'--',LineWidth=lWidth)
+plot(tD,oeF(3,:),tD,oeA(3,:),tD,oeS(3,:),':',tD,oeN(3,:),'--',LineWidth=lWidth)
 ylabel('$i\; [\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,oeF(4,:),tD,oeA(4,:),tS,oeS(4,:),':',tD,oeN(4,:),'--',LineWidth=lWidth)
+plot(tD,oeF(4,:),tD,oeA(4,:),tD,oeS(4,:),':',tD,oeN(4,:),'--',LineWidth=lWidth)
 ylabel('$\Omega \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,oeF(5,:),tD,oeA(5,:),tS,oeS(5,:),':',tD,oeN(5,:),'--',LineWidth=lWidth)
+plot(tD,oeF(5,:),tD,oeA(5,:),tD,oeS(5,:),':',tD,oeN(5,:),'--',LineWidth=lWidth)
 ylabel('$\omega \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t \;[\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,oeF(6,:),tD,oeA(6,:),tS,oeS(6,:),':',tD,oeN(6,:),'--',LineWidth=lWidth)
+plot(tD,oeF(6,:),tD,oeA(6,:),tD,oeS(6,:),':',tD,oeN(6,:),'--',LineWidth=lWidth)
 ylabel('$M_0 \; [\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 
@@ -125,28 +124,28 @@ end
 figure("Units","centimeters","Position",[0,0,16,16])
 tiledlayout(3,2,"Padding","compact","Tilespacing","tight")
 nexttile
-plot(tD,errF(1,:),tD,errA(1,:),'--',tS,errS(1,:),':',LineWidth=lWidth)
+plot(tD,errF(1,:),tD,errA(1,:),'--',tD,errS(1,:),':',LineWidth=lWidth)
 ylabel('$\delta a \;[\rm{km}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,errF(2,:),tD,errA(2,:),'--',tS,errS(2,:),':',LineWidth=lWidth)
+plot(tD,errF(2,:),tD,errA(2,:),'--',tD,errS(2,:),':',LineWidth=lWidth)
 ylabel('$\delta e $',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 legend('Fourier','Averaged','STELA',Location='northwest')
 nexttile
-plot(tD,errF(3,:),tD,errA(3,:),'--',tS,errS(3,:),':',LineWidth=lWidth)
+plot(tD,errF(3,:),tD,errA(3,:),'--',tD,errS(3,:),':',LineWidth=lWidth)
 ylabel('$\delta i \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,errF(4,:),tD,errA(4,:),'--',tS,errS(4,:),':',LineWidth=lWidth)
+plot(tD,errF(4,:),tD,errA(4,:),'--',tD,errS(4,:),':',LineWidth=lWidth)
 ylabel('$\delta \Omega \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,errF(5,:),tD,errA(5,:),'--',tS,errS(5,:),':',LineWidth=lWidth)
+plot(tD,errF(5,:),tD,errA(5,:),'--',tD,errS(5,:),':',LineWidth=lWidth)
 ylabel('$\delta \omega \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,errF(6,:),tD,errA(6,:),'--',tS,errS(6,:),':',LineWidth=lWidth)
+plot(tD,errF(6,:),tD,errA(6,:),'--',tD,errS(6,:),':',LineWidth=lWidth)
 ylabel('$\delta M_0 \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 
@@ -159,12 +158,12 @@ end
 figure("Units","centimeters","Position",[0,0,16,6])
 tiledlayout(1,2,"Padding","compact","Tilespacing","tight")
 nexttile
-plot(tD,dF,tD,dA,'--',tS,dS,':',LineWidth=lWidth)
+plot(tD,dF,tD,dA,'--',tD,dS,':',LineWidth=lWidth)
 ylabel('$\delta d \;[\rm{km}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,vF,tD,vA,'--',tS,vS,':',LineWidth=lWidth)
-ylabel('$\delta v \;\left[\rm{km}\rm{s}^{-1}\right]$',Interpreter='latex',FontSize=12)
+plot(tD,vF,tD,vA,'--',tD,vS,':',LineWidth=lWidth)
+ylabel('$\delta v \;\left[\rm{km}\,\rm{s}^{-1}\right]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 legend('Fourier','Averaged','STELA',Location='northwest')
 
@@ -238,22 +237,22 @@ tD = t/86400;
 figure("Units","centimeters","Position",[0,0,16,12])
 tiledlayout(2,2,"Padding","compact","Tilespacing","tight")
 nexttile
-plot(tD,oeF(1,:),tD,oeA(1,:),tS,oeS(1,:),':',tD,oeN(1,:),'--',LineWidth=lWidth)
+plot(tD,oeF(1,:),tD,oeA(1,:),tD,oeS(1,:),':',tD,oeN(1,:),'--',LineWidth=lWidth)
 ylabel('$a \;[\rm{km}]$',Interpreter='latex',FontSize=12)
 xlabel('$t \;[\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,oeF(2,:),tD,oeA(2,:),tS,oeS(2,:),':',tD,oeN(2,:),'--',LineWidth=lWidth)
+plot(tD,oeF(2,:),tD,oeA(2,:),tD,oeS(2,:),':',tD,oeN(2,:),'--',LineWidth=lWidth)
 ylabel('$e$',Interpreter='latex',FontSize=12)
 xlabel('$t \;[\rm{day}]$',Interpreter='latex',FontSize=12)
-legend('Fourier','Averaged','STELA','Numerical',Location='northwest')
 nexttile
-plot(tD,oeF(3,:),tD,oeA(3,:),tS,oeS(3,:),':',tD,oeN(3,:),'--',LineWidth=lWidth)
+plot(tD,oeF(3,:),tD,oeA(3,:),tD,oeS(3,:),':',tD,oeN(3,:),'--',LineWidth=lWidth)
 ylabel('$i\; [\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,lanF,tD,lanA,tS,lanS,':',tD,lanN,'--',LineWidth=lWidth)
+plot(tD,lanF,tD,lanA,tD,lanS,':',tD,lanN,'--',LineWidth=lWidth)
 ylabel('$L \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
+legend('Fourier','Averaged','STELA','Numerical',Location='southwest')
 
 if ~isempty(saveFolder)
 exportgraphics(gcf,[saveFolder '\GeoElements.eps'],...
@@ -264,20 +263,20 @@ end
 figure("Units","centimeters","Position",[0,0,16,12])
 tiledlayout(2,2,"Padding","compact","Tilespacing","tight")
 nexttile
-plot(tD,errF(1,:),tD,errA(1,:),'--',tS,errS(1,:),':',LineWidth=lWidth)
+plot(tD,errF(1,:),tD,errA(1,:),'--',tD,errS(1,:),':',LineWidth=lWidth)
 ylabel('$\delta a \;[\rm{km}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,errF(2,:),tD,errA(2,:),'--',tS,errS(2,:),':',LineWidth=lWidth)
+plot(tD,errF(2,:),tD,errA(2,:),'--',tD,errS(2,:),':',LineWidth=lWidth)
 ylabel('$\delta e $',Interpreter='latex',FontSize=12)
 xlabel('$t \;[\rm{day}]$',Interpreter='latex',FontSize=12)
 legend('Fourier','Averaged','STELA',Location='northwest')
 nexttile
-plot(tD,errF(3,:),tD,errA(3,:),'--',tS,errS(3,:),':',LineWidth=lWidth)
+plot(tD,errF(3,:),tD,errA(3,:),'--',tD,errS(3,:),':',LineWidth=lWidth)
 ylabel('$\delta i \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t \;[\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,errF(4,:),tD,errA(4,:),'--',tS,errS(4,:),':',LineWidth=lWidth)
+plot(tD,errF(4,:),tD,errA(4,:),'--',tD,errS(4,:),':',LineWidth=lWidth)
 ylabel('$\delta L \;[\rm{deg}]$',Interpreter='latex',FontSize=12)
 xlabel('$t \;[\rm{day}]$',Interpreter='latex',FontSize=12)
 
@@ -290,12 +289,12 @@ end
 figure("Units","centimeters","Position",[0,0,16,6])
 tiledlayout(1,2,"Padding","compact","Tilespacing","tight")
 nexttile
-plot(tD,dF,tD,dA,'--',tS,dS,':',LineWidth=lWidth)
+plot(tD,dF,tD,dA,'--',tD,dS,':',LineWidth=lWidth)
 ylabel('$\delta d \;[\rm{km}]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 nexttile
-plot(tD,vF,tD,vA,'--',tS,vS,':',LineWidth=lWidth)
-ylabel('$\delta v \;\left[\rm{km}\rm{s}^{-1}\right]$',Interpreter='latex',FontSize=12)
+plot(tD,vF,tD,vA,'--',tD,vS,':',LineWidth=lWidth)
+ylabel('$\delta v \;\left[\rm{km}\,\rm{s}^{-1}\right]$',Interpreter='latex',FontSize=12)
 xlabel('$t\; [\rm{day}]$',Interpreter='latex',FontSize=12)
 legend('Fourier','Averaged','STELA',Location='northwest')
 
