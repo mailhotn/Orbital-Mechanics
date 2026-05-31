@@ -15,7 +15,7 @@ Prop = Propagator(Sat);
 t = 0:1800:86400*30;
 kMax = 4;
 
-nTest = 10000;
+nTest = 1000;
 numTime = 0;
 fourTime = 0;
 singleTime = 0;

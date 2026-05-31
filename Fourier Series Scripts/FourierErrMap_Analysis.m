@@ -1,7 +1,9 @@
 clear
 %% Load Data
 dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping'; % ASRI
+dataFolder = 'C:\Users\mailh\My Drive\Doc Data\Error Mapping'; % Home PC 
 imageFolder = 'C:\Users\User\Google Drive\Doc Publications\2025 LPE Fourier Paper\Figures\AutoGen';
+imageFolder = 'C:\Users\mailh\My Drive\Doc Seminar\Figures';
 
 % dataFolder = 'C:\Users\mailh\My Drive\Doc Data\Error Mapping'; % Home
 % imageFolder = 'C:\Users\mailh\My Drive\Doc Publications\2025 LPE Fourier Paper\Figures\AutoGen'; % home
@@ -73,7 +75,7 @@ imageFolder = 'C:\Users\User\Google Drive\Doc Publications\2025 LPE Fourier Pape
 % Comparison to no M fix
 % load([dataFolder '\ErrMaps_23-5-2025_16-29.mat']); % F2 is no M fix - USE IN PAPER?
 % load([dataFolder '\ErrMaps_8-7-2025_18-35.mat']); % Strict LEO - better?
-% load([dataFolder '\ErrMaps_10-7-2025_17-24.mat']); % Paper 1
+load([dataFolder '\ErrMaps_10-7-2025_17-24.mat']); % Paper 1
 % load([dataFolder '\ErrMaps_31-10-2025_6-10.mat']); % nMax = k+2
 % load([dataFolder '\ErrMapsMax_4-11-2025_7-8.mat']); % Max error
 % load([dataFolder '\ErrMaps_8-11-2025_14-29.mat']); % nMax = k+3, lower me2oscNum accuracy
@@ -81,7 +83,7 @@ imageFolder = 'C:\Users\User\Google Drive\Doc Publications\2025 LPE Fourier Pape
 % Simplified J2
 % load([dataFolder '\ErrMaps_2-12-2025_12-27.mat']); % J2 Simp test, me2oscNum
 % load([dataFolder '\ErrMaps_2-12-2025_12-31.mat']); % J2 Simp test, me2osc
-load([dataFolder '\ErrMaps_3-12-2025_5-31.mat']); % J2 Simp big test, me2osc
+% load([dataFolder '\ErrMaps_3-12-2025_5-31.mat']); % J2 Simp big test, me2osc
 
 
 

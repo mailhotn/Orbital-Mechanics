@@ -3,6 +3,8 @@ oeLead = [7000, 0.003, 5, 5, 5, 5].'; % init oe
 dOe = [0,0,0,0,0,1].'; % mean element difference for follower
 oeMat = [oeLead,oeLead + dOe];
 kMax = 5;
+imageFolder = 'C:\Users\mailh\My Drive\Doc Seminar\Figures';
+
 
 Form = GeneralFormation(oeLead,dOe);
 Prop = Propagator(Form);
@@ -104,50 +106,50 @@ xlim([0,nDay*24])
 xticks(linspace(0,nDay*24,5*nDay))
 ylabel('$\delta v \ Error \left[\rm{\frac{km}{s}}\right]$',Interpreter='latex',FontSize=12)
 %%
-figure("Units","centimeters","Position",[0,0,16,19])
-tiledlayout(4,2,"Padding","compact","TileSpacing","tight")
+figure("Units","centimeters","Position",[0,0,16,6])
+tiledlayout(1,2,"Padding","compact","TileSpacing","tight")
 
-nexttile %r
-plot(t/3600,dRswB(1,:)-dRswC(1,:),t/3600,dRswF(1,:)-dRswC(1,:),LineWidth=1.2)
+% nexttile %r
+% plot(t/3600,dRswB(1,:)-dRswC(1,:),t/3600,dRswF(1,:)-dRswC(1,:),LineWidth=1.2)
+% % legend('Kozai','Fourier')
+% xlim([0,nDay*24])
+% xticks([])
+% ylabel('$\delta r\; \rm{Error}  \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
+% 
+% nexttile %dr
+% plot(t/3600,(dRswB(4,:)-dRswC(4,:))*1,t/3600,(dRswF(4,:)-dRswC(4,:))*1,LineWidth=1.2)
 % legend('Kozai','Fourier')
-xlim([0,nDay*24])
-xticks([])
-ylabel('$\delta r\; \rm{Error}  \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
-
-nexttile %dr
-plot(t/3600,(dRswB(4,:)-dRswC(4,:))*1,t/3600,(dRswF(4,:)-dRswC(4,:))*1,LineWidth=1.2)
-legend('Kozai','Fourier')
-xlim([0,nDay*24])
-xticks([])
-ylabel('$\delta \dot{r} \; \rm{Error} \left[{\rm{km}}/\rm{s}\right]$',Interpreter='latex',FontSize=12)
-
-nexttile %s
-plot(t/3600,dRswB(2,:)-dRswC(2,:),t/3600,dRswF(2,:)-dRswC(2,:),LineWidth=1.2)
-% legend('Kozai','Fourier')
-xlim([0,nDay*24])
-xticks([])
-ylabel('$\delta s\; \rm{Error}  \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
-
-nexttile %ds
-plot(t/3600,dRswB(5,:)-dRswC(5,:),t/3600,dRswF(5,:)-dRswC(5,:),LineWidth=1.2)
-% legend('Kozai','Fourier')
-xlim([0,nDay*24])
-xticks([])
-ylabel('$\delta \dot{s}\; \rm{Error}  \left[\rm{km}/\rm{s}\right]$',Interpreter='latex',FontSize=12)
-
-nexttile %w
-plot(t/3600,dRswB(3,:)-dRswC(3,:),t/3600,dRswF(3,:)-dRswC(3,:),LineWidth=1.2)
-% legend('Kozai','Fourier')
-xlim([0,nDay*24])
-xticks([])
-ylabel('$\delta w\; \rm{Error}  \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
-
-nexttile % dw
-plot(t/3600,dRswB(6,:)-dRswC(6,:),t/3600,dRswF(6,:)-dRswC(6,:),LineWidth=1.2)
-% legend('Kozai','Fourier')
-xlim([0,nDay*24])
-xticks([])
-ylabel('$\delta \dot{w}\; \rm{Error} \left[\rm{km}/\rm{s}\right]$',Interpreter='latex',FontSize=12)
+% xlim([0,nDay*24])
+% xticks([])
+% ylabel('$\delta \dot{r} \; \rm{Error} \left[{\rm{km}}/\rm{s}\right]$',Interpreter='latex',FontSize=12)
+% 
+% nexttile %s
+% plot(t/3600,dRswB(2,:)-dRswC(2,:),t/3600,dRswF(2,:)-dRswC(2,:),LineWidth=1.2)
+% % legend('Kozai','Fourier')
+% xlim([0,nDay*24])
+% xticks([])
+% ylabel('$\delta s\; \rm{Error}  \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
+% 
+% nexttile %ds
+% plot(t/3600,dRswB(5,:)-dRswC(5,:),t/3600,dRswF(5,:)-dRswC(5,:),LineWidth=1.2)
+% % legend('Kozai','Fourier')
+% xlim([0,nDay*24])
+% xticks([])
+% ylabel('$\delta \dot{s}\; \rm{Error}  \left[\rm{km}/\rm{s}\right]$',Interpreter='latex',FontSize=12)
+% 
+% nexttile %w
+% plot(t/3600,dRswB(3,:)-dRswC(3,:),t/3600,dRswF(3,:)-dRswC(3,:),LineWidth=1.2)
+% % legend('Kozai','Fourier')
+% xlim([0,nDay*24])
+% xticks([])
+% ylabel('$\delta w\; \rm{Error}  \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
+% 
+% nexttile % dw
+% plot(t/3600,dRswB(6,:)-dRswC(6,:),t/3600,dRswF(6,:)-dRswC(6,:),LineWidth=1.2)
+% % legend('Kozai','Fourier')
+% xlim([0,nDay*24])
+% xticks([])
+% ylabel('$\delta \dot{w}\; \rm{Error} \left[\rm{km}/\rm{s}\right]$',Interpreter='latex',FontSize=12)
 
 nexttile % total position
 plot(t/3600,errPosTotB,t/3600,errPosTotF,LineWidth=1.2)
@@ -164,8 +166,11 @@ xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
 xlim([0,nDay*24])
 xticks(linspace(0,nDay*24,5*nDay))
 ylabel('$\delta v\; \rm{Error} \left[\rm{km}/\rm{s}\right]$',Interpreter='latex',FontSize=12)
+legend('Kozai','Fourier',Location='southeast')
 
 
+exportgraphics(gcf,[imageFolder '\FFSimAll.eps'],...
+        "ContentType","vector","Resolution",600)
 %% orbital Elements
 % figure(11)
 % plot(t/3600,errOeB(1,:),t/3600,errOeF(1,:))

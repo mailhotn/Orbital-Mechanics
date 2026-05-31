@@ -81,9 +81,9 @@ levelsOe = [levelsOe1;levelsOe2;levelsOe3;levelsOe4;levelsOe5;levelsOe6;levelsOe
 % range of colors so we consistently get 0 as the same color
 [xV,yV] = meshgrid([1,2],[1,2]);
 
-figure("Units","centimeters","Position",[0,0,16,19])
-tiledlayout(4,2,"Padding","compact","TileSpacing","tight")
-for iOe = [1,4,2,5,3,6,7,8]
+figure("Units","centimeters","Position",[0,0,16,6])
+tiledlayout(1,2,"Padding","loose","TileSpacing","tight")
+for iOe = [7,8]
     % Plot all
     nexttile
     contourf(xV,yV,levelsOe(iOe,end)*[1,0;0,-1],levelsOe(iOe,:))
