@@ -2,6 +2,7 @@ clear
 %%
 saveFolder = 'G:\My Drive\Doc Publications\2026 3 Body Fourier Paper\Figures';
 % saveFolder = []; % comment to overwrite saved images
+saveFolder = 'C:\Users\mailh\My Drive\Doc Thesis\Defense';
 
 primary = Earth;
 third = {Moon,Sun};
@@ -62,7 +63,7 @@ singleTime = toc;
 xA = oe2eci(oeA,Earth,'me');
 oeA(6,:) = oeA(6,:) - sqrt(primary.mu./oeA(1,:).^3).*t*180/pi;
 %% Import Stela Data
-oeS = importdata('G:\My Drive\Doc Data\Stela 3B Sims\MolSimIcrf.mat').';
+oeS = importdata('C:\Users\mailh\My Drive\Doc Data\Stela 3B Sims\MolSimIcrf.mat').';
 xS = oe2eci(oeS,Earth,'me');
 xS(:,end) = nan(6,1);
 oeS(6,:) = unwrap(oeS(6,:)*pi/180)*180/pi - sqrt(primary.mu./oeS(1,:).^3).*t*180/pi;
@@ -155,8 +156,8 @@ exportgraphics(gcf,[saveFolder '\MolniyaErrors.eps'],...
 end
 
 % plot dist vel errors
-figure("Units","centimeters","Position",[0,0,16,6])
-tiledlayout(1,2,"Padding","compact","Tilespacing","tight")
+figure("Units","centimeters","Position",[0,0,16,16])
+tiledlayout(2,1,"Padding","compact","Tilespacing","tight")
 nexttile
 plot(tD,dF,tD,dA,'--',tD,dS,':',LineWidth=lWidth)
 ylabel('$\delta d \;[\rm{km}]$',Interpreter='latex',FontSize=12)
@@ -208,7 +209,7 @@ oeA(6,:) = oeA(6,:) - sqrt(primary.mu./oeA(1,:).^3).*t*180/pi;
 lanA =  oeA(5,:) + oeA(6,:) + oeA(4,:);
 oeA(4,:) = lanA;
 %% Import Stela Data
-oeS = importdata('G:\My Drive\Doc Data\Stela 3B Sims\GeoSimIcrf.mat').';
+oeS = importdata('C:\Users\mailh\My Drive\Doc Data\Stela 3B Sims\GeoSimIcrf.mat').';
 xS = oe2eci(oeS,Earth,'me');
 xS(:,end) = nan(6,1);
 oeS(6,:) = unwrap(oeS(6,:)*pi/180)*180/pi - sqrt(primary.mu./oeS(1,:).^3).*t*180/pi;
@@ -286,8 +287,8 @@ exportgraphics(gcf,[saveFolder '\GeoErrors.eps'],...
 end
 
 % plot dist vel errors
-figure("Units","centimeters","Position",[0,0,16,6])
-tiledlayout(1,2,"Padding","compact","Tilespacing","tight")
+figure("Units","centimeters","Position",[0,0,16,16])
+tiledlayout(2,1,"Padding","compact","Tilespacing","tight")
 nexttile
 plot(tD,dF,tD,dA,'--',tD,dS,':',LineWidth=lWidth)
 ylabel('$\delta d \;[\rm{km}]$',Interpreter='latex',FontSize=12)

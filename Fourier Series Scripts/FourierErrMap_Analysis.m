@@ -3,7 +3,7 @@ clear
 dataFolder = 'C:\Users\User\Google Drive\Doc Data\Error Mapping'; % ASRI
 dataFolder = 'C:\Users\mailh\My Drive\Doc Data\Error Mapping'; % Home PC 
 imageFolder = 'C:\Users\User\Google Drive\Doc Publications\2025 LPE Fourier Paper\Figures\AutoGen';
-imageFolder = 'C:\Users\mailh\My Drive\Doc Seminar\Figures';
+imageFolder = 'C:\Users\mailh\My Drive\Doc Thesis\Defense';
 
 % dataFolder = 'C:\Users\mailh\My Drive\Doc Data\Error Mapping'; % Home
 % imageFolder = 'C:\Users\mailh\My Drive\Doc Publications\2025 LPE Fourier Paper\Figures\AutoGen'; % home

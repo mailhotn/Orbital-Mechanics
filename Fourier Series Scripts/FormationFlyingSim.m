@@ -4,6 +4,7 @@ dOe = [0,0,0,0,0,1].'; % mean element difference for follower
 oeMat = [oeLead,oeLead + dOe];
 kMax = 5;
 imageFolder = 'C:\Users\mailh\My Drive\Doc Seminar\Figures';
+imageFolder = 'C:\Users\mailh\My Drive\Doc Thesis\Defense';
 
 
 Form = GeneralFormation(oeLead,dOe);
@@ -106,8 +107,8 @@ xlim([0,nDay*24])
 xticks(linspace(0,nDay*24,5*nDay))
 ylabel('$\delta v \ Error \left[\rm{\frac{km}{s}}\right]$',Interpreter='latex',FontSize=12)
 %%
-figure("Units","centimeters","Position",[0,0,16,6])
-tiledlayout(1,2,"Padding","compact","TileSpacing","tight")
+figure("Units","centimeters","Position",[0,0,16,16])
+tiledlayout(2,1,"Padding","compact","TileSpacing","tight")
 
 % nexttile %r
 % plot(t/3600,dRswB(1,:)-dRswC(1,:),t/3600,dRswF(1,:)-dRswC(1,:),LineWidth=1.2)
@@ -154,7 +155,7 @@ tiledlayout(1,2,"Padding","compact","TileSpacing","tight")
 nexttile % total position
 plot(t/3600,errPosTotB,t/3600,errPosTotF,LineWidth=1.2)
 % legend('Kozai','Fourier')
-xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
+% xlabel('$Time \left[\rm{hr}\right]$',Interpreter='latex',FontSize=12)
 xlim([0,nDay*24])
 xticks(linspace(0,nDay*24,5*nDay))
 ylabel('$\delta d\; \rm{Error}  \left[\rm{km}\right]$',Interpreter='latex',FontSize=12)
