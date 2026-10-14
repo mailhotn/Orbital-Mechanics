@@ -4,6 +4,8 @@ J2 = P.Con.primary.J2;
 Re = P.Con.primary.Re;
 mu = P.Con.primary.mu;
 
+% Time to J2000
+tJ = t.'/86400+P.Con.epoch;
 % handle elements vector
 nT = length(t);
 
@@ -65,12 +67,10 @@ CkdeM = [3*e,CkdeM];
 n3 = length(P.Con.third);
 for j3 = 1:n3
     mu3 = P.Con.third{j3}.mu;
-    % [r3b,v3b] = planetEphemeris(P.Con.epoch,P.Con.primary.name,P.Con.third{j3}.name);
-    % oe3 = eci2oe3b(r3b.',v3b.',P.Con.primary,P.Con.third{j3});
-    % x3b = P.Con.x3AtEpoch;
-    [r3bMat, v3bMat] = P.Con.third{j3}.PosJ2000(t);
-    % r3b = x3b(1:3,j3);
-    % v3b = x3b(4:6,j3);
+    [r3bMat,v3bMat] = planetEphemeris(tJ,P.Con.primary.name,P.Con.third{j3}.name);
+    r3bMat = r3bMat.';
+    v3bMat = v3bMat.';
+    % [r3bMat, v3bMat] = P.Con.third{j3}.PosJ2000(t);
     oe3 = eci2oe3b(r3bMat,v3bMat,P.Con.primary,P.Con.third{j3});
     
     r3 = vecnorm(r3bMat,2,1);

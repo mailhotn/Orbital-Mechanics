@@ -1,7 +1,7 @@
 clear
 %%
 saveFolder = 'G:\My Drive\Doc Publications\2026 3 Body Fourier Paper\Figures';
-% saveFolder = []; % comment to overwrite saved images
+saveFolder = []; % comment to overwrite saved images
 
 primary = Earth;
 third = {Moon,Sun};
