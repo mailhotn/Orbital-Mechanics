@@ -67,10 +67,10 @@ CkdeM = [3*e,CkdeM];
 n3 = length(P.Con.third);
 for j3 = 1:n3
     mu3 = P.Con.third{j3}.mu;
-    [r3bMat,v3bMat] = planetEphemeris(tJ,P.Con.primary.name,P.Con.third{j3}.name);
-    r3bMat = r3bMat.';
-    v3bMat = v3bMat.';
-    % [r3bMat, v3bMat] = P.Con.third{j3}.PosJ2000(t);
+    % [r3bMat,v3bMat] = planetEphemeris(tJ,P.Con.primary.name,P.Con.third{j3}.name);
+    % r3bMat = r3bMat.';
+    % v3bMat = v3bMat.';
+    [r3bMat, v3bMat] = P.Con.third{j3}.PosJ2000(t);
     oe3 = eci2oe3b(r3bMat,v3bMat,P.Con.primary,P.Con.third{j3});
     
     r3 = vecnorm(r3bMat,2,1);

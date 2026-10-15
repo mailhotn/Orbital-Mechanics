@@ -23,6 +23,10 @@ tic
 oeN = eci2oe(X1.',[],primary,'me');
 oeN(6,:) = unwrap(oeN(6,:)*pi/180)*180/pi - sqrt(primary.mu./oeN(1,:).^3).*t*180/pi;
 stableTime = toc;
+ra = oeN(1,:).*(1+oeN(2,:));
+rp = oeN(1,:).*(1-oeN(2,:));
+oeN(1,:) = ra;
+oeN(2,:) = rp;
 % lan1 = oeN(5,:) + oeN(6,:)+oeN(4,:);
 % oeN(6,:) = lan1;
 
@@ -51,6 +55,10 @@ fourTime = toc;
 xF = oe2eci(oeF,Earth,'me');
 % oeF(6,:) = me2ta(oeF(6,:),oeF(2,:));
 oeF(6,:) = oeF(6,:) - sqrt(primary.mu./oeF(1,:).^3).*t*180/pi;
+ra = oeF(1,:).*(1+oeF(2,:));
+rp = oeF(1,:).*(1-oeF(2,:));
+oeF(1,:) = ra;
+oeF(2,:) = rp;
 % lanF = oeF(5,:) + oeF(6,:)+ oeF(4,:);
 % oeF(6,:) = lanF;
 
@@ -61,13 +69,20 @@ oeA = oeA.';
 singleTime = toc;
 xA = oe2eci(oeA,Earth,'me');
 oeA(6,:) = oeA(6,:) - sqrt(primary.mu./oeA(1,:).^3).*t*180/pi;
+ra = oeA(1,:).*(1+oeA(2,:));
+rp = oeA(1,:).*(1-oeA(2,:));
+oeA(1,:) = ra;
+oeA(2,:) = rp;
 %% Import Stela Data
 oeS = importdata('G:\My Drive\Doc Data\Stela 3B Sims\MolSimIcrf.mat').';
 xS = oe2eci(oeS,Earth,'me');
 xS(:,end) = nan(6,1);
 oeS(6,:) = unwrap(oeS(6,:)*pi/180)*180/pi - sqrt(primary.mu./oeS(1,:).^3).*t*180/pi;
 oeS(6,end) = nan; % weird outlier
-
+ra = oeS(1,:).*(1+oeS(2,:));
+rp = oeS(1,:).*(1-oeS(2,:));
+oeS(1,:) = ra;
+oeS(2,:) = rp;
 %% Calculate relative errors - Molniya
 errA = abs(oeA-oeN);
 errS = abs(oeS-oeN);
@@ -83,6 +98,8 @@ meanErrFMol = trapz(t,errF,2)/t(end)
 meanErrSMol = trapz(t,errA,2)/t(end)
 meanErrStelaMol = trapz(t,errS,2)/t(end)
 molTimes = [stableTime,fourTime,singleTime]
+
+%% RMS Errors
 %% Plot Molniya
 % plot elements
 lWidth = 1.5;
@@ -187,6 +204,10 @@ oeN(6,:) = unwrap(oeN(6,:)*pi/180)*180/pi - sqrt(primary.mu./oeN(1,:).^3).*t*180
 stableTime = toc;
 lanN = oeN(5,:) + oeN(6,:)+oeN(4,:);
 oeN(4,:) = lanN;
+ra = oeN(1,:).*(1+oeN(2,:));
+rp = oeN(1,:).*(1-oeN(2,:));
+oeN(1,:) = ra;
+oeN(2,:) = rp;
 
 % Prop using Fourier solution
 tic
@@ -197,6 +218,10 @@ xF = oe2eci(oeF,Earth,'me');
 oeF(6,:) = oeF(6,:) - sqrt(primary.mu./oeF(1,:).^3).*t*180/pi;
 lanF = oeF(5,:) + oeF(6,:)+ oeF(4,:);
 oeF(4,:) = lanF;
+ra = oeF(1,:).*(1+oeF(2,:));
+rp = oeF(1,:).*(1-oeF(2,:));
+oeF(1,:) = ra;
+oeF(2,:) = rp;
 
 % Prop using singly averaged
 tic
@@ -207,6 +232,10 @@ xA = oe2eci(oeA,Earth,'me');
 oeA(6,:) = oeA(6,:) - sqrt(primary.mu./oeA(1,:).^3).*t*180/pi;
 lanA =  oeA(5,:) + oeA(6,:) + oeA(4,:);
 oeA(4,:) = lanA;
+ra = oeA(1,:).*(1+oeA(2,:));
+rp = oeA(1,:).*(1-oeA(2,:));
+oeA(1,:) = ra;
+oeA(2,:) = rp;
 %% Import Stela Data
 oeS = importdata('G:\My Drive\Doc Data\Stela 3B Sims\GeoSimIcrf.mat').';
 xS = oe2eci(oeS,Earth,'me');
@@ -215,6 +244,10 @@ oeS(6,:) = unwrap(oeS(6,:)*pi/180)*180/pi - sqrt(primary.mu./oeS(1,:).^3).*t*180
 lanS = oeS(5,:) + oeS(6,:)+oeS(4,:);
 lanS(end) = nan; % weird outlier
 oeS(4,:) = lanS;
+ra = oeS(1,:).*(1+oeS(2,:));
+rp = oeS(1,:).*(1-oeS(2,:));
+oeS(1,:) = ra;
+oeS(2,:) = rp;
 %% Calculate relative errors - GEO
 errA = abs(oeA-oeN);
 errS = abs(oeS-oeN);
