@@ -31,3 +31,8 @@ nexttile
 plot(t,oeM(5,:),t,oeFit(5,:))
 nexttile
 plot(t,unwrap(oeM(6,:)+oeM(5,:)),t,unwrap(oeFit(6,:)+oeFit(5,:)))
+%% Cubic spline
+j0 = juliandate(1999,1,1);
+j1 = juliandate(2001,1,1);
+tJ = linspace(j0,j1,1000).';
+[rM, vM] = planetEphemeris(tJ,primary.name,third.name);

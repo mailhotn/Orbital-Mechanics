@@ -95,11 +95,15 @@ vF = vecnorm((xF(4:6,:)-X1(:,4:6).'),2,1);
 vA = vecnorm((xA(4:6,:)-X1(:,4:6).'),2,1);
 vS = vecnorm((xS(4:6,:)-X1(:,4:6).'),2,1);
 meanErrFMol = trapz(t,errF,2)/t(end)
-meanErrSMol = trapz(t,errA,2)/t(end)
-meanErrStelaMol = trapz(t,errS,2)/t(end)
+meanErrAMol = trapz(t,errA,2)/t(end)
+meanErrSMol = trapz(t,errS,2)/t(end)
 molTimes = [stableTime,fourTime,singleTime]
 
 %% RMS Errors
+rmsA = vecnorm(errA,2,2)/length(t)
+rmsF = vecnorm(errF,2,2)/length(t)
+rmsS = vecnorm(errS,2,2)/length(t)
+
 %% Plot Molniya
 % plot elements
 lWidth = 1.5;
